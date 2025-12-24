@@ -1,0 +1,42 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+enum SubscriptionType {
+  NONE
+  TRIAL
+  ANNUAL
+}
+
+model User {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  email            String           @unique
+  password         String
+  plan             Plan             @default(FREE)
+  subscriptionType SubscriptionType @default(NONE)
+  planExpiry       DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  resumes          Resume[]
+}
+
+model Resume {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  templateId String   @default("modern")
+  userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id])
+  data       Json     // Stores the entire resume state (personal info, sections, etc.)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
