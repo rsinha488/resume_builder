@@ -10,9 +10,9 @@ export const convertToPlainText = (data: ResumeState): string => {
     if (personalInfo.website) text += `${personalInfo.website}\n`;
     text += `\nSUMMARY\n${personalInfo.summary}\n\n`;
 
-    if (experiences.length > 0) {
+    if (experiences?.length > 0) {
         text += `EXPERIENCE\n`;
-        experiences.forEach((exp) => {
+        experiences?.forEach((exp) => {
             text += `${exp.position} | ${exp.company}\n`;
             text += `${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}\n`;
             text += `${exp.description}\n\n`;

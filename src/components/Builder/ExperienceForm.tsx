@@ -23,7 +23,7 @@ export default function ExperienceForm() {
     };
 
     const handleChange = (id: string, field: keyof Experience, value: any) => {
-        const exp = experiences.find(e => e.id === id);
+        const exp = experiences?.find(e => e.id === id);
         if (exp) {
             dispatch(updateExperience({ ...exp, [field]: value }));
         }
@@ -31,7 +31,7 @@ export default function ExperienceForm() {
 
     return (
         <div className="space-y-8">
-            {experiences.map((exp, index) => (
+            {experiences?.map((exp, index) => (
                 <div key={exp.id} className="p-6 border border-gray-200 rounded-xl relative group bg-gray-50/50">
                     <button
                         onClick={() => dispatch(removeExperience(exp.id))}

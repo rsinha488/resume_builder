@@ -11,14 +11,14 @@ export default function SkillsForm() {
 
     const handleAdd = (e: React.FormEvent) => {
         e.preventDefault();
-        if (newSkill.trim() && !skills.includes(newSkill.trim())) {
+        if (newSkill.trim() && !skills?.includes(newSkill.trim())) {
             dispatch(updateSkills([...skills, newSkill.trim()]));
             setNewSkill('');
         }
     };
 
     const handleRemove = (skillToRemove: string) => {
-        dispatch(updateSkills(skills.filter(s => s !== skillToRemove)));
+        dispatch(updateSkills(skills?.filter(s => s !== skillToRemove)));
     };
 
     return (
@@ -40,7 +40,7 @@ export default function SkillsForm() {
             </form>
 
             <div className="flex flex-wrap gap-3">
-                {skills.map((skill) => (
+                {skills?.map((skill) => (
                     <span
                         key={skill}
                         className="inline-flex items-center px-4 py-2 rounded-full bg-primary-50 text-primary-700 text-sm font-semibold border border-primary-100 group"
@@ -56,7 +56,7 @@ export default function SkillsForm() {
                 ))}
             </div>
 
-            {skills.length === 0 && (
+            {skills?.length === 0 && (
                 <p className="text-center text-gray-500 py-8 italic">
                     No skills added yet. Add your top skills to stand out!
                 </p>

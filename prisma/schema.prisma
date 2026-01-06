@@ -28,6 +28,7 @@ model User {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   resumes          Resume[]
+  coverLetters     CoverLetter[]
 }
 
 model Resume {
@@ -37,6 +38,17 @@ model Resume {
   userId     String   @db.ObjectId
   user       User     @relation(fields: [userId], references: [id])
   data       Json     // Stores the entire resume state (personal info, sections, etc.)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model CoverLetter {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  templateId String   @default("modern")
+  userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id])
+  data       Json     // Stores recipient info, content, etc.
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

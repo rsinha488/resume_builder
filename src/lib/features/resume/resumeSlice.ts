@@ -44,6 +44,10 @@ export interface ResumeState {
     skills: string[];
     themeColor: string;
     fontFamily: string;
+    fontSize: 'small' | 'medium' | 'large';
+    lineSpacing: number;
+    sectionSpacing: number;
+    margins: number;
 }
 
 const initialState: ResumeState = {
@@ -63,6 +67,10 @@ const initialState: ResumeState = {
     skills: [],
     themeColor: '#2563eb',
     fontFamily: 'Inter',
+    fontSize: 'medium',
+    lineSpacing: 1.15,
+    sectionSpacing: 24,
+    margins: 60,
 };
 
 export const resumeSlice = createSlice({
@@ -79,14 +87,14 @@ export const resumeSlice = createSlice({
             state.personalInfo = { ...state.personalInfo, ...action.payload };
         },
         addExperience: (state, action: PayloadAction<Experience>) => {
-            state.experiences.push(action.payload);
+            state.experiences?.push(action.payload);
         },
         updateExperience: (state, action: PayloadAction<Experience>) => {
-            const index = state.experiences.findIndex(exp => exp.id === action.payload.id);
+            const index = state.experiences?.findIndex(exp => exp.id === action.payload.id);
             if (index !== -1) state.experiences[index] = action.payload;
         },
         removeExperience: (state, action: PayloadAction<string>) => {
-            state.experiences = state.experiences.filter(exp => exp.id !== action.payload);
+            state.experiences = state.experiences?.filter(exp => exp.id !== action.payload);
         },
         addEducation: (state, action: PayloadAction<Education>) => {
             state.education.push(action.payload);
@@ -107,6 +115,18 @@ export const resumeSlice = createSlice({
         updateFontFamily: (state, action: PayloadAction<string>) => {
             state.fontFamily = action.payload;
         },
+        updateFontSize: (state, action: PayloadAction<'small' | 'medium' | 'large'>) => {
+            state.fontSize = action.payload;
+        },
+        updateLineSpacing: (state, action: PayloadAction<number>) => {
+            state.lineSpacing = action.payload;
+        },
+        updateSectionSpacing: (state, action: PayloadAction<number>) => {
+            state.sectionSpacing = action.payload;
+        },
+        updateMargins: (state, action: PayloadAction<number>) => {
+            state.margins = action.payload;
+        },
         resetResume: () => initialState,
     },
 });
@@ -124,6 +144,10 @@ export const {
     updateSkills,
     updateThemeColor,
     updateFontFamily,
+    updateFontSize,
+    updateLineSpacing,
+    updateSectionSpacing,
+    updateMargins,
     resetResume
 } = resumeSlice.actions;
 

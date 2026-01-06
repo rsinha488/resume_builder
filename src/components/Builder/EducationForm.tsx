@@ -24,7 +24,7 @@ export default function EducationForm() {
     };
 
     const handleChange = (id: string, field: keyof Education, value: any) => {
-        const edu = education.find(e => e.id === id);
+        const edu = education?.find(e => e.id === id);
         if (edu) {
             dispatch(updateEducation({ ...edu, [field]: value }));
         }
@@ -32,7 +32,7 @@ export default function EducationForm() {
 
     return (
         <div className="space-y-8">
-            {education.map((edu, index) => (
+            {education?.map((edu, index) => (
                 <div key={edu.id} className="p-6 border border-gray-200 rounded-xl relative group bg-gray-50/50">
                     <button
                         onClick={() => dispatch(removeEducation(edu.id))}

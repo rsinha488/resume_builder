@@ -40,8 +40,8 @@ export default function PersonalInfoForm() {
             <div className="flex flex-col items-center mb-8">
                 <div className="relative group">
                     <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-md relative">
-                        {personalInfo.avatarUrl ? (
-                            <img src={personalInfo.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                        {personalInfo?.avatarUrl ? (
+                            <img src={personalInfo?.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-gray-400">
                                 <FaCamera size={32} />
@@ -67,7 +67,7 @@ export default function PersonalInfoForm() {
                     <input
                         type="text"
                         name="fullName"
-                        value={personalInfo.fullName}
+                        value={personalInfo?.fullName}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="John Doe"
@@ -78,7 +78,7 @@ export default function PersonalInfoForm() {
                     <input
                         type="text"
                         name="jobTitle"
-                        value={personalInfo.jobTitle}
+                        value={personalInfo?.jobTitle}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="Software Engineer"
@@ -89,7 +89,7 @@ export default function PersonalInfoForm() {
                     <input
                         type="email"
                         name="email"
-                        value={personalInfo.email}
+                        value={personalInfo?.email}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="john@example.com"
@@ -100,7 +100,7 @@ export default function PersonalInfoForm() {
                     <input
                         type="text"
                         name="phone"
-                        value={personalInfo.phone}
+                        value={personalInfo?.phone}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="+1 234 567 890"
@@ -111,7 +111,7 @@ export default function PersonalInfoForm() {
                     <input
                         type="text"
                         name="address"
-                        value={personalInfo.address}
+                        value={personalInfo?.address}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="New York, USA"
@@ -122,7 +122,7 @@ export default function PersonalInfoForm() {
                     <input
                         type="text"
                         name="website"
-                        value={personalInfo.website}
+                        value={personalInfo?.website}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="https://johndoe.com"
@@ -133,7 +133,7 @@ export default function PersonalInfoForm() {
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Professional Summary</label>
                 <textarea
                     name="summary"
-                    value={personalInfo.summary}
+                    value={personalInfo?.summary}
                     onChange={handleChange}
                     rows={4}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none"

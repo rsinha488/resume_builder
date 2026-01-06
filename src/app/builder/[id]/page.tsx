@@ -9,17 +9,20 @@ import ExperienceForm from '@/components/Builder/ExperienceForm';
 import EducationForm from '@/components/Builder/EducationForm';
 import SkillsForm from '@/components/Builder/SkillsForm';
 import TemplateSelector from '@/components/Builder/TemplateSelector';
-import CustomizationSidebar from '@/components/Builder/CustomizationSidebar';
+import ThemeSelector from '@/components/Builder/ThemeSelector';
 import ResumePreview from '@/components/Builder/ResumePreview';
+import AtsScoreDisplay from '@/components/Builder/AtsScoreDisplay';
 import { ResumePDF } from '@/components/Builder/ResumePDF';
 import UpgradeModal from '@/components/UpgradeModal';
+import BuilderSidebar from '@/components/Builder/BuilderSidebar';
+import BuilderBottomBar from '@/components/Builder/BuilderBottomBar';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import { FaSave, FaChevronLeft, FaChevronRight, FaDownload, FaCrown, FaFileAlt, FaPalette } from 'react-icons/fa';
+import { FaDownload, FaCrown, FaFileAlt } from 'react-icons/fa';
 import { convertToPlainText } from '@/lib/utils';
 
-const steps = [
-    { id: 'templates', title: 'Choose Template' },
-    { id: 'design', title: 'Design & Colors' },
+type BuilderMode = 'templates' | 'design' | 'content' | 'analysis';
+
+const contentSteps = [
     { id: 'personal', title: 'Personal Info' },
     { id: 'experience', title: 'Experience' },
     { id: 'education', title: 'Education' },
@@ -32,7 +35,8 @@ export default function BuilderPage() {
     const dispatch = useAppDispatch();
     const resume = useAppSelector((state) => state.resume);
 
-    const [currentStep, setCurrentStep] = useState(0);
+    const [currentMode, setCurrentMode] = useState<BuilderMode>('templates');
+    const [currentContentStep, setCurrentContentStep] = useState(0);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [userPlan, setUserPlan] = useState<'FREE' | 'PRO'>('FREE');
@@ -47,13 +51,11 @@ export default function BuilderPage() {
             }
 
             try {
-                // Fetch Resume
                 const resumeRes = await axios.get(`/api/resumes/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 dispatch(setResume(resumeRes.data.data));
 
-                // Fetch User Plan
                 const planRes = await axios.get('/api/user/plan', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -74,7 +76,7 @@ export default function BuilderPage() {
         const token = localStorage.getItem('token');
         try {
             await axios.put(`/api/resumes/${id}`, {
-                title: resume.personalInfo.fullName || 'My Resume',
+                title: resume.personalInfo?.fullName || 'My Resume',
                 data: resume
             }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -88,153 +90,181 @@ export default function BuilderPage() {
         }
     };
 
+    const handleNext = () => {
+        if (currentMode === 'templates') setCurrentMode('design');
+        else if (currentMode === 'design') setCurrentMode('content');
+        else if (currentMode === 'content') {
+            if (currentContentStep < contentSteps.length - 1) {
+                setCurrentContentStep(prev => prev + 1);
+            } else {
+                setCurrentMode('analysis');
+            }
+        }
+    };
+
+    const handleBack = () => {
+        if (currentMode === 'analysis') setCurrentMode('content');
+        else if (currentMode === 'content') {
+            if (currentContentStep > 0) {
+                setCurrentContentStep(prev => prev - 1);
+            } else {
+                setCurrentMode('design');
+            }
+        }
+        else if (currentMode === 'design') setCurrentMode('templates');
+    };
+
     const handleDownloadTxt = () => {
         const text = convertToPlainText(resume);
         const blob = new Blob([text], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${resume.personalInfo.fullName || 'resume'}.txt`;
+        link.download = `${resume.personalInfo?.fullName || 'resume'}.txt`;
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        link.remove();
         URL.revokeObjectURL(url);
     };
 
     const handleDownloadDocx = () => {
-        // Simulated DOCX download
         const text = convertToPlainText(resume);
         const blob = new Blob([text], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${resume.personalInfo.fullName || 'resume'}.docx`;
+        link.download = `${resume.personalInfo?.fullName || 'resume'}.docx`;
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        link.remove();
         URL.revokeObjectURL(url);
     };
 
     if (loading) return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
         </div>
     );
 
     return (
-        <div className="min-h-[calc(100vh-72px)] bg-gray-50 flex flex-col lg:flex-row">
-            {/* Editor Sidebar */}
-            <div className="w-full lg:w-1/2 p-6 lg:p-12 overflow-y-auto max-h-[calc(100vh-72px)]">
-                <div className="max-w-2xl mx-auto">
-                    <div className="flex justify-between items-center mb-8">
-                        <h1 className="text-2xl font-bold text-gray-900">{steps[currentStep].title}</h1>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={handleDownloadTxt}
-                                className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors shadow-sm"
-                                title="Download as Plain Text (Free)"
-                            >
-                                <FaFileAlt className="mr-2" /> .TXT
-                            </button>
-                            {userPlan === 'PRO' ? (
-                                <>
-                                    <button
-                                        onClick={handleDownloadDocx}
-                                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors shadow-sm"
-                                        title="Download as Word Document (Pro)"
-                                    >
-                                        <FaFileAlt className="mr-2" /> .DOCX
-                                    </button>
-                                    <PDFDownloadLink
-                                        document={<ResumePDF data={resume} />}
-                                        fileName={`${resume.personalInfo.fullName || 'resume'}.pdf`}
-                                        className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors shadow-sm"
-                                    >
-                                        {({ loading }) => (
-                                            <>
-                                                <FaDownload className="mr-2" /> {loading ? 'Preparing...' : 'Download PDF'}
-                                            </>
-                                        )}
-                                    </PDFDownloadLink>
-                                </>
-                            ) : (
-                                <button
-                                    onClick={() => setIsUpgradeModalOpen(true)}
-                                    className="inline-flex items-center px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors shadow-sm"
-                                >
-                                    <FaCrown className="mr-2" /> Upgrade to Download
-                                </button>
-                            )}
-                            <button
-                                onClick={handleSave}
-                                disabled={saving}
-                                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors shadow-sm"
-                            >
-                                <FaSave className="mr-2" /> {saving ? 'Saving...' : 'Save'}
-                            </button>
-                        </div>
+        <div className="h-screen bg-gray-50 flex overflow-hidden">
+            <BuilderSidebar
+                currentMode={currentMode}
+                onModeChange={(mode) => {
+                    setCurrentMode(mode);
+                    if (mode === 'content') setCurrentContentStep(0);
+                }}
+            />
+
+            <main className="flex-1 flex flex-col relative overflow-hidden">
+                {/* Header Actions */}
+                <header className="h-16 bg-white border-b border-gray-200 px-8 flex justify-between items-center z-10">
+                    <div className="flex items-center gap-4">
+                        <h1 className="text-lg font-bold text-gray-900">
+                            {currentMode === 'content' ? contentSteps[currentContentStep].title : currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}
+                        </h1>
                     </div>
 
-                    {/* Stepper */}
-                    <div className="flex mb-8 gap-2">
-                        {steps.map((step, index) => (
-                            <div
-                                key={step.id}
-                                className={`h-2 flex-1 rounded-full transition-colors ${index <= currentStep ? 'bg-primary-600' : 'bg-gray-200'
-                                    }`}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Form Content */}
-                    <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-8">
-                        {currentStep === 0 && (
-                            <TemplateSelector
-                                userPlan={userPlan}
-                                onUpgradeRequired={() => setIsUpgradeModalOpen(true)}
-                            />
-                        )}
-                        {currentStep === 1 && <CustomizationSidebar />}
-                        {currentStep === 2 && <PersonalInfoForm />}
-                        {currentStep === 3 && <ExperienceForm />}
-                        {currentStep === 4 && <EducationForm />}
-                        {currentStep === 5 && <SkillsForm />}
-                    </div>
-
-                    {/* Navigation Buttons */}
-                    <div className="flex justify-between">
+                    <div className="flex gap-3">
                         <button
-                            onClick={() => setCurrentStep(prev => Math.max(0, prev - 1))}
-                            disabled={currentStep === 0}
-                            className="inline-flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-all font-medium"
+                            onClick={handleDownloadTxt}
+                            className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
                         >
-                            <FaChevronLeft className="mr-2" /> Previous
+                            <FaFileAlt className="mr-2" /> .TXT
                         </button>
-                        {currentStep < steps.length - 1 ? (
-                            <button
-                                onClick={() => setCurrentStep(prev => Math.min(steps.length - 1, prev + 1))}
-                                className="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all font-medium shadow-md"
-                            >
-                                Next <FaChevronRight className="ml-2" />
-                            </button>
+                        {userPlan === 'PRO' ? (
+                            <>
+                                <button
+                                    onClick={handleDownloadDocx}
+                                    className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                >
+                                    <FaFileAlt className="mr-2" /> .DOCX
+                                </button>
+                                <PDFDownloadLink
+                                    document={<ResumePDF data={resume} />}
+                                    fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
+                                    className="inline-flex items-center px-3 py-1.5 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+                                >
+                                    {({ loading }) => (
+                                        <>
+                                            <FaDownload className="mr-2" /> {loading ? '...' : 'PDF'}
+                                        </>
+                                    )}
+                                </PDFDownloadLink>
+                            </>
                         ) : (
                             <button
-                                onClick={handleSave}
-                                className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all font-medium shadow-md"
+                                onClick={() => setIsUpgradeModalOpen(true)}
+                                className="inline-flex items-center px-3 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors"
                             >
-                                Finish & Save
+                                <FaCrown className="mr-2" /> Upgrade
                             </button>
                         )}
                     </div>
+                </header>
+
+                {/* Editor Area */}
+                <div className="flex-1 overflow-y-auto pb-24 p-8">
+                    <div className="max-w-3xl mx-auto">
+                        {currentMode === 'content' && (
+                            <div className="flex mb-8 gap-4 overflow-x-auto pb-2">
+                                {contentSteps.map((step, index) => (
+                                    <button
+                                        key={step.id}
+                                        onClick={() => setCurrentContentStep(index)}
+                                        className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${index === currentContentStep
+                                            ? 'bg-primary-600 text-white shadow-md'
+                                            : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
+                                            }`}
+                                    >
+                                        {step.title}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                            {currentMode === 'templates' && (
+                                <TemplateSelector
+                                    userPlan={userPlan}
+                                    onUpgradeRequired={() => setIsUpgradeModalOpen(true)}
+                                />
+                            )}
+                            {currentMode === 'design' && (
+                                <ThemeSelector
+                                    userPlan={userPlan}
+                                    onUpgrade={() => setIsUpgradeModalOpen(true)}
+                                />
+                            )}
+                            {currentMode === 'content' && (
+                                <>
+                                    {currentContentStep === 0 && <PersonalInfoForm />}
+                                    {currentContentStep === 1 && <ExperienceForm />}
+                                    {currentContentStep === 2 && <EducationForm />}
+                                    {currentContentStep === 3 && <SkillsForm />}
+                                </>
+                            )}
+                            {currentMode === 'analysis' && <AtsScoreDisplay />}
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <BuilderBottomBar
+                    onBack={handleBack}
+                    onNext={handleNext}
+                    onSave={handleSave}
+                    isFirstStep={currentMode === 'templates'}
+                    isLastStep={currentMode === 'analysis'}
+                    saving={saving}
+                />
+            </main>
 
             {/* Preview Section */}
-            <div className="w-full lg:w-1/2 bg-gray-200 p-6 lg:p-12 overflow-y-auto max-h-[calc(100vh-72px)] hidden lg:block">
-                <div className="sticky top-0">
+            <aside className="hidden xl:block w-[45%] bg-gray-200 overflow-y-auto p-12 border-l border-gray-300">
+                <div className="scale-[0.85] origin-top transform transition-transform duration-300">
                     <ResumePreview />
                 </div>
-            </div>
+            </aside>
 
             <UpgradeModal
                 isOpen={isUpgradeModalOpen}
