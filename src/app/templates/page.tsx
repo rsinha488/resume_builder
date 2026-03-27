@@ -71,8 +71,14 @@ export default function TemplatesPage() {
                         >
                             {/* Template Preview Area */}
                             <div className="aspect-[3/4] bg-gray-100 relative overflow-hidden border-b border-gray-100">
-                                <div className="absolute inset-0 flex flex-col items-center p-8">
-                                    <div className="w-[210mm] min-h-[297mm] transform scale-[0.18] origin-top shadow-2xl border border-gray-200 bg-white transition-transform duration-500 group-hover:scale-[0.20]">
+                                <div className="absolute inset-0 overflow-hidden flex items-start justify-center pt-14">
+                                    <div style={{
+                                        width: '794px',
+                                        minHeight: '1123px',
+                                        transform: 'scale(0.30)',
+                                        transformOrigin: 'top center',
+                                        flexShrink: 0,
+                                    }}>
                                         <ResumePreview templateId={template.id} />
                                     </div>
                                 </div>

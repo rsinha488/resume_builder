@@ -2,32 +2,63 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { FaEllipsisV, FaEdit, FaTrash, FaCopy, FaDownload, FaFileAlt } from 'react-icons/fa';
+import ResumePreview from '@/components/Builder/ResumePreview';
+import ConfirmModal from '@/components/ConfirmModal';
 
 interface DocumentCardProps {
     readonly id: string;
     readonly title: string;
     readonly updatedAt: string;
     readonly type: 'resume' | 'coverLetter';
+    readonly templateId?: string;
+    readonly resumeData?: any;
     readonly onDelete: (id: string) => void;
+    readonly onDuplicate: (id: string) => void;
+    readonly onDownload: (id: string) => void;
 }
 
-export default function DocumentCard({ id, title, updatedAt, type, onDelete }: DocumentCardProps) {
+export default function DocumentCard({ id, title, updatedAt, type, templateId, resumeData, onDelete, onDuplicate, onDownload }: DocumentCardProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const editUrl = type === 'resume' ? `/builder/${id}` : `/cover-letter/${id}`;
 
     return (
-        <div className="group relative bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl hover:border-primary-200 transition-all duration-300 overflow-hidden flex flex-col">
-            {/* Preview Placeholder */}
-            <Link href={editUrl} className="aspect-[3/4] bg-gray-50 flex items-center justify-center p-12 group-hover:bg-primary-50/30 transition-colors">
-                <div className="relative">
-                    <FaFileAlt className="h-32 w-32 text-gray-200 group-hover:text-primary-100 transition-colors duration-300" />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg">
-                            Edit {type === 'resume' ? 'Resume' : 'Letter'}
-                        </span>
+        <div className="group relative bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl hover:border-primary-200 transition-all duration-300 flex flex-col">
+            {/* Preview */}
+            <Link href={editUrl} className="aspect-[3/4] bg-gray-100 relative overflow-hidden block rounded-t-2xl">
+                {templateId && resumeData ? (
+                    <>
+                        <div className="absolute inset-0 overflow-hidden flex items-start justify-center pt-2">
+                            <div style={{
+                                width: '794px',
+                                minHeight: '1123px',
+                                transform: 'scale(0.27)',
+                                transformOrigin: 'top center',
+                                flexShrink: 0,
+                                pointerEvents: 'none',
+                            }}>
+                                <ResumePreview templateId={templateId} data={{ ...resumeData, templateId }} />
+                            </div>
+                        </div>
+                        <div className="absolute inset-0 bg-primary-600/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span className="bg-white text-primary-600 px-4 py-2 rounded-lg text-sm font-bold shadow-lg">
+                                Edit {type === 'resume' ? 'Resume' : 'Letter'}
+                            </span>
+                        </div>
+                    </>
+                ) : (
+                    <div className="absolute inset-0 flex items-center justify-center p-12 group-hover:bg-primary-50/30 transition-colors">
+                        <div className="relative">
+                            <FaFileAlt className="h-32 w-32 text-gray-200 group-hover:text-primary-100 transition-colors duration-300" />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg">
+                                    Edit {type === 'resume' ? 'Resume' : 'Letter'}
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
             </Link>
 
             {/* Content */}
@@ -62,19 +93,19 @@ export default function DocumentCard({ id, title, updatedAt, type, onDelete }: D
                                     </Link>
                                     <button
                                         className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                                        onClick={() => { /* TODO: Implement Duplicate */ setIsMenuOpen(false); }}
+                                        onClick={() => { onDuplicate(id); setIsMenuOpen(false); }}
                                     >
                                         <FaCopy className="text-gray-400" /> Duplicate
                                     </button>
                                     <button
                                         className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                                        onClick={() => { /* TODO: Implement Download */ setIsMenuOpen(false); }}
+                                        onClick={() => { onDownload(id); setIsMenuOpen(false); }}
                                     >
                                         <FaDownload className="text-gray-400" /> Download
                                     </button>
                                     <div className="h-px bg-gray-100 my-1" />
                                     <button
-                                        onClick={() => { onDelete(id); setIsMenuOpen(false); }}
+                                        onClick={() => { setShowConfirm(true); setIsMenuOpen(false); }}
                                         className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                                     >
                                         <FaTrash /> Delete
@@ -89,6 +120,15 @@ export default function DocumentCard({ id, title, updatedAt, type, onDelete }: D
                     Updated {new Date(updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
             </div>
+
+            <ConfirmModal
+                isOpen={showConfirm}
+                title={`Delete ${type === 'resume' ? 'Resume' : 'Cover Letter'}`}
+                message={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
+                confirmLabel="Delete"
+                onConfirm={() => { onDelete(id); setShowConfirm(false); }}
+                onCancel={() => setShowConfirm(false)}
+            />
         </div>
     );
 }

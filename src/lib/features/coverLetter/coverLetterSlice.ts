@@ -58,7 +58,16 @@ export const coverLetterSlice = createSlice({
     initialState,
     reducers: {
         setCoverLetter: (state, action: PayloadAction<CoverLetterState>) => {
-            return { ...action.payload, templateId: action.payload.templateId || 'modern' };
+            return {
+                ...action.payload,
+                templateId: action.payload.templateId || 'modern',
+                personalInfo: action.payload.personalInfo ?? initialState.personalInfo,
+                recipientInfo: action.payload.recipientInfo ?? initialState.recipientInfo,
+                content: action.payload.content ?? initialState.content,
+                themeColor: action.payload.themeColor ?? initialState.themeColor,
+                fontFamily: action.payload.fontFamily ?? initialState.fontFamily,
+                date: action.payload.date ?? initialState.date,
+            };
         },
         updateTemplate: (state, action: PayloadAction<string>) => {
             state.templateId = action.payload;

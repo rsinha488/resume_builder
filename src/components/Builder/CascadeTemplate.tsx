@@ -42,7 +42,7 @@ export default function CascadeTemplate({ data }: { readonly data: ResumeState }
                 {/* Avatar */}
                 {personalInfo?.avatarUrl && (
                     <div className="w-full aspect-square rounded-full border-4 border-white/20 overflow-hidden shadow-2xl">
-                        <img src={personalInfo.avatarUrl} alt={personalInfo?.fullName || 'Profile'} className="w-full h-full object-cover" />
+                        <img src={personalInfo.avatarUrl} alt={personalInfo?.fullName || 'Profile'} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }} />
                     </div>
                 )}
 

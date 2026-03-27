@@ -68,7 +68,7 @@ export default function ModernTemplate({ data }: { readonly data: ResumeState })
 
                 {personalInfo?.avatarUrl && (
                     <div className="ml-8 w-32 h-32 rounded-lg overflow-hidden border-2 border-gray-100 shadow-sm">
-                        <img src={personalInfo.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                        <img src={personalInfo.avatarUrl} alt="Profile" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }} />
                     </div>
                 )}
             </header>

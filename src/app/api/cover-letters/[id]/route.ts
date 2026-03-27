@@ -4,7 +4,7 @@ import { getUserFromRequest } from '@/lib/auth';
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const user = getUserFromRequest(request);
@@ -12,14 +12,10 @@ export async function GET(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const coverLetter = await prisma.coverLetter.findUnique({
-            where: {
-                id: params.id,
-                userId: user.userId,
-            },
-        });
+        const { id } = await params;
+        const coverLetter = await prisma.coverLetter.findUnique({ where: { id } });
 
-        if (!coverLetter) {
+        if (!coverLetter || coverLetter.userId !== user.userId) {
             return NextResponse.json({ error: 'Cover letter not found' }, { status: 404 });
         }
 
@@ -35,7 +31,7 @@ export async function GET(
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const user = getUserFromRequest(request);
@@ -43,13 +39,16 @@ export async function PUT(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const { id } = await params;
         const { title, data } = await request.json();
 
+        const existing = await prisma.coverLetter.findUnique({ where: { id } });
+        if (!existing || existing.userId !== user.userId) {
+            return NextResponse.json({ error: 'Cover letter not found' }, { status: 404 });
+        }
+
         const coverLetter = await prisma.coverLetter.update({
-            where: {
-                id: params.id,
-                userId: user.userId,
-            },
+            where: { id },
             data: {
                 title: title || 'Untitled Cover Letter',
                 templateId: data?.templateId || 'modern',
@@ -69,7 +68,7 @@ export async function PUT(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const user = getUserFromRequest(request);
@@ -77,12 +76,13 @@ export async function DELETE(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        await prisma.coverLetter.delete({
-            where: {
-                id: params.id,
-                userId: user.userId,
-            },
-        });
+        const { id } = await params;
+        const existing = await prisma.coverLetter.findUnique({ where: { id } });
+        if (!existing || existing.userId !== user.userId) {
+            return NextResponse.json({ error: 'Cover letter not found' }, { status: 404 });
+        }
+
+        await prisma.coverLetter.delete({ where: { id } });
 
         return NextResponse.json({ message: 'Cover letter deleted successfully' });
     } catch (error) {

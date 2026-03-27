@@ -4,9 +4,12 @@ import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaPlus, FaSearch } from 'react-icons/fa';
+import { pdf } from '@react-pdf/renderer';
 import DashboardHeader from '@/components/Dashboard/DashboardHeader';
 import DocumentCard from '@/components/Dashboard/DocumentCard';
 import EmptyState from '@/components/Dashboard/EmptyState';
+import { ResumePDF } from '@/components/Builder/ResumePDF';
+import { toast } from 'sonner';
 
 export default function DashboardPage() {
     const [resumes, setResumes] = useState<any[]>([]);
@@ -90,7 +93,6 @@ export default function DashboardPage() {
     };
 
     const deleteResume = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this resume? This action cannot be undone.')) return;
         const token = localStorage.getItem('token');
         try {
             await axios.delete(`/api/resumes/${id}`, {
@@ -104,7 +106,6 @@ export default function DashboardPage() {
     };
 
     const deleteCoverLetter = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this cover letter? This action cannot be undone.')) return;
         const token = localStorage.getItem('token');
         try {
             await axios.delete(`/api/cover-letters/${id}`, {
@@ -114,6 +115,61 @@ export default function DashboardPage() {
         } catch (error) {
             console.error('Error deleting cover letter:', error);
             alert('Failed to delete cover letter.');
+        }
+    };
+
+    const duplicateResume = async (id: string) => {
+        const token = localStorage.getItem('token');
+        const original = resumes.find(r => r.id === id);
+        if (!original) return;
+        try {
+            const response = await axios.post('/api/resumes', {
+                title: `${original.title} (Copy)`,
+                data: original.data,
+            }, { headers: { Authorization: `Bearer ${token}` } });
+            setResumes([response.data, ...resumes]);
+            toast.success('Resume duplicated!');
+        } catch (error) {
+            console.error('Error duplicating resume:', error);
+            toast.error('Failed to duplicate resume.');
+        }
+    };
+
+    const duplicateCoverLetter = async (id: string) => {
+        const token = localStorage.getItem('token');
+        const original = coverLetters.find(cl => cl.id === id);
+        if (!original) return;
+        try {
+            const response = await axios.post('/api/cover-letters', {
+                title: `${original.title} (Copy)`,
+                data: original.data,
+            }, { headers: { Authorization: `Bearer ${token}` } });
+            setCoverLetters([response.data, ...coverLetters]);
+            toast.success('Cover letter duplicated!');
+        } catch (error) {
+            console.error('Error duplicating cover letter:', error);
+            toast.error('Failed to duplicate cover letter.');
+        }
+    };
+
+    const downloadResume = async (id: string) => {
+        const doc = resumes.find(r => r.id === id);
+        if (!doc) return;
+        try {
+            toast.loading('Generating PDF...');
+            const blob = await pdf(<ResumePDF data={doc.data} />).toBlob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${doc.data?.personalInfo?.fullName || doc.title}.pdf`;
+            link.click();
+            URL.revokeObjectURL(url);
+            toast.dismiss();
+            toast.success('PDF downloaded!');
+        } catch (error) {
+            console.error('Error downloading resume:', error);
+            toast.dismiss();
+            toast.error('Failed to generate PDF.');
         }
     };
 
@@ -198,7 +254,11 @@ export default function DashboardPage() {
                                 title={doc.title}
                                 updatedAt={doc.updatedAt}
                                 type={activeTab === 'resumes' ? 'resume' : 'coverLetter'}
+                                templateId={doc.templateId}
+                                resumeData={doc.data}
                                 onDelete={activeTab === 'resumes' ? deleteResume : deleteCoverLetter}
+                                onDuplicate={activeTab === 'resumes' ? duplicateResume : duplicateCoverLetter}
+                                onDownload={activeTab === 'resumes' ? downloadResume : () => toast.error('PDF download is only available for resumes.')}
                             />
                         ))}
                     </div>

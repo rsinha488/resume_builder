@@ -76,7 +76,7 @@ export default function PersonalInfoForm() {
                         id="fullName"
                         type="text"
                         name="fullName"
-                        value={personalInfo?.fullName}
+                        value={personalInfo?.fullName ?? ''}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="John Doe"
@@ -88,7 +88,7 @@ export default function PersonalInfoForm() {
                         id="jobTitle"
                         type="text"
                         name="jobTitle"
-                        value={personalInfo?.jobTitle}
+                        value={personalInfo?.jobTitle ?? ''}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="Software Engineer"
@@ -100,7 +100,7 @@ export default function PersonalInfoForm() {
                         id="email"
                         type="email"
                         name="email"
-                        value={personalInfo?.email}
+                        value={personalInfo?.email ?? ''}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="john@example.com"
@@ -112,7 +112,7 @@ export default function PersonalInfoForm() {
                         id="phone"
                         type="text"
                         name="phone"
-                        value={personalInfo?.phone}
+                        value={personalInfo?.phone ?? ''}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="+1 234 567 890"
@@ -124,7 +124,7 @@ export default function PersonalInfoForm() {
                         id="address"
                         type="text"
                         name="address"
-                        value={personalInfo?.address}
+                        value={personalInfo?.address ?? ''}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="New York, USA"
@@ -136,7 +136,7 @@ export default function PersonalInfoForm() {
                         id="website"
                         type="text"
                         name="website"
-                        value={personalInfo?.website}
+                        value={personalInfo?.website ?? ''}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                         placeholder="https://johndoe.com"
@@ -148,7 +148,7 @@ export default function PersonalInfoForm() {
                 <textarea
                     id="summary"
                     name="summary"
-                    value={personalInfo?.summary}
+                    value={personalInfo?.summary ?? ''}
                     onChange={handleChange}
                     rows={4}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none"

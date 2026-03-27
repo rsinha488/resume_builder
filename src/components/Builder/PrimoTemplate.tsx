@@ -42,7 +42,7 @@ export default function PrimoTemplate({ data }: { readonly data: ResumeState }) 
             >
                 {personalInfo?.avatarUrl && (
                     <div className="w-24 h-24 rounded-2xl border-4 border-white/30 overflow-hidden shadow-xl mb-6 mx-auto">
-                        <img src={personalInfo.avatarUrl} alt={personalInfo.fullName || 'Profile'} className="w-full h-full object-cover" />
+                        <img src={personalInfo.avatarUrl} alt={personalInfo.fullName || 'Profile'} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = 'none'; }} />
                     </div>
                 )}
 
