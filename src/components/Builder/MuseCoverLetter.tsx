@@ -2,7 +2,7 @@
 import { CoverLetterState } from '@/lib/features/coverLetter/coverLetterSlice';
 
 export default function MuseCoverLetter({ data }: { readonly data: CoverLetterState }) {
-    const { personalInfo, recipient, content, themeColor, fontFamily } = data;
+    const { personalInfo, recipientInfo, content, themeColor, fontFamily } = data;
 
     return (
         <div
@@ -34,15 +34,14 @@ export default function MuseCoverLetter({ data }: { readonly data: CoverLetterSt
                         {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                     </div>
                     <div className="space-y-1 font-serif italic text-gray-600">
-                        <h3 className="text-xl font-serif text-gray-900 not-italic font-bold">{recipient?.name || 'Hiring Manager'}</h3>
-                        <p>{recipient?.jobTitle}</p>
-                        <p className="font-bold" style={{ color: themeColor }}>{recipient?.company}</p>
-                        <p>{recipient?.address}</p>
+                        <h3 className="text-xl font-serif text-gray-900 not-italic font-bold">{recipientInfo?.hiringManagerName || 'Hiring Manager'}</h3>
+                        <p className="font-bold" style={{ color: themeColor }}>{recipientInfo?.companyName}</p>
+                        <p>{recipientInfo?.address}</p>
                     </div>
                 </div>
 
                 <div className="prose prose-sm max-w-none font-serif">
-                    <p className="font-serif italic text-gray-900 text-lg mb-8">Dear {recipient?.name || 'Hiring Manager'},</p>
+                    <p className="font-serif italic text-gray-900 text-lg mb-8">Dear {recipientInfo?.hiringManagerName || 'Hiring Manager'},</p>
                     <div className="text-gray-700 leading-relaxed whitespace-pre-line space-y-6 italic">
                         {content || 'Start writing your cover letter...'}
                     </div>

@@ -3,7 +3,7 @@ import { CoverLetterState } from '@/lib/features/coverLetter/coverLetterSlice';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaGlobe } from 'react-icons/fa';
 
 export default function VibesCoverLetter({ data }: { readonly data: CoverLetterState }) {
-    const { personalInfo, recipient, content, themeColor, fontFamily } = data;
+    const { personalInfo, recipientInfo, content, themeColor, fontFamily } = data;
 
     return (
         <div
@@ -27,7 +27,7 @@ export default function VibesCoverLetter({ data }: { readonly data: CoverLetterS
                     </div>
 
                     <div className="prose prose-sm max-w-none">
-                        <p className="font-bold text-gray-900 mb-6 text-lg">Dear {recipient?.name || 'Hiring Manager'},</p>
+                        <p className="font-bold text-gray-900 mb-6 text-lg">Dear {recipientInfo?.hiringManagerName || 'Hiring Manager'},</p>
                         <div className="text-gray-700 leading-relaxed whitespace-pre-line space-y-6">
                             {content || 'Start writing your cover letter...'}
                         </div>
@@ -44,10 +44,9 @@ export default function VibesCoverLetter({ data }: { readonly data: CoverLetterS
                 <section>
                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-6">Recipient</h3>
                     <div className="space-y-1 text-sm">
-                        <h4 className="font-bold text-gray-900">{recipient?.name || 'Hiring Manager'}</h4>
-                        <p className="text-gray-600">{recipient?.jobTitle}</p>
-                        <p className="text-gray-500 uppercase tracking-wider text-[10px] font-black">{recipient?.company}</p>
-                        <p className="text-gray-600">{recipient?.address}</p>
+                        <h4 className="font-bold text-gray-900">{recipientInfo?.hiringManagerName || 'Hiring Manager'}</h4>
+                        <p className="text-gray-500 uppercase tracking-wider text-[10px] font-black">{recipientInfo?.companyName}</p>
+                        <p className="text-gray-600">{recipientInfo?.address}</p>
                     </div>
                 </section>
 

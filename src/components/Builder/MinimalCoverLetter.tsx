@@ -2,7 +2,7 @@
 import { CoverLetterState } from '@/lib/features/coverLetter/coverLetterSlice';
 
 export default function MinimalCoverLetter({ data }: { readonly data: CoverLetterState }) {
-    const { personalInfo, recipient, content, themeColor, fontFamily } = data;
+    const { personalInfo, recipientInfo, content, themeColor, fontFamily } = data;
 
     return (
         <div
@@ -28,14 +28,14 @@ export default function MinimalCoverLetter({ data }: { readonly data: CoverLette
                         {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                     </div>
                     <div className="space-y-1">
-                        <h3 className="font-bold text-gray-900">{recipient?.name || 'Hiring Manager'}</h3>
-                        <p className="text-sm text-gray-600">{recipient?.jobTitle}</p>
-                        <p className="text-sm text-gray-600">{recipient?.company}</p>
+                        <h3 className="font-bold text-gray-900">{recipientInfo?.hiringManagerName || 'Hiring Manager'}</h3>
+                        <p className="text-sm text-gray-600">{recipientInfo?.companyName}</p>
+                        <p className="text-sm text-gray-600">{recipientInfo?.address}</p>
                     </div>
                 </div>
 
                 <div className="prose prose-sm max-w-none">
-                    <p className="font-bold text-gray-900 mb-6">Dear {recipient?.name || 'Hiring Manager'},</p>
+                    <p className="font-bold text-gray-900 mb-6">Dear {recipientInfo?.hiringManagerName || 'Hiring Manager'},</p>
                     <div className="text-gray-700 leading-relaxed whitespace-pre-line space-y-6">
                         {content || 'Start writing your cover letter...'}
                     </div>

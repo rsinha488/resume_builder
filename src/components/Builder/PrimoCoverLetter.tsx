@@ -2,7 +2,7 @@
 import { CoverLetterState } from '@/lib/features/coverLetter/coverLetterSlice';
 
 export default function PrimoCoverLetter({ data }: { readonly data: CoverLetterState }) {
-    const { personalInfo, recipient, content, themeColor, fontFamily } = data;
+    const { personalInfo, recipientInfo, content, themeColor, fontFamily } = data;
 
     return (
         <div
@@ -45,15 +45,15 @@ export default function PrimoCoverLetter({ data }: { readonly data: CoverLetterS
                     <section>
                         <h3 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">Recipient</h3>
                         <div className="space-y-1 text-sm font-bold">
-                            <p className="text-gray-900">{recipient?.name || 'Hiring Manager'}</p>
-                            <p className="text-gray-600">{recipient?.jobTitle}</p>
-                            <p style={{ color: themeColor }}>{recipient?.company}</p>
+                            <p className="text-gray-900">{recipientInfo?.hiringManagerName || 'Hiring Manager'}</p>
+                            <p style={{ color: themeColor }}>{recipientInfo?.companyName}</p>
+                            <p className="text-gray-600">{recipientInfo?.address}</p>
                         </div>
                     </section>
                 </div>
 
                 <div className="w-2/3">
-                    <p className="font-black text-gray-900 text-xl mb-8">Dear {recipient?.name || 'Hiring Manager'},</p>
+                    <p className="font-black text-gray-900 text-xl mb-8">Dear {recipientInfo?.hiringManagerName || 'Hiring Manager'},</p>
                     <div className="text-gray-700 leading-relaxed whitespace-pre-line space-y-6 text-lg">
                         {content || 'Start writing your cover letter...'}
                     </div>

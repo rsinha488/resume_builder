@@ -3,7 +3,7 @@ import { CoverLetterState } from '@/lib/features/coverLetter/coverLetterSlice';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 
 export default function InfluxCoverLetter({ data }: { readonly data: CoverLetterState }) {
-    const { personalInfo, recipient, content, themeColor, fontFamily } = data;
+    const { personalInfo, recipientInfo, content, themeColor, fontFamily } = data;
 
     return (
         <div
@@ -32,15 +32,14 @@ export default function InfluxCoverLetter({ data }: { readonly data: CoverLetter
                         {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                     </div>
                     <div className="space-y-1">
-                        <h3 className="text-xl font-black text-gray-900">{recipient?.name || 'Hiring Manager'}</h3>
-                        <p className="text-gray-600 font-bold">{recipient?.jobTitle}</p>
-                        <p className="text-gray-500 uppercase tracking-wider text-xs font-black">{recipient?.company}</p>
-                        <p className="text-gray-600">{recipient?.address}</p>
+                        <h3 className="text-xl font-black text-gray-900">{recipientInfo?.hiringManagerName || 'Hiring Manager'}</h3>
+                        <p className="text-gray-500 uppercase tracking-wider text-xs font-black">{recipientInfo?.companyName}</p>
+                        <p className="text-gray-600">{recipientInfo?.address}</p>
                     </div>
                 </div>
 
                 <div className="prose prose-sm max-w-none">
-                    <p className="font-black text-gray-900 text-lg mb-8">Dear {recipient?.name || 'Hiring Manager'},</p>
+                    <p className="font-black text-gray-900 text-lg mb-8">Dear {recipientInfo?.hiringManagerName || 'Hiring Manager'},</p>
                     <div className="text-gray-700 leading-relaxed whitespace-pre-line space-y-6">
                         {content || 'Start writing your cover letter...'}
                     </div>
