@@ -31,64 +31,63 @@ export default function PrimoTemplate({ data }: { readonly data: ResumeState }) 
                 lineHeight: lineSpacing
             }}
         >
-            {/* Bold Header */}
+            {/* Left Sidebar — 30% */}
             <div
-                className="text-white"
+                className="text-white flex-shrink-0"
                 style={{
+                    width: '30%',
                     backgroundColor: themeColor || '#2d3748',
-                    padding: `${margins || 96}px ${(margins || 96) * 0.8}px`
+                    padding: `${margins || 40}px ${(margins || 40) * 0.8}px`
                 }}
             >
-                <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                        <h1 className="text-5xl font-black tracking-tight mb-2 uppercase">
-                            {personalInfo?.fullName || 'Your Name'}
-                        </h1>
-                        <h2 className="text-2xl font-medium opacity-90 tracking-wide uppercase">
-                            {personalInfo?.jobTitle || 'Professional Title'}
-                        </h2>
+                {personalInfo?.avatarUrl && (
+                    <div className="w-24 h-24 rounded-2xl border-4 border-white/30 overflow-hidden shadow-xl mb-6 mx-auto">
+                        <img src={personalInfo.avatarUrl} alt={personalInfo.fullName || 'Profile'} className="w-full h-full object-cover" />
                     </div>
-                    {personalInfo?.avatarUrl && (
-                        <div className="w-32 h-32 rounded-2xl border-4 border-white/30 overflow-hidden shadow-xl">
-                            <img src={personalInfo.avatarUrl} alt={personalInfo.fullName || 'Profile'} className="w-full h-full object-cover" />
-                        </div>
-                    )}
-                </div>
+                )}
 
-                <div className="mt-8 flex flex-wrap gap-6 text-sm font-medium">
+                <h1 className="text-2xl font-black tracking-tight mb-1 uppercase break-words">
+                    {personalInfo?.fullName || 'Your Name'}
+                </h1>
+                <h2 className="text-sm font-medium opacity-90 tracking-wide uppercase mb-8">
+                    {personalInfo?.jobTitle || 'Professional Title'}
+                </h2>
+
+                <div className="flex flex-col gap-3 text-xs font-medium">
                     {personalInfo?.email && (
                         <div className="flex items-center gap-2">
-                            <FaEnvelope className="opacity-70" />
-                            <span>{personalInfo.email}</span>
+                            <FaEnvelope className="opacity-70 flex-shrink-0" />
+                            <span className="break-all">{personalInfo.email}</span>
                         </div>
                     )}
                     {personalInfo?.phone && (
                         <div className="flex items-center gap-2">
-                            <FaPhone className="opacity-70" />
+                            <FaPhone className="opacity-70 flex-shrink-0" />
                             <span>{personalInfo.phone}</span>
                         </div>
                     )}
                     {personalInfo?.address && (
                         <div className="flex items-center gap-2">
-                            <FaMapMarkerAlt className="opacity-70" />
+                            <FaMapMarkerAlt className="opacity-70 flex-shrink-0" />
                             <span>{personalInfo.address}</span>
                         </div>
                     )}
                     {personalInfo?.website && (
                         <div className="flex items-center gap-2">
-                            <FaGlobe className="opacity-70" />
-                            <span>{personalInfo.website}</span>
+                            <FaGlobe className="opacity-70 flex-shrink-0" />
+                            <span className="break-all">{personalInfo.website}</span>
                         </div>
                     )}
                 </div>
             </div>
 
+            {/* Right Content — 70% */}
             <div
                 className="flex-1 bg-white"
-                style={{ padding: `${margins || 96}px` }}
+                style={{ padding: `${margins || 40}px` }}
             >
                 {/* Main Content */}
-                <div style={{ gap: `${sectionSpacing}px` }} className="col-span-8 flex flex-col">
+                <div style={{ gap: `${sectionSpacing}px` }} className="flex flex-col">
                     {/* Summary */}
                     {personalInfo?.summary && (
                         <section>
@@ -137,8 +136,8 @@ export default function PrimoTemplate({ data }: { readonly data: ResumeState }) 
                     </section>
                 </div>
 
-                {/* Sidebar */}
-                <div style={{ gap: `${sectionSpacing}px` }} className="col-span-4 flex flex-col">
+                {/* Skills & Education */}
+                <div style={{ gap: `${sectionSpacing}px` }} className="flex flex-col">
                     {/* Skills */}
                     <section>
                         <h3
