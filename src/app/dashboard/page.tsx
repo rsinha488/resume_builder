@@ -36,7 +36,7 @@ export default function DashboardPage() {
                 setCoverLetters(clRes.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
-                // TODO: Add toast notification for error
+                toast.error('Failed to load documents. Please refresh the page.');
             } finally {
                 setLoading(false);
             }
@@ -65,7 +65,7 @@ export default function DashboardPage() {
             router.push(`/builder/${response.data.id}`);
         } catch (error) {
             console.error('Error creating resume:', error);
-            alert('Failed to create resume. Please try again.');
+            toast.error('Failed to create resume. Please try again.');
         }
     };
 
@@ -88,7 +88,7 @@ export default function DashboardPage() {
             router.push(`/cover-letter/${response.data.id}`);
         } catch (error) {
             console.error('Error creating cover letter:', error);
-            alert('Failed to create cover letter. Please try again.');
+            toast.error('Failed to create cover letter. Please try again.');
         }
     };
 
@@ -99,9 +99,10 @@ export default function DashboardPage() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setResumes(resumes.filter(r => r.id !== id));
+            toast.success('Resume deleted.');
         } catch (error) {
             console.error('Error deleting resume:', error);
-            alert('Failed to delete resume.');
+            toast.error('Failed to delete resume.');
         }
     };
 
@@ -112,9 +113,10 @@ export default function DashboardPage() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCoverLetters(coverLetters.filter(cl => cl.id !== id));
+            toast.success('Cover letter deleted.');
         } catch (error) {
             console.error('Error deleting cover letter:', error);
-            alert('Failed to delete cover letter.');
+            toast.error('Failed to delete cover letter.');
         }
     };
 

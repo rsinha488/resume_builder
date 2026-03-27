@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRequire } from 'module';
 import mammoth from 'mammoth';
 import { parseResumeText } from '@/lib/parser';
 import { v4 as uuidv4 } from 'uuid';
+import { getUserFromRequest } from '@/lib/auth';
 
-const require = createRequire(import.meta.url);
-const pdf = require('pdf-parse');
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
     try {
+        const user = getUserFromRequest(req);
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const formData = await req.formData();
         const file = formData.get('file') as File;
 
@@ -20,7 +24,11 @@ export async function POST(req: NextRequest) {
         let text = '';
 
         if (file.type === 'application/pdf') {
-            const data = await pdf(buffer);
+            // Lazy-load pdf-parse to avoid DOMMatrix/canvas errors at module init
+            const { createRequire } = await import('module');
+            const nodeRequire = createRequire(import.meta.url);
+            const pdfParse = nodeRequire('pdf-parse');
+            const data = await pdfParse(buffer);
             text = data.text;
         } else if (
             file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||

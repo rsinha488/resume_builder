@@ -20,7 +20,6 @@ export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: Upgr
         const token = localStorage.getItem('token');
         try {
             const response = await axios.post('/api/checkout', {
-                plan: 'PRO',
                 subscriptionType: type
             }, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -125,8 +124,8 @@ export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: Upgr
                         </div>
                     </div>
 
-                    <p className="mt-8 text-center text-sm text-gray-400 italic">
-                        Secure checkout. Cancel anytime. Simulated payment for demonstration.
+                    <p className="mt-8 text-center text-sm text-gray-400">
+                        Secure checkout powered by Stripe. Cancel anytime.
                     </p>
                 </div>
             </div>

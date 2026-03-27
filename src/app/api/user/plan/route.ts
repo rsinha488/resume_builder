@@ -58,8 +58,26 @@ export async function GET(request: Request) {
 
         const userData = await prisma.user.findUnique({
             where: { id: user.userId },
-            select: { plan: true }
+            select: { plan: true, subscriptionType: true, planExpiry: true },
         });
+
+        if (!userData) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        // Auto-downgrade expired trial
+        if (
+            userData.plan === 'PRO' &&
+            userData.subscriptionType === 'TRIAL' &&
+            userData.planExpiry &&
+            new Date() > userData.planExpiry
+        ) {
+            await prisma.user.update({
+                where: { id: user.userId },
+                data: { plan: 'FREE', subscriptionType: 'NONE', planExpiry: null },
+            });
+            return NextResponse.json({ plan: 'FREE', subscriptionType: 'NONE', planExpiry: null });
+        }
 
         return NextResponse.json(userData);
     } catch (error) {

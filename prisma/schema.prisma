@@ -19,16 +19,20 @@ enum SubscriptionType {
 }
 
 model User {
-  id               String           @id @default(auto()) @map("_id") @db.ObjectId
-  email            String           @unique
-  password         String
-  plan             Plan             @default(FREE)
-  subscriptionType SubscriptionType @default(NONE)
-  planExpiry       DateTime?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  resumes          Resume[]
-  coverLetters     CoverLetter[]
+  id                   String           @id @default(auto()) @map("_id") @db.ObjectId
+  email                String           @unique
+  password             String
+  plan                 Plan             @default(FREE)
+  subscriptionType     SubscriptionType @default(NONE)
+  planExpiry           DateTime?
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  resetToken           String?
+  resetTokenExpiry     DateTime?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  resumes              Resume[]
+  coverLetters         CoverLetter[]
 }
 
 model Resume {

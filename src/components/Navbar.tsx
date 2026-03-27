@@ -15,6 +15,7 @@ export default function Navbar() {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        document.cookie = 'token=; path=/; max-age=0';
         setIsLoggedIn(false);
         router.push('/login');
     };

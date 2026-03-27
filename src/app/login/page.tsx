@@ -32,6 +32,7 @@ export default function LoginPage() {
                 password: data.password
             });
             localStorage.setItem('token', response.data.token);
+            document.cookie = `token=${response.data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`;
             router.push('/dashboard');
         } catch (err: any) {
             setError(err.response?.data?.error || 'Invalid credentials');
@@ -72,7 +73,12 @@ export default function LoginPage() {
                             {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Password</label>
+                            <div className="flex justify-between items-center">
+                                <label className="block text-sm font-medium text-gray-700">Password</label>
+                                <Link href="/forgot-password" className="text-xs text-primary-600 hover:text-primary-500">
+                                    Forgot password?
+                                </Link>
+                            </div>
                             <input
                                 {...register('password')}
                                 type="password"

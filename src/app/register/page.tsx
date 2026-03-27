@@ -36,6 +36,7 @@ export default function RegisterPage() {
                 password: data.password
             });
             localStorage.setItem('token', response.data.token);
+            document.cookie = `token=${response.data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Strict`;
             router.push('/dashboard');
         } catch (err: any) {
             setError(err.response?.data?.error || 'Something went wrong');
