@@ -1,9 +1,9 @@
 'use client';
-import { FaFileAlt, FaPalette, FaEdit, FaChartBar } from 'react-icons/fa';
+import { FaFileAlt, FaPalette, FaEdit, FaChartBar, FaCheck } from 'react-icons/fa';
 
 interface BuilderSidebarProps {
-    currentMode: 'templates' | 'design' | 'content' | 'analysis';
-    onModeChange: (mode: 'templates' | 'design' | 'content' | 'analysis') => void;
+    readonly currentMode: 'templates' | 'design' | 'content' | 'analysis' | 'finalize';
+    readonly onModeChange: (mode: 'templates' | 'design' | 'content' | 'analysis' | 'finalize') => void;
 }
 
 const MODES = [
@@ -11,17 +11,12 @@ const MODES = [
     { id: 'design', icon: FaPalette, label: 'Design' },
     { id: 'content', icon: FaEdit, label: 'Content' },
     { id: 'analysis', icon: FaChartBar, label: 'Analysis' },
+    { id: 'finalize', icon: FaCheck, label: 'Finalize' },
 ] as const;
 
-export default function BuilderSidebar({ currentMode, onModeChange }: { readonly currentMode: 'templates' | 'design' | 'content' | 'analysis'; readonly onModeChange: (mode: 'templates' | 'design' | 'content' | 'analysis') => void }) {
+export default function BuilderSidebar({ currentMode, onModeChange }: BuilderSidebarProps) {
     return (
-        <aside className="w-20 bg-gray-900 flex flex-col items-center py-8 gap-8 border-r border-gray-800 z-20">
-            <div className="mb-4">
-                <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                    R
-                </div>
-            </div>
-
+        <aside className="w-20 bg-gray-900 flex flex-col items-center py-8 gap-4 border-r border-gray-800 z-20">
             <nav className="flex flex-col gap-4">
                 {MODES.map((mode) => {
                     const Icon = mode.icon;

@@ -24,11 +24,12 @@ export default function DiamondTemplate({ data }: { readonly data: ResumeState }
 
     return (
         <div
+            id="resume-content"
             className="bg-white shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] text-gray-800"
             style={{
                 fontFamily: fontFamily || 'sans-serif',
-                padding: `${margins}px`,
-                lineHeight: lineSpacing
+                padding: `${margins || 96}px`,
+                lineHeight: lineSpacing || 1.15
             }}
         >
             {/* Bold Geometric Header */}

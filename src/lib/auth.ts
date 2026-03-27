@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { headers } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -15,9 +14,8 @@ export const verifyToken = (token: string) => {
     }
 };
 
-export const getUserFromRequest = async () => {
-    const headersList = await headers();
-    const token = headersList.get('authorization')?.split(' ')[1];
+export const getUserFromRequest = (request: Request) => {
+    const token = request.headers.get('authorization')?.split(' ')[1];
     if (!token) return null;
     return verifyToken(token);
 };

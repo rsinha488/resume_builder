@@ -1,6 +1,7 @@
 'use client';
 import { COLOR_PALETTES, FONT_PAIRINGS } from '@/lib/themes';
-import { FaLock, FaCheckCircle, FaPlus } from 'react-icons/fa';
+import { FaLock, FaCheckCircle, FaPlus, FaMagic } from 'react-icons/fa';
+import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { useRef } from 'react';
 import {
@@ -172,7 +173,7 @@ export default function ThemeSelector({ userPlan, onUpgrade }: ThemeSelectorProp
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">
                         <label htmlFor="line-spacing" className="text-xs font-bold text-gray-500 uppercase tracking-widest">Line Spacing</label>
-                        <span className="text-xs font-black text-primary-600">{lineSpacing}x</span>
+                        <span className="text-xs font-black text-primary-600">{lineSpacing}px</span>
                     </div>
                     <input
                         id="line-spacing"
@@ -228,6 +229,59 @@ export default function ThemeSelector({ userPlan, onUpgrade }: ThemeSelectorProp
                         onChange={(e) => dispatch(updateMargins(Number.parseInt(e.target.value, 10)))}
                         className={`w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-primary-600 ${userPlan === 'FREE' ? 'opacity-50 cursor-not-allowed' : ''}`}
                     />
+                </div>
+
+                {/* Fit to One Page */}
+                <div className="pt-4">
+                    <button
+                        onClick={() => {
+                            if (userPlan === 'FREE') {
+                                onUpgrade();
+                                return;
+                            }
+
+                            const content = document.getElementById('resume-content');
+                            if (!content) return;
+
+                            // A4 height in pixels at 96 DPI is ~1123px
+                            const A4_HEIGHT = 1122;
+                            let currentHeight = content.scrollHeight;
+
+                            if (currentHeight <= A4_HEIGHT) {
+                                toast.success('Your resume already fits on one page!');
+                                return;
+                            }
+
+                            // Iterative adjustment
+                            // 1. Reduce section spacing
+                            if (sectionSpacing > 12) {
+                                dispatch(updateSectionSpacing(12));
+                            }
+                            // 2. Reduce line spacing
+                            if (lineSpacing > 1.0) {
+                                dispatch(updateLineSpacing(1.0));
+                            }
+                            // 3. Reduce font size
+                            if (fontSize === 'large') {
+                                dispatch(updateFontSize('medium'));
+                            } else if (fontSize === 'medium') {
+                                dispatch(updateFontSize('small'));
+                            }
+                            // 4. Reduce margins
+                            if (margins > 40) {
+                                dispatch(updateMargins(40));
+                            }
+
+                            toast.success('Adjusted settings to fit on one page!');
+                        }}
+                        className={`w-full py-4 rounded-2xl border-2 border-primary-600 text-primary-600 font-black uppercase tracking-widest text-xs hover:bg-primary-600 hover:text-white transition-all flex items-center justify-center gap-3 shadow-lg shadow-primary-100 ${userPlan === 'FREE' ? 'opacity-60 grayscale cursor-not-allowed' : ''}`}
+                    >
+                        <FaMagic /> Fit to One Page
+                        {userPlan === 'FREE' && <FaLock size={10} />}
+                    </button>
+                    <p className="text-[10px] text-gray-400 mt-3 text-center font-medium">
+                        Automatically adjusts spacing and font sizes to fit your content on a single page.
+                    </p>
                 </div>
             </div>
 

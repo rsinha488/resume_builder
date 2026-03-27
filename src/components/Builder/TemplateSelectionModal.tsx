@@ -11,11 +11,11 @@ import ResumePreview from './ResumePreview';
 import CoverLetterPreview from './CoverLetterPreview';
 
 interface TemplateSelectionModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    mode: 'resume' | 'cover-letter';
-    userPlan: string;
-    onUpgrade: () => void;
+    readonly isOpen: boolean;
+    readonly onClose: () => void;
+    readonly mode: 'resume' | 'cover-letter';
+    readonly userPlan: string;
+    readonly onUpgrade: () => void;
 }
 
 export default function TemplateSelectionModal({
@@ -87,8 +87,8 @@ export default function TemplateSelectionModal({
                 {/* Content */}
                 <div className="flex-1 flex overflow-hidden">
                     {/* Left Panel: Live Preview */}
-                    <div className="hidden lg:flex flex-1 bg-gray-100 items-center justify-center p-8 overflow-y-auto border-r">
-                        <div className="w-full max-w-[600px] transform scale-[0.7] origin-top shadow-2xl">
+                    <div className="hidden lg:flex flex-1 bg-gray-100 justify-center p-12 overflow-y-auto border-r">
+                        <div className="w-[210mm] min-h-[297mm] transform scale-[0.5] xl:scale-[0.65] origin-top shadow-2xl bg-white mb-12">
                             {mode === 'resume' ? <ResumePreview /> : <CoverLetterPreview />}
                         </div>
                     </div>
@@ -123,18 +123,18 @@ export default function TemplateSelectionModal({
                             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Choose template:</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 {TEMPLATES.map((template) => (
-                                    <div
+                                    <button
                                         key={template.id}
                                         onClick={() => handleTemplateSelect(template.id, template.isPremium)}
-                                        className={`group relative cursor-pointer rounded-xl border-2 transition-all overflow-hidden ${currentTemplateId === template.id
+                                        className={`relative cursor-pointer rounded-xl border-2 transition-all overflow-hidden group text-left ${currentTemplateId === template.id
                                             ? 'border-blue-500 ring-4 ring-blue-50'
                                             : 'border-gray-100 hover:border-blue-200'
                                             }`}
                                     >
-                                        {/* Template Thumbnail Placeholder */}
-                                        <div className="aspect-[3/4] bg-gray-50 flex flex-col items-center justify-center p-4 group-hover:bg-gray-100 transition-colors">
-                                            <div className="w-full h-full border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center text-gray-300 text-xs text-center p-2">
-                                                {template.name}
+                                        {/* Template Thumbnail Preview */}
+                                        <div className="aspect-[3/4] bg-gray-100 flex flex-col items-center overflow-hidden relative group-hover:bg-gray-200 transition-colors border-b p-2">
+                                            <div className="w-[210mm] min-h-[297mm] transform scale-[0.12] origin-top shadow-md border border-gray-200 pointer-events-none bg-white">
+                                                <ResumePreview templateId={template.id} />
                                             </div>
                                         </div>
 
@@ -164,7 +164,7 @@ export default function TemplateSelectionModal({
                                         <div className="p-3 bg-white border-t">
                                             <p className="text-xs font-bold text-gray-900 truncate">{template.name}</p>
                                         </div>
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
                         </div>

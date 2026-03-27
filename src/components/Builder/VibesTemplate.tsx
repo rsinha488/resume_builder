@@ -24,7 +24,8 @@ export default function VibesTemplate({ data }: { readonly data: ResumeState }) 
 
     return (
         <div
-            className="bg-white shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] flex text-gray-800 overflow-hidden"
+            id="resume-content"
+            className="bg-white shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] flex flex-row-reverse text-gray-800 overflow-hidden"
             style={{
                 fontFamily: fontFamily || 'sans-serif',
                 lineHeight: lineSpacing
@@ -33,7 +34,7 @@ export default function VibesTemplate({ data }: { readonly data: ResumeState }) 
             {/* Main Content (Left) */}
             <main
                 className="flex-1 bg-white"
-                style={{ padding: `${margins}px` }}
+                style={{ padding: `${margins || 96}px` }}
             >
                 <header className="mb-12">
                     <h1 className="text-6xl font-black tracking-tighter mb-2 text-gray-900">
@@ -106,8 +107,8 @@ export default function VibesTemplate({ data }: { readonly data: ResumeState }) 
             <aside
                 className="w-[30%] bg-gray-50 flex flex-col"
                 style={{
-                    padding: `${margins}px ${margins * 0.8}px`,
-                    gap: `${sectionSpacing}px`
+                    padding: `${margins || 96}px ${(margins || 96) * 0.8}px`,
+                    gap: `${sectionSpacing || 24}px`
                 }}
             >
                 {/* Avatar */}

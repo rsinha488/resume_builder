@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { addEducation, updateEducation, removeEducation, Education } from '@/lib/features/resume/resumeSlice';
 import { FaPlus, FaTrash } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'sonner';
 
 export default function EducationForm() {
     const dispatch = useAppDispatch();
@@ -35,7 +36,10 @@ export default function EducationForm() {
             {education?.map((edu, index) => (
                 <div key={edu.id} className="p-6 border border-gray-200 rounded-xl relative group bg-gray-50/50">
                     <button
-                        onClick={() => dispatch(removeEducation(edu.id))}
+                        onClick={() => {
+                            dispatch(removeEducation(edu.id));
+                            toast.success('Education removed');
+                        }}
                         className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors"
                     >
                         <FaTrash size={16} />
@@ -44,8 +48,9 @@ export default function EducationForm() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">School / University</label>
+                            <label htmlFor={`school-${edu.id}`} className="block text-sm font-semibold text-gray-700 mb-1">School / University</label>
                             <input
+                                id={`school-${edu.id}`}
                                 type="text"
                                 value={edu.school}
                                 onChange={(e) => handleChange(edu.id, 'school', e.target.value)}
@@ -54,8 +59,9 @@ export default function EducationForm() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">Degree</label>
+                            <label htmlFor={`degree-${edu.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Degree</label>
                             <input
+                                id={`degree-${edu.id}`}
                                 type="text"
                                 value={edu.degree}
                                 onChange={(e) => handleChange(edu.id, 'degree', e.target.value)}
@@ -64,8 +70,9 @@ export default function EducationForm() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">Field of Study</label>
+                            <label htmlFor={`field-${edu.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Field of Study</label>
                             <input
+                                id={`field-${edu.id}`}
                                 type="text"
                                 value={edu.field}
                                 onChange={(e) => handleChange(edu.id, 'field', e.target.value)}
@@ -74,8 +81,9 @@ export default function EducationForm() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">Location</label>
+                            <label htmlFor={`location-${edu.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Location</label>
                             <input
+                                id={`location-${edu.id}`}
                                 type="text"
                                 value={edu.location}
                                 onChange={(e) => handleChange(edu.id, 'location', e.target.value)}
@@ -84,8 +92,9 @@ export default function EducationForm() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">Start Date</label>
+                            <label htmlFor={`startDate-${edu.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Start Date</label>
                             <input
+                                id={`startDate-${edu.id}`}
                                 type="text"
                                 value={edu.startDate}
                                 onChange={(e) => handleChange(edu.id, 'startDate', e.target.value)}
@@ -94,8 +103,9 @@ export default function EducationForm() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">End Date</label>
+                            <label htmlFor={`endDate-${edu.id}`} className="block text-sm font-semibold text-gray-700 mb-1">End Date</label>
                             <input
+                                id={`endDate-${edu.id}`}
                                 type="text"
                                 value={edu.endDate}
                                 onChange={(e) => handleChange(edu.id, 'endDate', e.target.value)}

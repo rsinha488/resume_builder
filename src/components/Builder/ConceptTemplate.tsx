@@ -24,10 +24,11 @@ export default function ConceptTemplate({ data }: { readonly data: ResumeState }
 
     return (
         <div
+            id="resume-content"
             className="bg-white shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] text-gray-800"
             style={{
                 fontFamily: fontFamily || 'sans-serif',
-                padding: `${margins}px`,
+                padding: `${margins || 96}px ${(margins || 96) * 0.8}px`,
                 lineHeight: lineSpacing
             }}
         >

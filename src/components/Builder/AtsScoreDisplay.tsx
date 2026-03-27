@@ -5,7 +5,8 @@ import { FaExclamationCircle, FaLightbulb, FaCheckCircle } from 'react-icons/fa'
 
 export default function AtsScoreDisplay() {
     const resume = useAppSelector((state) => state.resume);
-    const { score, suggestions } = calculateAtsScore(resume);
+    const { score: rawScore, suggestions } = calculateAtsScore(resume);
+    const score = Number.isNaN(rawScore) ? 0 : rawScore;
 
     const getScoreColor = (score: number) => {
         if (score >= 80) return 'text-green-600';

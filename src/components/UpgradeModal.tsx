@@ -2,11 +2,12 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { FaCrown, FaCheck, FaTimes, FaSpinner } from 'react-icons/fa';
+import { toast } from 'sonner';
 
 interface UpgradeModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onUpgradeSuccess: () => void;
+    readonly isOpen: boolean;
+    readonly onClose: () => void;
+    readonly onUpgradeSuccess: () => void;
 }
 
 export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: UpgradeModalProps) {
@@ -18,17 +19,21 @@ export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: Upgr
         setLoading(type);
         const token = localStorage.getItem('token');
         try {
-            await axios.post('/api/user/plan', {
+            const response = await axios.post('/api/checkout', {
                 plan: 'PRO',
                 subscriptionType: type
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            onUpgradeSuccess();
-            onClose();
+
+            if (response.data.url) {
+                globalThis.location.href = response.data.url;
+            } else {
+                throw new Error('No checkout URL returned');
+            }
         } catch (error) {
             console.error('Upgrade error:', error);
-            alert('Failed to upgrade. Please try again.');
+            toast.error('Failed to initiate checkout. Please try again.');
         } finally {
             setLoading(null);
         }

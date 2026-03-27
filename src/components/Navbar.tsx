@@ -1,11 +1,12 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -17,6 +18,11 @@ export default function Navbar() {
         setIsLoggedIn(false);
         router.push('/login');
     };
+
+    // Hide navbar on dashboard, builder, and templates pages
+    if (pathname.startsWith('/dashboard') || pathname.startsWith('/builder') || pathname.startsWith('/templates')) {
+        return null;
+    }
 
     return (
         <nav className="flex justify-between items-center px-8 py-4 bg-white shadow-sm sticky top-0 z-50">

@@ -24,7 +24,8 @@ export default function PrimoTemplate({ data }: { readonly data: ResumeState }) 
 
     return (
         <div
-            className="bg-white shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] text-gray-800 overflow-hidden"
+            id="resume-content"
+            className="bg-white shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] flex text-gray-800 overflow-hidden"
             style={{
                 fontFamily: fontFamily || 'sans-serif',
                 lineHeight: lineSpacing
@@ -34,8 +35,8 @@ export default function PrimoTemplate({ data }: { readonly data: ResumeState }) 
             <div
                 className="text-white"
                 style={{
-                    backgroundColor: themeColor || '#1a365d',
-                    padding: `${margins}px`
+                    backgroundColor: themeColor || '#2d3748',
+                    padding: `${margins || 96}px ${(margins || 96) * 0.8}px`
                 }}
             >
                 <div className="flex justify-between items-start">
@@ -83,8 +84,8 @@ export default function PrimoTemplate({ data }: { readonly data: ResumeState }) 
             </div>
 
             <div
-                className="grid grid-cols-12 gap-12"
-                style={{ padding: `${margins}px` }}
+                className="flex-1 bg-white"
+                style={{ padding: `${margins || 96}px` }}
             >
                 {/* Main Content */}
                 <div style={{ gap: `${sectionSpacing}px` }} className="col-span-8 flex flex-col">

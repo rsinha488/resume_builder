@@ -11,31 +11,63 @@ import InfluxTemplate from './InfluxTemplate';
 import VibesTemplate from './VibesTemplate';
 import MuseTemplate from './MuseTemplate';
 
-export default function ResumePreview() {
-    const resume = useAppSelector((state) => state.resume);
-    const { templateId } = resume;
+import { SAMPLE_DATA } from '@/lib/sampleData';
 
-    switch (templateId) {
+import { ResumeState } from '@/lib/features/resume/resumeSlice';
+
+interface ResumePreviewProps {
+    readonly data?: ResumeState;
+    readonly templateId?: string;
+}
+
+export default function ResumePreview({ data, templateId }: ResumePreviewProps) {
+    const stateResume = useAppSelector((state) => state.resume);
+    const resume = data || stateResume;
+
+    // Helper to check if personal info is empty
+    // Merge logic: Use user data if present, otherwise fallback to sample data
+    const displayData: ResumeState = {
+        ...resume,
+        personalInfo: resume.personalInfo?.fullName ? resume.personalInfo : (SAMPLE_DATA.personalInfo as any),
+        experiences: resume.experiences?.length > 0 ? resume.experiences : (SAMPLE_DATA.experiences as any),
+        education: resume.education?.length > 0 ? resume.education : (SAMPLE_DATA.education as any),
+        skills: resume.skills?.length > 0 ? resume.skills : (SAMPLE_DATA.skills as any),
+        languages: resume.languages?.length > 0 ? resume.languages : (SAMPLE_DATA.languages as any),
+        certifications: resume.certifications?.length > 0 ? resume.certifications : (SAMPLE_DATA.certifications as any),
+        hobbies: resume.hobbies?.length > 0 ? resume.hobbies : (SAMPLE_DATA.hobbies as any),
+        // Design fallbacks
+        templateId: templateId || resume.templateId || (SAMPLE_DATA.templateId as string),
+        themeColor: resume.themeColor || (SAMPLE_DATA.themeColor as string),
+        fontFamily: resume.fontFamily || (SAMPLE_DATA.fontFamily as string),
+        fontSize: resume.fontSize || (SAMPLE_DATA.fontSize as any),
+        lineSpacing: resume.lineSpacing || (SAMPLE_DATA.lineSpacing as number),
+        sectionSpacing: resume.sectionSpacing || (SAMPLE_DATA.sectionSpacing as number),
+        margins: resume.margins || (SAMPLE_DATA.margins as number),
+    };
+
+    const finalTemplateId = templateId || resume.templateId;
+
+    switch (finalTemplateId) {
         case 'classic':
-            return <ClassicTemplate data={resume} />;
+            return <ClassicTemplate data={displayData as any} />;
         case 'primo':
-            return <PrimoTemplate data={resume} />;
+            return <PrimoTemplate data={displayData as any} />;
         case 'minimal':
-            return <MinimalTemplate data={resume} />;
+            return <MinimalTemplate data={displayData as any} />;
         case 'cascade':
-            return <CascadeTemplate data={resume} />;
+            return <CascadeTemplate data={displayData as any} />;
         case 'concept':
-            return <ConceptTemplate data={resume} />;
+            return <ConceptTemplate data={displayData as any} />;
         case 'diamond':
-            return <DiamondTemplate data={resume} />;
+            return <DiamondTemplate data={displayData as any} />;
         case 'influx':
-            return <InfluxTemplate data={resume} />;
+            return <InfluxTemplate data={displayData as any} />;
         case 'vibes':
-            return <VibesTemplate data={resume} />;
+            return <VibesTemplate data={displayData as any} />;
         case 'muse':
-            return <MuseTemplate data={resume} />;
+            return <MuseTemplate data={displayData as any} />;
         case 'modern':
         default:
-            return <ModernTemplate data={resume} />;
+            return <ModernTemplate data={displayData as any} />;
     }
 }

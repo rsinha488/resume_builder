@@ -23,11 +23,12 @@ export default function MinimalTemplate({ data }: { readonly data: ResumeState }
 
     return (
         <div
-            className="bg-white shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] text-gray-700 leading-relaxed"
+            id="resume-content"
+            className="bg-white shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] text-gray-800 leading-relaxed"
             style={{
-                fontFamily: fontFamily || 'serif',
-                padding: `${margins}px`,
-                lineHeight: lineSpacing
+                fontFamily: fontFamily || 'sans-serif',
+                padding: `${margins || 96}px`,
+                lineHeight: lineSpacing || 1.15
             }}
         >
             {/* Centered Header */}

@@ -4,6 +4,7 @@ import { updatePersonalInfo } from '@/lib/features/resume/resumeSlice';
 import { useState } from 'react';
 import axios from 'axios';
 import { FaCamera, FaSpinner } from 'react-icons/fa';
+import { toast } from 'sonner';
 
 export default function PersonalInfoForm() {
     const dispatch = useAppDispatch();
@@ -19,6 +20,12 @@ export default function PersonalInfoForm() {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Basic validation
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('File size too large. Please upload an image smaller than 2MB.');
+            return;
+        }
+
         setUploading(true);
         const formData = new FormData();
         formData.append('file', file);
@@ -26,9 +33,10 @@ export default function PersonalInfoForm() {
         try {
             const response = await axios.post('/api/upload', formData);
             dispatch(updatePersonalInfo({ avatarUrl: response.data.secure_url }));
+            toast.success('Photo uploaded successfully!');
         } catch (error) {
             console.error('Error uploading image:', error);
-            alert('Failed to upload image');
+            toast.error('Failed to upload image. Please try again.');
         } finally {
             setUploading(false);
         }
@@ -63,8 +71,9 @@ export default function PersonalInfoForm() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
+                    <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
                     <input
+                        id="fullName"
                         type="text"
                         name="fullName"
                         value={personalInfo?.fullName}
@@ -74,8 +83,9 @@ export default function PersonalInfoForm() {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Job Title</label>
+                    <label htmlFor="jobTitle" className="block text-sm font-semibold text-gray-700 mb-1">Job Title</label>
                     <input
+                        id="jobTitle"
                         type="text"
                         name="jobTitle"
                         value={personalInfo?.jobTitle}
@@ -85,8 +95,9 @@ export default function PersonalInfoForm() {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
                     <input
+                        id="email"
                         type="email"
                         name="email"
                         value={personalInfo?.email}
@@ -96,8 +107,9 @@ export default function PersonalInfoForm() {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
+                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
                     <input
+                        id="phone"
                         type="text"
                         name="phone"
                         value={personalInfo?.phone}
@@ -107,8 +119,9 @@ export default function PersonalInfoForm() {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
+                    <label htmlFor="address" className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
                     <input
+                        id="address"
                         type="text"
                         name="address"
                         value={personalInfo?.address}
@@ -118,8 +131,9 @@ export default function PersonalInfoForm() {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Website</label>
+                    <label htmlFor="website" className="block text-sm font-semibold text-gray-700 mb-1">Website</label>
                     <input
+                        id="website"
                         type="text"
                         name="website"
                         value={personalInfo?.website}
@@ -130,8 +144,9 @@ export default function PersonalInfoForm() {
                 </div>
             </div>
             <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Professional Summary</label>
+                <label htmlFor="summary" className="block text-sm font-semibold text-gray-700 mb-1">Professional Summary</label>
                 <textarea
+                    id="summary"
                     name="summary"
                     value={personalInfo?.summary}
                     onChange={handleChange}

@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { addExperience, updateExperience, removeExperience, Experience } from '@/lib/features/resume/resumeSlice';
 import { FaPlus, FaTrash } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'sonner';
 
 export default function ExperienceForm() {
     const dispatch = useAppDispatch();
@@ -34,7 +35,10 @@ export default function ExperienceForm() {
             {experiences?.map((exp, index) => (
                 <div key={exp.id} className="p-6 border border-gray-200 rounded-xl relative group bg-gray-50/50">
                     <button
-                        onClick={() => dispatch(removeExperience(exp.id))}
+                        onClick={() => {
+                            dispatch(removeExperience(exp.id));
+                            toast.success('Experience removed');
+                        }}
                         className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors"
                     >
                         <FaTrash size={16} />
@@ -43,8 +47,9 @@ export default function ExperienceForm() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">Company</label>
+                            <label htmlFor={`company-${exp.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Company</label>
                             <input
+                                id={`company-${exp.id}`}
                                 type="text"
                                 value={exp.company}
                                 onChange={(e) => handleChange(exp.id, 'company', e.target.value)}
@@ -53,8 +58,9 @@ export default function ExperienceForm() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">Position</label>
+                            <label htmlFor={`position-${exp.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Position</label>
                             <input
+                                id={`position-${exp.id}`}
                                 type="text"
                                 value={exp.position}
                                 onChange={(e) => handleChange(exp.id, 'position', e.target.value)}
@@ -63,8 +69,9 @@ export default function ExperienceForm() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">Start Date</label>
+                            <label htmlFor={`startDate-${exp.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Start Date</label>
                             <input
+                                id={`startDate-${exp.id}`}
                                 type="text"
                                 value={exp.startDate}
                                 onChange={(e) => handleChange(exp.id, 'startDate', e.target.value)}
@@ -73,8 +80,9 @@ export default function ExperienceForm() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">End Date</label>
+                            <label htmlFor={`endDate-${exp.id}`} className="block text-sm font-semibold text-gray-700 mb-1">End Date</label>
                             <input
+                                id={`endDate-${exp.id}`}
                                 type="text"
                                 value={exp.endDate}
                                 onChange={(e) => handleChange(exp.id, 'endDate', e.target.value)}
@@ -96,8 +104,9 @@ export default function ExperienceForm() {
                             </label>
                         </div>
                         <div className="sm:col-span-2">
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+                            <label htmlFor={`description-${exp.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
                             <textarea
+                                id={`description-${exp.id}`}
                                 value={exp.description}
                                 onChange={(e) => handleChange(exp.id, 'description', e.target.value)}
                                 rows={4}

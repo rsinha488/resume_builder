@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { setResume } from '@/lib/features/resume/resumeSlice';
+import { setResume, updatePersonalInfo } from '@/lib/features/resume/resumeSlice';
 import PersonalInfoForm from '@/components/Builder/PersonalInfoForm';
 import ExperienceForm from '@/components/Builder/ExperienceForm';
 import EducationForm from '@/components/Builder/EducationForm';
@@ -17,16 +17,24 @@ import UpgradeModal from '@/components/UpgradeModal';
 import BuilderSidebar from '@/components/Builder/BuilderSidebar';
 import BuilderBottomBar from '@/components/Builder/BuilderBottomBar';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import { FaDownload, FaCrown, FaFileAlt } from 'react-icons/fa';
+import { FaDownload, FaCrown, FaFileAlt, FaCheck, FaEdit } from 'react-icons/fa';
+import ProgressBar from '@/components/Builder/ProgressBar';
+import { toast } from 'sonner';
 import { convertToPlainText } from '@/lib/utils';
 
-type BuilderMode = 'templates' | 'design' | 'content' | 'analysis';
+type BuilderMode = 'templates' | 'design' | 'content' | 'analysis' | 'finalize';
+
+import { SAMPLE_DATA } from '@/lib/sampleData';
+import ExtraSections from '@/components/Builder/ExtraSections';
+import DashboardHeader from '@/components/Dashboard/DashboardHeader';
 
 const contentSteps = [
     { id: 'personal', title: 'Personal Info' },
     { id: 'experience', title: 'Experience' },
     { id: 'education', title: 'Education' },
     { id: 'skills', title: 'Skills' },
+    { id: 'extra', title: 'Extra Sections' },
+    { id: 'summary', title: 'Professional Summary' },
 ];
 
 export default function BuilderPage() {
@@ -81,10 +89,10 @@ export default function BuilderPage() {
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            alert('Resume saved successfully!');
+            toast.success('Resume saved successfully!');
         } catch (error) {
             console.error('Error saving resume:', error);
-            alert('Failed to save resume');
+            toast.error('Failed to save resume. Please try again.');
         } finally {
             setSaving(false);
         }
@@ -100,10 +108,12 @@ export default function BuilderPage() {
                 setCurrentMode('analysis');
             }
         }
+        else if (currentMode === 'analysis') setCurrentMode('finalize');
     };
 
     const handleBack = () => {
-        if (currentMode === 'analysis') setCurrentMode('content');
+        if (currentMode === 'finalize') setCurrentMode('analysis');
+        else if (currentMode === 'analysis') setCurrentMode('content');
         else if (currentMode === 'content') {
             if (currentContentStep > 0) {
                 setCurrentContentStep(prev => prev - 1);
@@ -112,6 +122,15 @@ export default function BuilderPage() {
             }
         }
         else if (currentMode === 'design') setCurrentMode('templates');
+    };
+
+    const handleFillSampleData = () => {
+        dispatch(setResume({
+            ...resume,
+            ...SAMPLE_DATA,
+            personalInfo: { ...resume.personalInfo, ...SAMPLE_DATA.personalInfo },
+        } as any));
+        toast.success('Resume filled with sample data!');
     };
 
     const handleDownloadTxt = () => {
@@ -147,130 +166,217 @@ export default function BuilderPage() {
     );
 
     return (
-        <div className="h-screen bg-gray-50 flex overflow-hidden">
-            <BuilderSidebar
-                currentMode={currentMode}
-                onModeChange={(mode) => {
-                    setCurrentMode(mode);
-                    if (mode === 'content') setCurrentContentStep(0);
-                }}
-            />
+        <div className="min-h-screen bg-gray-50 flex flex-col overflow-hidden">
+            <DashboardHeader />
 
-            <main className="flex-1 flex flex-col relative overflow-hidden">
-                {/* Header Actions */}
-                <header className="h-16 bg-white border-b border-gray-200 px-8 flex justify-between items-center z-10">
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-lg font-bold text-gray-900">
-                            {currentMode === 'content' ? contentSteps[currentContentStep].title : currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}
-                        </h1>
-                    </div>
+            <div className="flex-1 flex overflow-hidden">
+                <BuilderSidebar
+                    currentMode={currentMode}
+                    onModeChange={(mode) => {
+                        setCurrentMode(mode);
+                        if (mode === 'content') setCurrentContentStep(0);
+                    }}
+                />
 
-                    <div className="flex gap-3">
-                        <button
-                            onClick={handleDownloadTxt}
-                            className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-                        >
-                            <FaFileAlt className="mr-2" /> .TXT
-                        </button>
-                        {userPlan === 'PRO' ? (
-                            <>
-                                <button
-                                    onClick={handleDownloadDocx}
-                                    className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                                >
-                                    <FaFileAlt className="mr-2" /> .DOCX
-                                </button>
-                                <PDFDownloadLink
-                                    document={<ResumePDF data={resume} />}
-                                    fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
-                                    className="inline-flex items-center px-3 py-1.5 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
-                                >
-                                    {({ loading }) => (
-                                        <>
-                                            <FaDownload className="mr-2" /> {loading ? '...' : 'PDF'}
-                                        </>
-                                    )}
-                                </PDFDownloadLink>
-                            </>
-                        ) : (
+                <main className="flex-1 flex flex-col relative overflow-hidden">
+                    <ProgressBar
+                        steps={contentSteps}
+                        currentStep={currentContentStep}
+                        currentMode={currentMode}
+                    />
+                    {/* Header Actions */}
+                    <header className="h-16 bg-white border-b border-gray-200 px-8 flex justify-between items-center z-10">
+                        <div className="flex items-center gap-4">
+                            <h1 className="text-lg font-bold text-gray-900">
+                                {currentMode === 'content' ? contentSteps[currentContentStep].title : currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}
+                            </h1>
+                        </div>
+
+                        <div className="flex gap-3">
                             <button
-                                onClick={() => setIsUpgradeModalOpen(true)}
-                                className="inline-flex items-center px-3 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors"
+                                onClick={handleFillSampleData}
+                                className="inline-flex items-center px-3 py-1.5 text-sm border border-primary-200 text-primary-600 rounded-md hover:bg-primary-50 transition-colors"
                             >
-                                <FaCrown className="mr-2" /> Upgrade
+                                <FaEdit className="mr-2" /> Fill Sample
                             </button>
-                        )}
-                    </div>
-                </header>
-
-                {/* Editor Area */}
-                <div className="flex-1 overflow-y-auto pb-24 p-8">
-                    <div className="max-w-3xl mx-auto">
-                        {currentMode === 'content' && (
-                            <div className="flex mb-8 gap-4 overflow-x-auto pb-2">
-                                {contentSteps.map((step, index) => (
-                                    <button
-                                        key={step.id}
-                                        onClick={() => setCurrentContentStep(index)}
-                                        className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${index === currentContentStep
-                                            ? 'bg-primary-600 text-white shadow-md'
-                                            : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
-                                            }`}
-                                    >
-                                        {step.title}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                            {currentMode === 'templates' && (
-                                <TemplateSelector
-                                    userPlan={userPlan}
-                                    onUpgradeRequired={() => setIsUpgradeModalOpen(true)}
-                                />
-                            )}
-                            {currentMode === 'design' && (
-                                <ThemeSelector
-                                    userPlan={userPlan}
-                                    onUpgrade={() => setIsUpgradeModalOpen(true)}
-                                />
-                            )}
-                            {currentMode === 'content' && (
+                            <button
+                                onClick={handleDownloadTxt}
+                                className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                            >
+                                <FaFileAlt className="mr-2" /> .TXT
+                            </button>
+                            {userPlan === 'PRO' ? (
                                 <>
-                                    {currentContentStep === 0 && <PersonalInfoForm />}
-                                    {currentContentStep === 1 && <ExperienceForm />}
-                                    {currentContentStep === 2 && <EducationForm />}
-                                    {currentContentStep === 3 && <SkillsForm />}
+                                    <button
+                                        onClick={handleDownloadDocx}
+                                        className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                    >
+                                        <FaFileAlt className="mr-2" /> .DOCX
+                                    </button>
+                                    <PDFDownloadLink
+                                        document={<ResumePDF data={resume} />}
+                                        fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
+                                        className="inline-flex items-center px-3 py-1.5 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+                                    >
+                                        {({ loading }) => (
+                                            <>
+                                                <FaDownload className="mr-2" /> {loading ? '...' : 'PDF'}
+                                            </>
+                                        )}
+                                    </PDFDownloadLink>
                                 </>
+                            ) : (
+                                <button
+                                    onClick={() => setIsUpgradeModalOpen(true)}
+                                    className="inline-flex items-center px-3 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors"
+                                >
+                                    <FaCrown className="mr-2" /> Upgrade
+                                </button>
                             )}
-                            {currentMode === 'analysis' && <AtsScoreDisplay />}
+                        </div>
+                    </header>
+
+                    {/* Editor Area */}
+                    <div className="flex-1 overflow-y-auto pb-24 p-8">
+                        <div className="max-w-3xl mx-auto">
+                            {currentMode === 'content' && (
+                                <div className="flex mb-8 gap-4 overflow-x-auto pb-2">
+                                    {contentSteps.map((step, index) => (
+                                        <button
+                                            key={step.id}
+                                            onClick={() => setCurrentContentStep(index)}
+                                            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${index === currentContentStep
+                                                ? 'bg-primary-600 text-white shadow-md'
+                                                : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
+                                                }`}
+                                        >
+                                            {step.title}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                                {currentMode === 'templates' && (
+                                    <TemplateSelector
+                                        userPlan={userPlan}
+                                        onUpgradeRequired={() => setIsUpgradeModalOpen(true)}
+                                    />
+                                )}
+                                {currentMode === 'design' && (
+                                    <ThemeSelector
+                                        userPlan={userPlan}
+                                        onUpgrade={() => setIsUpgradeModalOpen(true)}
+                                    />
+                                )}
+                                {currentMode === 'content' && (
+                                    <>
+                                        {currentContentStep === 0 && <PersonalInfoForm />}
+                                        {currentContentStep === 1 && <ExperienceForm />}
+                                        {currentContentStep === 2 && <EducationForm />}
+                                        {currentContentStep === 3 && <SkillsForm />}
+                                        {currentContentStep === 4 && <ExtraSections />}
+                                        {currentContentStep === 5 && (
+                                            <div className="space-y-6">
+                                                <label htmlFor="summary-large" className="block text-sm font-semibold text-gray-700 mb-1">Professional Summary</label>
+                                                <p className="text-sm text-gray-500 mb-4">Write a short, catchy summary that highlights your best qualities and experiences.</p>
+                                                <textarea
+                                                    id="summary-large"
+                                                    value={resume.personalInfo?.summary}
+                                                    onChange={(e) => dispatch(updatePersonalInfo({ summary: e.target.value }))}
+                                                    rows={10}
+                                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none resize-none text-lg"
+                                                    placeholder="e.g. Passionate Software Engineer with 5+ years of experience..."
+                                                />
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                                {currentMode === 'analysis' && <AtsScoreDisplay />}
+                                {currentMode === 'finalize' && (
+                                    <div className="text-center space-y-8 py-12">
+                                        <div className="flex justify-center">
+                                            <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center shadow-inner">
+                                                <FaCheck size={48} />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h2 className="text-3xl font-black text-gray-900 mb-2">You're all set!</h2>
+                                            <p className="text-gray-600 text-lg">Your professional resume is ready for download.</p>
+                                        </div>
+
+                                        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                                            <button
+                                                onClick={handleDownloadTxt}
+                                                className="w-full sm:w-auto px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center"
+                                            >
+                                                <FaFileAlt className="mr-2" /> Download .TXT
+                                            </button>
+
+                                            {userPlan === 'PRO' ? (
+                                                <>
+                                                    <button
+                                                        onClick={handleDownloadDocx}
+                                                        className="w-full sm:w-auto px-8 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg flex items-center justify-center"
+                                                    >
+                                                        <FaFileAlt className="mr-2" /> Download .DOCX
+                                                    </button>
+                                                    <PDFDownloadLink
+                                                        document={<ResumePDF data={resume} />}
+                                                        fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
+                                                        className="w-full sm:w-auto px-8 py-4 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-all shadow-lg flex items-center justify-center"
+                                                    >
+                                                        {({ loading }) => (
+                                                            <>
+                                                                <FaDownload className="mr-2" /> {loading ? 'Generating...' : 'Download PDF'}
+                                                            </>
+                                                        )}
+                                                    </PDFDownloadLink>
+                                                </>
+                                            ) : (
+                                                <button
+                                                    onClick={() => setIsUpgradeModalOpen(true)}
+                                                    className="w-full sm:w-auto px-8 py-4 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-all shadow-lg flex items-center justify-center animate-bounce"
+                                                >
+                                                    <FaCrown className="mr-2" /> Upgrade to Download PDF
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {userPlan !== 'PRO' && (
+                                            <p className="text-sm text-gray-500 italic">
+                                                Free users can download in .TXT format. Upgrade for PDF and Word formats.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <BuilderBottomBar
-                    onBack={handleBack}
-                    onNext={handleNext}
-                    onSave={handleSave}
-                    isFirstStep={currentMode === 'templates'}
-                    isLastStep={currentMode === 'analysis'}
-                    saving={saving}
+                    <BuilderBottomBar
+                        onBack={handleBack}
+                        onNext={handleNext}
+                        onSave={handleSave}
+                        isFirstStep={currentMode === 'templates'}
+                        isLastStep={currentMode === 'finalize'}
+                        saving={saving}
+                    />
+                </main>
+
+                {/* Preview Section */}
+                <aside className="hidden xl:block w-[45%] bg-gray-200 overflow-y-auto p-12 border-l border-gray-300">
+                    <div className="scale-[0.85] origin-top transform transition-transform duration-300">
+                        <ResumePreview />
+                    </div>
+                </aside>
+
+                <UpgradeModal
+                    isOpen={isUpgradeModalOpen}
+                    onClose={() => setIsUpgradeModalOpen(false)}
+                    onUpgradeSuccess={() => setUserPlan('PRO')}
                 />
-            </main>
-
-            {/* Preview Section */}
-            <aside className="hidden xl:block w-[45%] bg-gray-200 overflow-y-auto p-12 border-l border-gray-300">
-                <div className="scale-[0.85] origin-top transform transition-transform duration-300">
-                    <ResumePreview />
-                </div>
-            </aside>
-
-            <UpgradeModal
-                isOpen={isUpgradeModalOpen}
-                onClose={() => setIsUpgradeModalOpen(false)}
-                onUpgradeSuccess={() => setUserPlan('PRO')}
-            />
-        </div>
+            </div>
+        </div >
     );
 }

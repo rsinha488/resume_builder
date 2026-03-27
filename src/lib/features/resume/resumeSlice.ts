@@ -42,6 +42,9 @@ export interface ResumeState {
     experiences: Experience[];
     education: Education[];
     skills: string[];
+    languages: string[];
+    certifications: string[];
+    hobbies: string[];
     themeColor: string;
     fontFamily: string;
     fontSize: 'small' | 'medium' | 'large';
@@ -65,12 +68,15 @@ const initialState: ResumeState = {
     experiences: [],
     education: [],
     skills: [],
+    languages: [],
+    certifications: [],
+    hobbies: [],
     themeColor: '#2563eb',
     fontFamily: 'Inter',
     fontSize: 'medium',
     lineSpacing: 1.15,
     sectionSpacing: 24,
-    margins: 60,
+    margins: 16,
 };
 
 export const resumeSlice = createSlice({
@@ -78,7 +84,16 @@ export const resumeSlice = createSlice({
     initialState,
     reducers: {
         setResume: (state, action: PayloadAction<ResumeState>) => {
-            return { ...action.payload, templateId: action.payload.templateId || 'modern' };
+            return {
+                ...action.payload,
+                templateId: action.payload.templateId || 'modern',
+                lineSpacing: action.payload.lineSpacing ?? initialState.lineSpacing,
+                sectionSpacing: action.payload.sectionSpacing ?? initialState.sectionSpacing,
+                margins: action.payload.margins ?? initialState.margins,
+                fontSize: action.payload.fontSize ?? initialState.fontSize,
+                fontFamily: action.payload.fontFamily ?? initialState.fontFamily,
+                themeColor: action.payload.themeColor ?? initialState.themeColor,
+            };
         },
         updateTemplate: (state, action: PayloadAction<string>) => {
             state.templateId = action.payload;
@@ -108,6 +123,15 @@ export const resumeSlice = createSlice({
         },
         updateSkills: (state, action: PayloadAction<string[]>) => {
             state.skills = action.payload;
+        },
+        updateLanguages: (state, action: PayloadAction<string[]>) => {
+            state.languages = action.payload;
+        },
+        updateCertifications: (state, action: PayloadAction<string[]>) => {
+            state.certifications = action.payload;
+        },
+        updateHobbies: (state, action: PayloadAction<string[]>) => {
+            state.hobbies = action.payload;
         },
         updateThemeColor: (state, action: PayloadAction<string>) => {
             state.themeColor = action.payload;
@@ -142,6 +166,9 @@ export const {
     updateEducation,
     removeEducation,
     updateSkills,
+    updateLanguages,
+    updateCertifications,
+    updateHobbies,
     updateThemeColor,
     updateFontFamily,
     updateFontSize,

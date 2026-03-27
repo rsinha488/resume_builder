@@ -24,6 +24,7 @@ export default function CascadeTemplate({ data }: { readonly data: ResumeState }
 
     return (
         <div
+            id="resume-content"
             className="bg-white shadow-2xl mx-auto w-full max-w-[210mm] min-h-[297mm] flex text-gray-800 overflow-hidden"
             style={{
                 fontFamily: fontFamily || 'sans-serif',
@@ -35,7 +36,7 @@ export default function CascadeTemplate({ data }: { readonly data: ResumeState }
                 className="w-[35%] text-white flex flex-col gap-10"
                 style={{
                     backgroundColor: themeColor || '#2d3748',
-                    padding: `${margins}px ${margins * 0.8}px`
+                    padding: `${margins || 96}px ${(margins || 96) * 0.8}px`
                 }}
             >
                 {/* Avatar */}
@@ -118,7 +119,7 @@ export default function CascadeTemplate({ data }: { readonly data: ResumeState }
             {/* Main Content */}
             <main
                 className="flex-1 bg-white"
-                style={{ padding: `${margins}px` }}
+                style={{ padding: `${margins || 96}px` }}
             >
                 <header style={{ marginBottom: `${sectionSpacing * 1.5}px` }}>
                     <h1

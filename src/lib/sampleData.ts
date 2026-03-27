@@ -1,0 +1,60 @@
+import { ResumeState } from './features/resume/resumeSlice';
+import { v4 as uuidv4 } from 'uuid';
+
+export const SAMPLE_DATA: Partial<ResumeState> = {
+    personalInfo: {
+        fullName: 'John Doe',
+        jobTitle: 'Senior Software Engineer',
+        email: 'john.doe@example.com',
+        phone: '+1 (555) 123-4567',
+        address: 'San Francisco, CA',
+        website: 'https://johndoe.dev',
+        summary: 'Innovative and results-driven Senior Software Engineer with over 8 years of experience in building scalable web applications. Proven expertise in React, Node.js, and cloud architecture. Passionate about mentoring junior developers and implementing best practices in software development.',
+    },
+    experiences: [
+        {
+            id: uuidv4(),
+            company: 'Tech Solutions Inc.',
+            position: 'Senior Software Engineer',
+            location: 'San Francisco, CA',
+            startDate: '2020-01',
+            endDate: '',
+            current: true,
+            description: '• Led the development of a high-traffic e-commerce platform using React and Next.js, resulting in a 40% increase in user engagement.\n• Architected and implemented a microservices-based backend using Node.js and AWS, improving system scalability and reliability.\n• Mentored a team of 5 junior developers, conducting code reviews and providing technical guidance.',
+        },
+        {
+            id: uuidv4(),
+            company: 'Creative Web Agency',
+            position: 'Full Stack Developer',
+            location: 'Austin, TX',
+            startDate: '2016-06',
+            endDate: '2019-12',
+            current: false,
+            description: '• Developed and maintained multiple client websites using a variety of technologies including React, Vue.js, and Express.\n• Collaborated with designers to create responsive and visually appealing user interfaces.\n• Optimized website performance, reducing page load times by 30%.',
+        },
+    ],
+    education: [
+        {
+            id: uuidv4(),
+            school: 'University of California, Berkeley',
+            degree: 'Bachelor of Science',
+            field: 'Computer Science',
+            location: 'Berkeley, CA',
+            startDate: '2012-08',
+            endDate: '2016-05',
+            current: false,
+            description: 'Graduated with Honors. Relevant coursework: Data Structures, Algorithms, Operating Systems, Database Systems.',
+        },
+    ],
+    skills: ['React', 'Node.js', 'TypeScript', 'Next.js', 'AWS', 'Docker', 'GraphQL', 'PostgreSQL', 'Agile Methodologies'],
+    languages: ['English (Native)', 'Spanish (Fluent)', 'French (Intermediate)'],
+    certifications: ['AWS Certified Solutions Architect', 'Google Professional Cloud Developer'],
+    hobbies: ['Hiking', 'Photography', 'Playing Guitar', 'Open Source Contributing'],
+    templateId: 'modern',
+    themeColor: '#2563eb',
+    fontFamily: 'Inter',
+    fontSize: 'medium',
+    lineSpacing: 1.15,
+    sectionSpacing: 24,
+    margins: 64,
+};

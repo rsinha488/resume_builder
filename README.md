@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Resume Builder 🚀
 
-## Getting Started
+A professional, Zety-inspired AI Resume Builder built with Next.js, Redux, and Prisma. Create, customize, and export stunning resumes with ease.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Dynamic Templates**: Choose from a variety of professional, ATS-friendly templates.
+- **Live Preview**: See your changes in real-time as you type.
+- **AI-Powered**: (Optional) Integrated AI features for content generation.
+- **Fit to One Page**: Automatically optimize layout to fit content on a single page.
+- **Export Options**: Download your resume in PDF, DOCX, or TXT formats.
+- **Dashboard**: Manage multiple resumes and cover letters in one place.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend**: Next.js 15+, React 19, Redux Toolkit, Tailwind CSS
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: MongoDB
+- **Authentication**: JWT-based auth
+- **Storage**: Cloudinary (for profile images)
+- **PDF Generation**: @react-pdf/renderer
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Getting Started
 
-## Learn More
+### Prerequisites
 
-To learn more about Next.js, take a look at the following resources:
+- Node.js 18+ 
+- MongoDB (Local or Atlas)
+- Cloudinary Account (for image uploads)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd resume-builder
+   ```
 
-## Deploy on Vercel
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Set up Environment Variables**:
+   Create a `.env` file in the root directory and add the following:
+   ```env
+   DATABASE_URL="your_mongodb_connection_string"
+   JWT_SECRET="your_jwt_secret_key"
+   
+   # Cloudinary Configuration
+   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your_cloud_name"
+   CLOUDINARY_API_KEY="your_api_key"
+   CLOUDINARY_API_SECRET="your_api_secret"
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Initialize Database**:
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
+
+### Running the Application
+
+- **Development Mode**:
+  ```bash
+  npm run dev
+  ```
+  Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+- **Build for Production**:
+  ```bash
+  npm run build
+  npm run start
+  ```
+
+## 📂 Project Structure
+
+- `src/app`: Next.js App Router pages and API routes.
+- `src/components`: Reusable UI components (Builder, Dashboard, etc.).
+- `src/lib`: Utility functions, hooks, and Redux slices.
+- `src/styles`: Global styles and Tailwind configuration.
+- `prisma`: Database schema and migrations.
+- `public`: Static assets and icons.
+
+## 📄 License
+
+This project is licensed under the MIT License.

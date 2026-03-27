@@ -6,9 +6,11 @@ import { useState } from 'react';
 import TemplateSelectionModal from './TemplateSelectionModal';
 
 interface TemplateSelectorProps {
-    userPlan: 'FREE' | 'PRO';
-    onUpgradeRequired: () => void;
+    readonly userPlan: 'FREE' | 'PRO';
+    readonly onUpgradeRequired: () => void;
 }
+
+import ResumePreview from './ResumePreview';
 
 export default function TemplateSelector({ userPlan, onUpgradeRequired }: TemplateSelectorProps) {
     const dispatch = useAppDispatch();
@@ -54,39 +56,34 @@ export default function TemplateSelector({ userPlan, onUpgradeRequired }: Templa
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {TEMPLATES.map((template) => (
-                    <div
+                    <button
                         key={template.id}
-                        role="button"
-                        tabIndex={0}
                         onClick={() => handleSelect(template.id, template.isPremium)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                handleSelect(template.id, template.isPremium);
-                            }
-                        }}
-                        className={`relative cursor-pointer rounded-xl border-2 transition-all overflow-hidden group ${selectedTemplateId === template.id
+                        className={`relative cursor-pointer rounded-xl border-2 transition-all overflow-hidden group text-left ${selectedTemplateId === template.id
                             ? 'border-primary-600 ring-2 ring-primary-100'
                             : 'border-gray-200 hover:border-primary-300'
                             }`}
                     >
-                        {/* Thumbnail Placeholder */}
-                        <div className="aspect-[3/4] bg-gray-100 flex items-center justify-center relative">
-                            <span className="text-gray-400 font-medium">{template.name} Preview</span>
-
-                            {template.isPremium && (
-                                <div className="absolute top-3 right-3 bg-amber-500 text-white p-1.5 rounded-full shadow-lg">
-                                    <FaCrown size={14} />
-                                </div>
-                            )}
-
-                            {selectedTemplateId === template.id && (
-                                <div className="absolute inset-0 bg-primary-600/10 flex items-center justify-center">
-                                    <div className="bg-primary-600 text-white p-2 rounded-full shadow-lg">
-                                        <FaCheck size={20} />
-                                    </div>
-                                </div>
-                            )}
+                        {/* Template Thumbnail Preview */}
+                        <div className="aspect-[3/4] bg-gray-100 flex flex-col items-center overflow-hidden relative group-hover:bg-gray-200 transition-colors border-b p-4">
+                            <div className="w-[210mm] min-h-[297mm] transform scale-[0.16] origin-top shadow-lg border border-gray-200 pointer-events-none bg-white">
+                                <ResumePreview templateId={template.id} />
+                            </div>
                         </div>
+
+                        {template.isPremium && (
+                            <div className="absolute top-3 right-3 bg-amber-500 text-white p-1.5 rounded-full shadow-lg">
+                                <FaCrown size={14} />
+                            </div>
+                        )}
+
+                        {selectedTemplateId === template.id && (
+                            <div className="absolute inset-0 bg-primary-600/10 flex items-center justify-center">
+                                <div className="bg-primary-600 text-white p-2 rounded-full shadow-lg">
+                                    <FaCheck size={20} />
+                                </div>
+                            </div>
+                        )}
 
                         <div className="p-4 bg-white">
                             <div className="flex justify-between items-center mb-1">
@@ -99,9 +96,9 @@ export default function TemplateSelector({ userPlan, onUpgradeRequired }: Templa
                             </div>
                             <p className="text-xs text-gray-500 line-clamp-2">{template.description}</p>
                         </div>
-                    </div>
+                    </button>
                 ))}
             </div>
-        </div>
+        </div >
     );
 }

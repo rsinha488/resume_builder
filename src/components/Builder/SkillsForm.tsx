@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { updateSkills } from '@/lib/features/resume/resumeSlice';
 import { FaPlus, FaTimes } from 'react-icons/fa';
+import { toast } from 'sonner';
 
 export default function SkillsForm() {
     const dispatch = useAppDispatch();
@@ -14,11 +15,13 @@ export default function SkillsForm() {
         if (newSkill.trim() && !skills?.includes(newSkill.trim())) {
             dispatch(updateSkills([...skills, newSkill.trim()]));
             setNewSkill('');
+            toast.success('Skill added');
         }
     };
 
     const handleRemove = (skillToRemove: string) => {
         dispatch(updateSkills(skills?.filter(s => s !== skillToRemove)));
+        toast.success('Skill removed');
     };
 
     return (
