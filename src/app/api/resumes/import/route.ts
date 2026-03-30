@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
         if (file.type === 'application/pdf') {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const pdfParse = require('pdf-parse');
+            const pdfParse = require('pdf-parse/node');
             const data = await pdfParse(buffer);
             text = data.text;
         } else if (
