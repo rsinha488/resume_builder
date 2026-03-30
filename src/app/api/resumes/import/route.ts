@@ -24,10 +24,8 @@ export async function POST(req: NextRequest) {
         let text = '';
 
         if (file.type === 'application/pdf') {
-            // Lazy-load pdf-parse to avoid DOMMatrix/canvas errors at module init
-            const { createRequire } = await import('module');
-            const nodeRequire = createRequire(import.meta.url);
-            const pdfParse = nodeRequire('pdf-parse');
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const pdfParse = require('pdf-parse');
             const data = await pdfParse(buffer);
             text = data.text;
         } else if (
