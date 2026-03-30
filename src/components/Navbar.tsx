@@ -4,14 +4,16 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 export default function Navbar() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
     const router = useRouter();
     const pathname = usePathname();
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        setIsLoggedIn(!!token);
-    }, []);
+        const check = () => setIsLoggedIn(!!localStorage.getItem('token'));
+        check();
+        window.addEventListener('storage', check);
+        return () => window.removeEventListener('storage', check);
+    }, [pathname]);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -25,6 +27,8 @@ export default function Navbar() {
         return null;
     }
 
+    const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
+
     return (
         <nav className="flex justify-between items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
             <Link href="/" className="flex items-center gap-2 group">
@@ -33,30 +37,32 @@ export default function Navbar() {
                 </div>
                 <span className="text-xl font-black tracking-tight text-gray-900">RESUME<span className="text-primary-600">BUILDER</span></span>
             </Link>
-            <div className="flex items-center gap-6">
-                {isLoggedIn ? (
-                    <>
-                        <Link href="/dashboard" className="text-gray-600 font-medium hover:text-gray-900 transition-colors">
-                            Dashboard
-                        </Link>
-                        <button
-                            className="text-gray-600 font-medium hover:text-gray-900 transition-colors"
-                            onClick={handleLogout}
-                        >
-                            Logout
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <Link href="/login" className="px-4 py-2 text-primary-600 border border-primary-600 rounded-md font-medium hover:bg-primary-50 transition-colors">
-                            Login
-                        </Link>
-                        <Link href="/register" className="px-4 py-2 bg-primary-600 text-white rounded-md font-medium hover:bg-primary-700 transition-colors shadow-sm">
-                            Sign Up
-                        </Link>
-                    </>
-                )}
-            </div>
+            {!isAuthPage && isLoggedIn !== null && (
+                <div className="flex items-center gap-6">
+                    {isLoggedIn ? (
+                        <>
+                            <Link href="/dashboard" className="text-gray-600 font-medium hover:text-gray-900 transition-colors">
+                                Dashboard
+                            </Link>
+                            <button
+                                className="text-gray-600 font-medium hover:text-gray-900 transition-colors"
+                                onClick={handleLogout}
+                            >
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link href="/login" className="px-4 py-2 text-primary-600 border border-primary-600 rounded-md font-medium hover:bg-primary-50 transition-colors">
+                                Login
+                            </Link>
+                            <Link href="/register" className="px-4 py-2 bg-primary-600 text-white rounded-md font-medium hover:bg-primary-700 transition-colors shadow-sm">
+                                Sign Up
+                            </Link>
+                        </>
+                    )}
+                </div>
+            )}
         </nav>
     );
 }

@@ -3,9 +3,8 @@ import Stripe from 'stripe';
 import { getUserFromRequest } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 export async function POST(req: Request) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
     try {
         const user = getUserFromRequest(req);
         if (!user) {
