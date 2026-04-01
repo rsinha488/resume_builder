@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mammoth from 'mammoth';
 import { parseResumeText } from '@/lib/parser';
-import { v4 as uuidv4 } from 'uuid';
 import { getUserFromRequest } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
 
@@ -43,17 +43,24 @@ export async function POST(req: NextRequest) {
         }
 
         const parsedData = parseResumeText(text);
+        const title = parsedData.personalInfo?.fullName || 'Imported Resume';
+        const resumeData = {
+            ...parsedData,
+            themeColor: '#2563eb',
+            fontFamily: 'Inter, sans-serif',
+            templateId: 'modern'
+        };
 
-        return NextResponse.json({
-            id: uuidv4(),
-            title: parsedData.personalInfo?.fullName || 'Imported Resume',
+        const resume = await prisma.resume.create({
             data: {
-                ...parsedData,
-                themeColor: '#2563eb',
-                fontFamily: 'Inter, sans-serif',
-                templateId: 'modern'
-            }
+                title,
+                templateId: 'modern',
+                userId: user.userId,
+                data: resumeData as object,
+            },
         });
+
+        return NextResponse.json({ id: resume.id, title: resume.title, data: resumeData });
     } catch (error) {
         console.error('Import error:', error);
         return NextResponse.json({ error: 'Internal server error during import' }, { status: 500 });

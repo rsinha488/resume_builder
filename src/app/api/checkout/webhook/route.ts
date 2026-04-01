@@ -32,9 +32,6 @@ export async function POST(req: Request) {
                 if (subscriptionType === 'TRIAL') {
                     planExpiry = new Date();
                     planExpiry.setDate(planExpiry.getDate() + 14);
-                } else if (subscriptionType === 'ANNUAL') {
-                    planExpiry = new Date();
-                    planExpiry.setFullYear(planExpiry.getFullYear() + 1);
                 }
 
                 await prisma.user.update({
@@ -67,6 +64,37 @@ export async function POST(req: Request) {
 
             case 'invoice.payment_failed': {
                 // Renewal failed — downgrade to FREE
+                const invoice = event.data.object as Stripe.Invoice & { subscription?: string | { id: string } | null };
+                const rawSub = invoice.subscription;
+                const subId = typeof rawSub === 'string' ? rawSub : rawSub?.id;
+                if (subId) {
+                    await prisma.user.updateMany({
+                        where: { stripeSubscriptionId: subId },
+                        data: { plan: 'FREE', subscriptionType: 'NONE', planExpiry: null },
+                    });
+                }
+                break;
+            }
+
+            case 'customer.subscription.updated': {
+                const subscription = event.data.object as Stripe.Subscription;
+                const status = subscription.status;
+                if (status === 'active') {
+                    await prisma.user.updateMany({
+                        where: { stripeSubscriptionId: subscription.id },
+                        data: { plan: 'PRO' },
+                    });
+                } else if (status === 'past_due' || status === 'unpaid') {
+                    await prisma.user.updateMany({
+                        where: { stripeSubscriptionId: subscription.id },
+                        data: { plan: 'FREE', subscriptionType: 'NONE', planExpiry: null },
+                    });
+                }
+                break;
+            }
+
+            case 'invoice.payment_action_required': {
+                // 3D Secure / SCA required — downgrade until resolved
                 const invoice = event.data.object as Stripe.Invoice & { subscription?: string | { id: string } | null };
                 const rawSub = invoice.subscription;
                 const subId = typeof rawSub === 'string' ? rawSub : rawSub?.id;

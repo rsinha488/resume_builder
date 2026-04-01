@@ -15,9 +15,9 @@ export default function Navbar() {
         return () => window.removeEventListener('storage', check);
     }, [pathname]);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         localStorage.removeItem('token');
-        document.cookie = 'token=; path=/; max-age=0';
+        await fetch('/api/auth/logout', { method: 'POST' });
         setIsLoggedIn(false);
         router.push('/login');
     };

@@ -146,13 +146,53 @@ export default function BuilderPage() {
         URL.revokeObjectURL(url);
     };
 
-    const handleDownloadDocx = () => {
-        const text = convertToPlainText(resume);
-        const blob = new Blob([text], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const handleDownloadDocx = async () => {
+        const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = await import('docx');
+        const { personalInfo, experiences, education, skills } = resume;
+
+        const children = [
+            new Paragraph({ text: personalInfo.fullName, heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
+            new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${personalInfo.email}  |  ${personalInfo.phone}  |  ${personalInfo.address}`, size: 20 })] }),
+            ...(personalInfo.website ? [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: personalInfo.website, size: 20 })] })] : []),
+            new Paragraph({}),
+        ];
+
+        if (personalInfo.summary) {
+            children.push(new Paragraph({ text: 'SUMMARY', heading: HeadingLevel.HEADING_2 }));
+            children.push(new Paragraph({ text: personalInfo.summary }));
+            children.push(new Paragraph({}));
+        }
+
+        if (experiences?.length > 0) {
+            children.push(new Paragraph({ text: 'EXPERIENCE', heading: HeadingLevel.HEADING_2 }));
+            experiences.forEach((exp) => {
+                children.push(new Paragraph({ children: [new TextRun({ text: `${exp.position} — ${exp.company}`, bold: true })] }));
+                children.push(new Paragraph({ children: [new TextRun({ text: `${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}`, italics: true, size: 20 })] }));
+                if (exp.description) children.push(new Paragraph({ text: exp.description }));
+                children.push(new Paragraph({}));
+            });
+        }
+
+        if (education?.length > 0) {
+            children.push(new Paragraph({ text: 'EDUCATION', heading: HeadingLevel.HEADING_2 }));
+            education.forEach((edu) => {
+                children.push(new Paragraph({ children: [new TextRun({ text: `${edu.degree} in ${edu.field}`, bold: true })] }));
+                children.push(new Paragraph({ children: [new TextRun({ text: `${edu.school}  |  ${edu.startDate} - ${edu.endDate}`, italics: true, size: 20 })] }));
+                children.push(new Paragraph({}));
+            });
+        }
+
+        if (skills?.length > 0) {
+            children.push(new Paragraph({ text: 'SKILLS', heading: HeadingLevel.HEADING_2 }));
+            children.push(new Paragraph({ text: skills.join(', ') }));
+        }
+
+        const doc = new Document({ sections: [{ children }] });
+        const blob = await Packer.toBlob(doc);
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${resume.personalInfo?.fullName || 'resume'}.docx`;
+        link.download = `${personalInfo.fullName || 'resume'}.docx`;
         document.body.appendChild(link);
         link.click();
         link.remove();

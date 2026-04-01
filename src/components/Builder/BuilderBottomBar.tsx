@@ -1,15 +1,6 @@
 'use client';
 import { FaChevronLeft, FaChevronRight, FaSave } from 'react-icons/fa';
 
-interface BuilderBottomBarProps {
-    onBack: () => void;
-    onNext: () => void;
-    onSave: () => void;
-    isFirstStep: boolean;
-    isLastStep: boolean;
-    saving: boolean;
-}
-
 export default function BuilderBottomBar({
     onBack,
     onNext,

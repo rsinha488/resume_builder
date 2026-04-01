@@ -22,9 +22,9 @@ export default function DashboardHeader() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         localStorage.removeItem('token');
-        document.cookie = 'token=; path=/; max-age=0';
+        await fetch('/api/auth/logout', { method: 'POST' });
         router.push('/login');
     };
 

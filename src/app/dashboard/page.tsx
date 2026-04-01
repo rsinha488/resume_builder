@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FaPlus, FaSearch } from 'react-icons/fa';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { FaPlus, FaSearch, FaCrown, FaExternalLinkAlt } from 'react-icons/fa';
 import { pdf } from '@react-pdf/renderer';
 import DashboardHeader from '@/components/Dashboard/DashboardHeader';
 import DocumentCard from '@/components/Dashboard/DocumentCard';
@@ -17,7 +17,9 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'resumes' | 'coverLetters'>('resumes');
     const [searchQuery, setSearchQuery] = useState('');
+    const [userPlan, setUserPlan] = useState<{ plan: string; subscriptionType: string; planExpiry: string | null } | null>(null);
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,6 +46,25 @@ export default function DashboardPage() {
 
         fetchData();
     }, [router]);
+
+    useEffect(() => {
+        const fetchPlan = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            try {
+                const res = await axios.get('/api/user/plan', { headers: { Authorization: `Bearer ${token}` } });
+                setUserPlan(res.data);
+            } catch { /* silent */ }
+        };
+        fetchPlan();
+
+        const upgrade = searchParams.get('upgrade');
+        if (upgrade === 'success') {
+            toast.success('🎉 Welcome to PRO! Your plan has been activated.');
+            // Remove query param from URL without reload
+            window.history.replaceState({}, '', '/dashboard');
+        }
+    }, [searchParams]);
 
     const createNewResume = async () => {
         const token = localStorage.getItem('token');
@@ -89,6 +110,18 @@ export default function DashboardPage() {
         } catch (error) {
             console.error('Error creating cover letter:', error);
             toast.error('Failed to create cover letter. Please try again.');
+        }
+    };
+
+    const handleManageBilling = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const res = await axios.post('/api/checkout/portal', {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.data.url) window.location.href = res.data.url;
+        } catch {
+            toast.error('Could not open billing portal. Please try again.');
         }
     };
 
@@ -190,6 +223,30 @@ export default function DashboardPage() {
             <DashboardHeader />
 
             <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
+                {/* Plan Status Banner */}
+                {userPlan && userPlan.plan === 'PRO' && (
+                    <div className="mb-8 flex items-center justify-between px-6 py-4 bg-gradient-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-2xl">
+                        <div className="flex items-center gap-3">
+                            <FaCrown className="text-yellow-500" size={20} />
+                            <div>
+                                <span className="font-bold text-gray-900">PRO Plan Active</span>
+                                <span className="ml-2 text-sm text-gray-500">
+                                    {userPlan.subscriptionType === 'TRIAL' && userPlan.planExpiry
+                                        ? `Trial expires ${new Date(userPlan.planExpiry).toLocaleDateString()}`
+                                        : 'Annual subscription'}
+                                </span>
+                            </div>
+                        </div>
+                        {userPlan.subscriptionType === 'ANNUAL' && (
+                            <button
+                                onClick={handleManageBilling}
+                                className="flex items-center gap-2 text-sm font-semibold text-primary-600 hover:text-primary-700 transition-colors"
+                            >
+                                Manage Billing <FaExternalLinkAlt size={12} />
+                            </button>
+                        )}
+                    </div>
+                )}
                 {/* Dashboard Title & Search */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-8">
                     <div>
