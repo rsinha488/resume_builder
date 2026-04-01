@@ -39,27 +39,35 @@ export async function POST(request: Request) {
             },
         });
 
-        await transporter.sendMail({
-            from: process.env.SMTP_FROM,
-            to: email,
-            subject: 'Reset your password — ResumeBuilder',
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
-                    <h2 style="color: #1d4ed8;">Reset Your Password</h2>
-                    <p>You requested a password reset. Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>
-                    <a href="${resetUrl}" style="display: inline-block; margin: 16px 0; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
-                        Reset Password
-                    </a>
-                    <p style="color: #6b7280; font-size: 13px;">If you didn't request this, you can safely ignore this email.</p>
-                    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
-                    <p style="color: #9ca3af; font-size: 12px;">ResumeBuilder &mdash; ${appUrl}</p>
-                </div>
-            `,
-        });
+        try {
+            await transporter.sendMail({
+                from: process.env.SMTP_FROM,
+                to: email,
+                subject: 'Reset your password — ResumeBuilder',
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
+                        <h2 style="color: #1d4ed8;">Reset Your Password</h2>
+                        <p>You requested a password reset. Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>
+                        <a href="${resetUrl}" style="display: inline-block; margin: 16px 0; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                            Reset Password
+                        </a>
+                        <p style="color: #6b7280; font-size: 13px;">If you didn't request this, you can safely ignore this email.</p>
+                        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+                        <p style="color: #9ca3af; font-size: 12px;">ResumeBuilder &mdash; ${appUrl}</p>
+                    </div>
+                `,
+            });
+        } catch (emailError) {
+            console.error('SMTP error:', emailError);
+            return NextResponse.json(
+                { error: 'We could not send the reset email. Please check your email address or try again later.' },
+                { status: 503 }
+            );
+        }
 
         return NextResponse.json({ message: 'If that email exists, a reset link has been sent.' });
     } catch (error) {
         console.error('Forgot password error:', error);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
     }
 }

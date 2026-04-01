@@ -113,7 +113,10 @@ export default function BuilderPage() {
 
     const handleBack = () => {
         if (currentMode === 'finalize') setCurrentMode('analysis');
-        else if (currentMode === 'analysis') setCurrentMode('content');
+        else if (currentMode === 'analysis') {
+            setCurrentContentStep(contentSteps.length - 1);
+            setCurrentMode('content');
+        }
         else if (currentMode === 'content') {
             if (currentContentStep > 0) {
                 setCurrentContentStep(prev => prev - 1);

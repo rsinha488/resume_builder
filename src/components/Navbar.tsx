@@ -22,8 +22,14 @@ export default function Navbar() {
         router.push('/login');
     };
 
-    // Hide navbar on dashboard, builder, and templates pages
-    if (pathname.startsWith('/dashboard') || pathname.startsWith('/builder') || pathname.startsWith('/templates')) {
+    // Hide navbar on pages that use DashboardHeader
+    if (
+        pathname.startsWith('/dashboard') ||
+        pathname.startsWith('/builder') ||
+        pathname.startsWith('/templates') ||
+        pathname.startsWith('/profile') ||
+        pathname.startsWith('/cover-letter')
+    ) {
         return null;
     }
 

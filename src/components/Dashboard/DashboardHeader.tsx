@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { FaUserCircle, FaBell, FaFileImport, FaSignOutAlt, FaUser } from 'react-icons/fa';
@@ -8,6 +9,9 @@ import ImportModal from './ImportModal';
 export default function DashboardHeader() {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const [userName, setUserName] = useState<string | null>(null);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
+    const [userAvatar, setUserAvatar] = useState<string | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const pathname = usePathname();
@@ -20,6 +24,25 @@ export default function DashboardHeader() {
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const fetchProfile = () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        fetch('/api/user/profile', { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => r.json())
+            .then(data => {
+                setUserName(data.name || null);
+                setUserEmail(data.email || null);
+                setUserAvatar(data.avatarUrl || null);
+            })
+            .catch(() => {});
+    };
+
+    useEffect(() => {
+        fetchProfile();
+        window.addEventListener('profile-updated', fetchProfile);
+        return () => window.removeEventListener('profile-updated', fetchProfile);
     }, []);
 
     const handleLogout = async () => {
@@ -77,17 +100,20 @@ export default function DashboardHeader() {
                             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                             className="flex items-center gap-3 p-1.5 pl-4 rounded-xl border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
                         >
-                            <span className="text-sm font-bold text-gray-700">My Account</span>
-                            <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
-                                <FaUserCircle size={24} />
+                            <span className="text-sm font-bold text-gray-700">{userName || 'My Account'}</span>
+                            <div className="w-8 h-8 rounded-lg overflow-hidden bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-sm flex-shrink-0">
+                                {userAvatar
+                                    ? <Image src={userAvatar} alt="avatar" width={32} height={32} className="object-cover w-full h-full" />
+                                    : userName ? userName.charAt(0).toUpperCase() : <FaUserCircle size={20} />}
                             </div>
                         </button>
 
                         {isUserMenuOpen && (
-                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 animate-in fade-in zoom-in-95 duration-200">
-                                <div className="px-4 py-3 border-b border-gray-50">
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Account</p>
-                                    <p className="text-sm font-bold text-gray-900 truncate">User Account</p>
+                            <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="px-4 py-3 border-b border-gray-100">
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Account</p>
+                                    <p className="text-sm font-bold text-gray-900 truncate">{userName || 'My Account'}</p>
+                                    {userEmail && <p className="text-xs text-gray-400 truncate mt-0.5">{userEmail}</p>}
                                 </div>
                                 <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50 hover:text-primary-600 transition-colors">
                                     <FaUser size={14} /> Profile Settings

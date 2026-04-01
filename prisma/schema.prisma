@@ -21,6 +21,8 @@ enum SubscriptionType {
 model User {
   id                   String           @id @default(auto()) @map("_id") @db.ObjectId
   email                String           @unique
+  name                 String?
+  avatarUrl            String?
   password             String
   plan                 Plan             @default(FREE)
   subscriptionType     SubscriptionType @default(NONE)
