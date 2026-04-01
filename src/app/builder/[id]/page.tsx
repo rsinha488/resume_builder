@@ -17,7 +17,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 import BuilderSidebar from '@/components/Builder/BuilderSidebar';
 import BuilderBottomBar from '@/components/Builder/BuilderBottomBar';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import { FaDownload, FaCrown, FaFileAlt, FaCheck, FaEdit } from 'react-icons/fa';
+import { FaDownload, FaCrown, FaFileAlt, FaCheck, FaEdit, FaSpinner, FaMagic } from 'react-icons/fa';
 import ProgressBar from '@/components/Builder/ProgressBar';
 import { toast } from 'sonner';
 import { convertToPlainText } from '@/lib/utils';
@@ -49,6 +49,25 @@ export default function BuilderPage() {
     const [saving, setSaving] = useState(false);
     const [userPlan, setUserPlan] = useState<'FREE' | 'PRO'>('FREE');
     const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+    const [generatingSummary, setGeneratingSummary] = useState(false);
+
+    const handleGenerateSummary = async () => {
+        setGeneratingSummary(true);
+        const token = localStorage.getItem('token');
+        try {
+            const res = await axios.post('/api/ai/generate-summary', {
+                personalInfo: resume.personalInfo,
+                experiences: resume.experiences,
+                skills: resume.skills,
+            }, { headers: { Authorization: `Bearer ${token}` } });
+            dispatch(updatePersonalInfo({ summary: res.data.summary }));
+            toast.success('Summary generated!');
+        } catch {
+            toast.error('Failed to generate summary.');
+        } finally {
+            setGeneratingSummary(false);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -321,8 +340,21 @@ export default function BuilderPage() {
                                         {currentContentStep === 4 && <ExtraSections />}
                                         {currentContentStep === 5 && (
                                             <div className="space-y-6">
-                                                <label htmlFor="summary-large" className="block text-sm font-semibold text-gray-700 mb-1">Professional Summary</label>
-                                                <p className="text-sm text-gray-500 mb-4">Write a short, catchy summary that highlights your best qualities and experiences.</p>
+                                                <div className="flex justify-between items-center">
+                                                    <label htmlFor="summary-large" className="block text-sm font-semibold text-gray-700">Professional Summary</label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleGenerateSummary}
+                                                        disabled={generatingSummary}
+                                                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+                                                    >
+                                                        {generatingSummary
+                                                            ? <><FaSpinner className="animate-spin" size={10} /> Generating...</>
+                                                            : <><FaMagic size={10} /> Generate with AI</>
+                                                        }
+                                                    </button>
+                                                </div>
+                                                <p className="text-sm text-gray-500">Write a short, catchy summary that highlights your best qualities and experiences.</p>
                                                 <textarea
                                                     id="summary-large"
                                                     value={resume.personalInfo?.summary}
@@ -333,6 +365,7 @@ export default function BuilderPage() {
                                                 />
                                             </div>
                                         )}
+
                                     </>
                                 )}
                                 {currentMode === 'analysis' && <AtsScoreDisplay />}

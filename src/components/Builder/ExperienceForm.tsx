@@ -1,13 +1,19 @@
 'use client';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { addExperience, updateExperience, removeExperience, Experience } from '@/lib/features/resume/resumeSlice';
-import { FaPlus, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaMagic, FaSpinner } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
+import { useState } from 'react';
+import axios from 'axios';
 
 export default function ExperienceForm() {
     const dispatch = useAppDispatch();
     const experiences = useAppSelector((state) => state.resume.experiences);
+    const personalInfo = useAppSelector((state) => state.resume.personalInfo);
+
+    // Add state per experience (keyed by experience id)
+    const [rewriting, setRewriting] = useState<string | null>(null);
 
     const handleAdd = () => {
         const newExp: Experience = {
@@ -27,6 +33,26 @@ export default function ExperienceForm() {
         const exp = experiences?.find(e => e.id === id);
         if (exp) {
             dispatch(updateExperience({ ...exp, [field]: value }));
+        }
+    };
+
+    const handleRewriteBullet = async (expId: string, description: string, jobTitle: string) => {
+        setRewriting(expId);
+        const token = localStorage.getItem('token');
+        try {
+            const res = await axios.post('/api/ai/rewrite-bullet',
+                { description, jobTitle },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const exp = experiences?.find(e => e.id === expId);
+            if (exp) {
+                dispatch(updateExperience({ ...exp, description: res.data.rewritten }));
+            }
+            toast.success('Description rewritten!');
+        } catch {
+            toast.error('Failed to rewrite. Please try again.');
+        } finally {
+            setRewriting(null);
         }
     };
 
@@ -113,7 +139,20 @@ export default function ExperienceForm() {
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none resize-none"
                                 placeholder="Describe your responsibilities and achievements..."
                             />
+
+                            <button
+                                type="button"
+                                onClick={() => handleRewriteBullet(exp.id, exp.description, personalInfo?.jobTitle || '')}
+                                disabled={rewriting === exp.id || !exp.description?.trim()}
+                                className="mt-2 flex items-center gap-2 text-xs font-semibold text-purple-600 hover:text-purple-700 disabled:opacity-40 transition-colors"
+                            >
+                                {rewriting === exp.id
+                                    ? <><FaSpinner className="animate-spin" size={11} /> Rewriting...</>
+                                    : <><FaMagic size={11} /> Rewrite with AI</>
+                                }
+                            </button>
                         </div>
+
                     </div>
                 </div>
             ))}
