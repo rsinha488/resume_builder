@@ -69,6 +69,12 @@ export default function BuilderPage() {
         }
     };
 
+    // Lock body scroll while builder is mounted — each panel scrolls independently
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = ''; };
+    }, []);
+
     useEffect(() => {
         const fetchData = async () => {
             const token = localStorage.getItem('token');
@@ -228,10 +234,10 @@ export default function BuilderPage() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col overflow-hidden">
+        <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
             <DashboardHeader />
 
-            <div className="flex-1 flex overflow-hidden">
+            <div className="flex-1 flex overflow-hidden min-h-0">
                 <BuilderSidebar
                     currentMode={currentMode}
                     onModeChange={(mode) => {
@@ -240,14 +246,14 @@ export default function BuilderPage() {
                     }}
                 />
 
-                <main className="flex-1 flex flex-col relative overflow-hidden">
+                <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
                     <ProgressBar
                         steps={contentSteps}
                         currentStep={currentContentStep}
                         currentMode={currentMode}
                     />
                     {/* Header Actions */}
-                    <header className="h-16 bg-white border-b border-gray-200 px-8 flex justify-between items-center z-10">
+                    <header className="flex-shrink-0 h-16 bg-white border-b border-gray-200 px-8 flex justify-between items-center z-10">
                         <div className="flex items-center gap-4">
                             <h1 className="text-lg font-bold text-gray-900">
                                 {currentMode === 'content' ? contentSteps[currentContentStep].title : currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}
@@ -298,8 +304,8 @@ export default function BuilderPage() {
                         </div>
                     </header>
 
-                    {/* Editor Area */}
-                    <div className="flex-1 overflow-y-auto pb-24 p-8">
+                    {/* Editor Area — scrolls independently, bottom bar stays pinned */}
+                    <div className="flex-1 overflow-y-auto min-h-0 pb-24 p-8">
                         <div className="max-w-3xl mx-auto">
                             {currentMode === 'content' && (
                                 <div className="flex mb-8 gap-4 overflow-x-auto pb-2">
@@ -440,8 +446,8 @@ export default function BuilderPage() {
                     />
                 </main>
 
-                {/* Preview Section */}
-                <aside className="hidden xl:block w-[45%] bg-gray-200 overflow-y-auto p-12 border-l border-gray-300">
+                {/* Preview Section — own scroll, never affects page */}
+                <aside className="hidden xl:flex xl:flex-col w-[45%] bg-gray-200 overflow-y-auto min-h-0 p-12 border-l border-gray-300">
                     <div className="scale-[0.85] origin-top transform transition-transform duration-300">
                         <ResumePreview />
                     </div>

@@ -19,3 +19,16 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Global input / textarea visibility */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+textarea,
+select {
+  color: #111827 !important; /* gray-900 — always dark regardless of Tailwind utility classes */
+}
+
+input:not([type="checkbox"]):not([type="radio"])::placeholder,
+textarea::placeholder {
+  color: #9ca3af !important; /* gray-400 — visible but clearly a placeholder */
+  opacity: 1;
+}
