@@ -18,9 +18,10 @@ import { ResumeState } from '@/lib/features/resume/resumeSlice';
 interface ResumePreviewProps {
     readonly data?: ResumeState;
     readonly templateId?: string;
+    readonly onSectionClick?: (sectionId: string) => void;
 }
 
-export default function ResumePreview({ data, templateId }: ResumePreviewProps) {
+export default function ResumePreview({ data, templateId, onSectionClick }: ResumePreviewProps) {
     const stateResume = useAppSelector((state) => state.resume);
     const resume = data || stateResume;
 
@@ -49,25 +50,25 @@ export default function ResumePreview({ data, templateId }: ResumePreviewProps) 
 
     switch (finalTemplateId) {
         case 'classic':
-            return <ClassicTemplate data={displayData as any} />;
+            return <ClassicTemplate data={displayData as any} onSectionClick={onSectionClick} />;
         case 'primo':
-            return <PrimoTemplate data={displayData as any} />;
+            return <PrimoTemplate data={displayData as any} onSectionClick={onSectionClick} />;
         case 'minimal':
-            return <MinimalTemplate data={displayData as any} />;
+            return <MinimalTemplate data={displayData as any} onSectionClick={onSectionClick} />;
         case 'cascade':
-            return <CascadeTemplate data={displayData as any} />;
+            return <CascadeTemplate data={displayData as any} onSectionClick={onSectionClick} />;
         case 'concept':
-            return <ConceptTemplate data={displayData as any} />;
+            return <ConceptTemplate data={displayData as any} onSectionClick={onSectionClick} />;
         case 'diamond':
-            return <DiamondTemplate data={displayData as any} />;
+            return <DiamondTemplate data={displayData as any} onSectionClick={onSectionClick} />;
         case 'influx':
-            return <InfluxTemplate data={displayData as any} />;
+            return <InfluxTemplate data={displayData as any} onSectionClick={onSectionClick} />;
         case 'vibes':
-            return <VibesTemplate data={displayData as any} />;
+            return <VibesTemplate data={displayData as any} onSectionClick={onSectionClick} />;
         case 'muse':
-            return <MuseTemplate data={displayData as any} />;
+            return <MuseTemplate data={displayData as any} onSectionClick={onSectionClick} />;
         case 'modern':
         default:
-            return <ModernTemplate data={displayData as any} />;
+            return <ModernTemplate data={displayData as any} onSectionClick={onSectionClick} />;
     }
 }

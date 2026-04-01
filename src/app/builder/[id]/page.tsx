@@ -21,12 +21,11 @@ import { FaDownload, FaCrown, FaFileAlt, FaCheck, FaEdit, FaSpinner, FaMagic } f
 import ProgressBar from '@/components/Builder/ProgressBar';
 import { toast } from 'sonner';
 import { convertToPlainText } from '@/lib/utils';
-
-type BuilderMode = 'templates' | 'design' | 'content' | 'analysis' | 'finalize';
-
 import { SAMPLE_DATA } from '@/lib/sampleData';
 import ExtraSections from '@/components/Builder/ExtraSections';
 import DashboardHeader from '@/components/Dashboard/DashboardHeader';
+
+type BuilderMode = 'templates' | 'design' | 'content' | 'analysis' | 'finalize';
 
 const contentSteps = [
     { id: 'personal', title: 'Personal Info' },
@@ -69,7 +68,6 @@ export default function BuilderPage() {
         }
     };
 
-    // Lock body scroll while builder is mounted — each panel scrolls independently
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         return () => { document.body.style.overflow = ''; };
@@ -84,14 +82,11 @@ export default function BuilderPage() {
             }
 
             try {
-                const resumeRes = await axios.get(`/api/resumes/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const [resumeRes, planRes] = await Promise.all([
+                    axios.get(`/api/resumes/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
+                    axios.get('/api/user/plan', { headers: { Authorization: `Bearer ${token}` } })
+                ]);
                 dispatch(setResume(resumeRes.data.data));
-
-                const planRes = await axios.get('/api/user/plan', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
                 setUserPlan(planRes.data.plan);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -111,9 +106,7 @@ export default function BuilderPage() {
             await axios.put(`/api/resumes/${id}`, {
                 title: resume.personalInfo?.fullName || 'My Resume',
                 data: resume
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            }, { headers: { Authorization: `Bearer ${token}` } });
             toast.success('Resume saved successfully!');
         } catch (error) {
             console.error('Error saving resume:', error);
@@ -227,6 +220,18 @@ export default function BuilderPage() {
         URL.revokeObjectURL(url);
     };
 
+    const handleSectionClick = (sectionId: string) => {
+        setCurrentMode('content');
+        const stepIndex = contentSteps.findIndex(s => s.id === sectionId);
+        if (stepIndex !== -1) setCurrentContentStep(stepIndex);
+        
+        // Scroll the form into view if needed
+        const editorArea = document.getElementById('editor-area');
+        if (editorArea) {
+            editorArea.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
@@ -305,7 +310,7 @@ export default function BuilderPage() {
                     </header>
 
                     {/* Editor Area — scrolls independently, bottom bar stays pinned */}
-                    <div className="flex-1 overflow-y-auto min-h-0 pb-24 p-8">
+                    <div id="editor-area" className="flex-1 overflow-y-auto min-h-0 pb-24 p-8 scroll-smooth">
                         <div className="max-w-3xl mx-auto">
                             {currentMode === 'content' && (
                                 <div className="flex mb-8 gap-4 overflow-x-auto pb-2">
@@ -449,7 +454,7 @@ export default function BuilderPage() {
                 {/* Preview Section — own scroll, never affects page */}
                 <aside className="hidden xl:flex xl:flex-col w-[45%] bg-gray-200 overflow-y-auto min-h-0 p-12 border-l border-gray-300">
                     <div className="scale-[0.85] origin-top transform transition-transform duration-300">
-                        <ResumePreview />
+                        <ResumePreview onSectionClick={handleSectionClick} />
                     </div>
                 </aside>
 
