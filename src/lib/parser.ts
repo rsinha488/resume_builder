@@ -218,10 +218,26 @@ function parseEducationBlocks(lines: string[]) {
 
 function identifySections(lines: string[]) {
     const sections: { [key: string]: string[] } = {
-        experience: ['experience', 'work history', 'employment', 'professional background', 'work experience'],
-        education: ['education', 'academic', 'qualification', 'academic background'],
-        skills: ['skills', 'technologies', 'competencies', 'expertise', 'technical skills', 'core competencies'],
-        summary: ['summary', 'profile', 'objective', 'about me', 'professional summary', 'career objective']
+        experience: [
+            'experience', 'work history', 'employment', 'professional background', 
+            'work experience', 'professional experience', 'career history', 
+            'employment history', 'work', 'history', 'professional career'
+        ],
+        education: [
+            'education', 'academic', 'qualification', 'academic background',
+            'educational background', 'learning', 'scholastic', 'academics',
+            'degrees', 'training', 'certifications'
+        ],
+        skills: [
+            'skills', 'technologies', 'competencies', 'expertise', 
+            'technical skills', 'core competencies', 'tools', 'proficiencies',
+            'languages', 'core skills', 'tech stack', 'software', 'qualifications'
+        ],
+        summary: [
+            'summary', 'profile', 'objective', 'about me', 'professional summary', 
+            'career objective', 'executive summary', 'personal profile', 'about', 
+            'bio', 'overview', 'professional profile', 'personal statement'
+        ]
     };
 
     const sectionContent: { [key: string]: string[] } = {
