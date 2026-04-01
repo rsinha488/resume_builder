@@ -51,6 +51,7 @@ export interface ResumeState {
     lineSpacing: number;
     sectionSpacing: number;
     margins: number;
+    isMultiPage: boolean;
 }
 
 const initialState: ResumeState = {
@@ -77,6 +78,7 @@ const initialState: ResumeState = {
     lineSpacing: 1.15,
     sectionSpacing: 24,
     margins: 16,
+    isMultiPage: false,
 };
 
 export const resumeSlice = createSlice({
@@ -93,6 +95,7 @@ export const resumeSlice = createSlice({
                 fontSize: action.payload.fontSize ?? initialState.fontSize,
                 fontFamily: action.payload.fontFamily ?? initialState.fontFamily,
                 themeColor: action.payload.themeColor ?? initialState.themeColor,
+                isMultiPage: action.payload.isMultiPage ?? initialState.isMultiPage,
             };
         },
         updateTemplate: (state, action: PayloadAction<string>) => {
@@ -151,6 +154,9 @@ export const resumeSlice = createSlice({
         updateMargins: (state, action: PayloadAction<number>) => {
             state.margins = action.payload;
         },
+        updateIsMultiPage: (state, action: PayloadAction<boolean>) => {
+            state.isMultiPage = action.payload;
+        },
         resetResume: () => initialState,
     },
 });
@@ -175,6 +181,7 @@ export const {
     updateLineSpacing,
     updateSectionSpacing,
     updateMargins,
+    updateIsMultiPage,
     resetResume
 } = resumeSlice.actions;
 

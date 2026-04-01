@@ -282,7 +282,7 @@ export default function BuilderPage() {
                                         <FaFileAlt className="mr-2" /> .DOCX
                                     </button>
                                     <PDFDownloadLink
-                                        document={<ResumePDF data={resume} />}
+                                        document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
                                         fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
                                         className="inline-flex items-center px-3 py-1.5 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
                                     >
@@ -404,7 +404,7 @@ export default function BuilderPage() {
                                                         <FaFileAlt className="mr-2" /> Download .DOCX
                                                     </button>
                                                     <PDFDownloadLink
-                                                        document={<ResumePDF data={resume} />}
+                                                        document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
                                                         fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
                                                         className="w-full sm:w-auto px-8 py-4 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-all shadow-lg flex items-center justify-center"
                                                     >

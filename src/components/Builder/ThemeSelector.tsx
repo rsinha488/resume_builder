@@ -10,7 +10,8 @@ import {
     updateFontSize,
     updateLineSpacing,
     updateSectionSpacing,
-    updateMargins
+    updateMargins,
+    updateIsMultiPage
 } from '@/lib/features/resume/resumeSlice';
 
 interface ThemeSelectorProps {
@@ -26,7 +27,8 @@ export default function ThemeSelector({ userPlan, onUpgrade }: ThemeSelectorProp
         fontSize,
         lineSpacing,
         sectionSpacing,
-        margins
+        margins,
+        isMultiPage
     } = useAppSelector((state) => state.resume);
     const colorInputRef = useRef<HTMLInputElement>(null);
 
@@ -178,8 +180,8 @@ export default function ThemeSelector({ userPlan, onUpgrade }: ThemeSelectorProp
                     <input
                         id="line-spacing"
                         type="range"
-                        min="1.0"
-                        max="2.0"
+                        min="1"
+                        max="2"
                         step="0.05"
                         value={lineSpacing}
                         onChange={(e) => dispatch(updateLineSpacing(Number.parseFloat(e.target.value)))}
@@ -231,6 +233,42 @@ export default function ThemeSelector({ userPlan, onUpgrade }: ThemeSelectorProp
                     />
                 </div>
 
+                {/* Page Layout Toggle */}
+                <fieldset className="space-y-4 pt-4">
+                    <legend className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                        Page Layout
+                        {userPlan === 'FREE' && <FaLock className="text-amber-400" size={10} />}
+                    </legend>
+                    <div className="flex p-1 bg-gray-100 rounded-xl">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (userPlan === 'FREE') onUpgrade();
+                                else dispatch(updateIsMultiPage(false));
+                            }}
+                            className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${isMultiPage
+                                ? 'text-gray-400 hover:text-gray-600 cursor-pointer'
+                                : 'bg-white text-primary-600 shadow-sm'
+                                } ${userPlan === 'FREE' ? 'opacity-50' : ''}`}
+                        >
+                            Single Page
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (userPlan === 'FREE') onUpgrade();
+                                else dispatch(updateIsMultiPage(true));
+                            }}
+                            className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${isMultiPage
+                                ? 'bg-white text-primary-600 shadow-sm'
+                                : 'text-gray-400 hover:text-gray-600 cursor-pointer'
+                                } ${userPlan === 'FREE' ? 'opacity-50' : ''}`}
+                        >
+                            Two Pages
+                        </button>
+                    </div>
+                </fieldset>
+
                 {/* Fit to One Page */}
                 <div className="pt-4">
                     <button
@@ -258,8 +296,8 @@ export default function ThemeSelector({ userPlan, onUpgrade }: ThemeSelectorProp
                                 dispatch(updateSectionSpacing(12));
                             }
                             // 2. Reduce line spacing
-                            if (lineSpacing > 1.0) {
-                                dispatch(updateLineSpacing(1.0));
+                            if (lineSpacing > 1) {
+                                dispatch(updateLineSpacing(1));
                             }
                             // 3. Reduce font size
                             if (fontSize === 'large') {
