@@ -24,10 +24,10 @@ export async function POST(req: NextRequest) {
         let text = '';
 
         if (file.type === 'application/pdf') {
-            // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const pdfParse = require('pdf-parse/node');
-            const data = await pdfParse(buffer);
-            text = data.text;
+            const { extractText, getDocumentProxy } = await import('unpdf');
+            const pdf = await getDocumentProxy(new Uint8Array(buffer));
+            const { text: pages } = await extractText(pdf, { mergePages: false });
+            text = (pages as string[]).join('\n');
         } else if (
             file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
             file.name.endsWith('.docx')
@@ -61,8 +61,10 @@ export async function POST(req: NextRequest) {
         });
 
         return NextResponse.json({ id: resume.id, title: resume.title, data: resumeData });
-    } catch (error) {
-        console.error('Import error:', error);
-        return NextResponse.json({ error: 'Internal server error during import' }, { status: 500 });
+    } catch (error: any) {
+        console.error('Import error:', error?.message || error);
+        return NextResponse.json({
+            error: error?.message || 'Internal server error during import'
+        }, { status: 500 });
     }
 }

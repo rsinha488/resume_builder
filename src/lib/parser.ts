@@ -1,23 +1,64 @@
 import { ResumeState } from './features/resume/resumeSlice';
 
-export function parseResumeText(text: string): Partial<ResumeState> {
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    const data: any = {
-        personalInfo: extractPersonalInfo(text, lines),
-        experiences: [],
-        education: [],
-        skills: []
-    };
+// Section header keywords
+const SECTION_KEYWORDS: Record<string, string[]> = {
+    experience: [
+        'work experience', 'professional experience', 'employment history', 'work history',
+        'career history', 'professional background', 'employment', 'experience', 'work'
+    ],
+    education: [
+        'educational background', 'academic background', 'education', 'academic',
+        'qualification', 'degrees', 'training', 'certifications'
+    ],
+    skills: [
+        'technical skills', 'core competencies', 'key skills', 'core skills',
+        'tech stack', 'technologies', 'competencies', 'expertise', 'skills',
+        'tools', 'proficiencies', 'software', 'qualifications', 'languages'
+    ],
+    summary: [
+        'professional summary', 'career objective', 'executive summary',
+        'personal profile', 'professional profile', 'personal statement',
+        'about me', 'summary', 'profile', 'objective', 'about', 'bio', 'overview'
+    ]
+};
 
+// Known section header patterns (case-insensitive) to split flat text on
+const SECTION_SPLIT_RE = new RegExp(
+    '(?<![a-z])(' +
+    Object.values(SECTION_KEYWORDS).flat()
+        .sort((a, b) => b.length - a.length) // longest first
+        .map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .join('|') +
+    ')(?=\\s|$)',
+    'gi'
+);
+
+export function parseResumeText(text: string): Partial<ResumeState> {
+    // Normalise: collapse excessive whitespace but preserve single newlines
+    const normalised = text.replace(/\r\n/g, '\n').replace(/[ \t]+/g, ' ').trim();
+
+    // If the text has very few newlines relative to its length it is likely a flat blob
+    // (pdfjs/unpdf sometimes returns one giant line per page). Split it heuristically.
+    const newlineRatio = (normalised.match(/\n/g) || []).length / (normalised.length / 100);
+    const structured = newlineRatio > 0.5 ? normalised : splitFlatText(normalised);
+
+    const lines = structured.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+    const personalInfo = extractPersonalInfo(structured, lines);
     const sectionContent = identifySections(lines);
+
+    const data: any = { personalInfo, experiences: [], education: [], skills: [] };
 
     if (sectionContent.summary.length > 0) {
         data.personalInfo.summary = sectionContent.summary.join(' ');
     }
 
     if (sectionContent.skills.length > 0) {
-        const skillsText = sectionContent.skills.join(', ');
-        data.skills = skillsText.split(/[,|•\n]/).map((s: string) => s.trim()).filter((s: string) => s.length > 1 && s.length < 40);
+        const raw = sectionContent.skills.join(' ');
+        data.skills = raw
+            .split(/[,|•·\n\/]/)
+            .map((s: string) => s.trim())
+            .filter((s: string) => s.length > 1 && s.length < 50 && !/^\d+$/.test(s));
     }
 
     if (sectionContent.experience.length > 0) {
@@ -31,63 +72,126 @@ export function parseResumeText(text: string): Partial<ResumeState> {
     return data;
 }
 
+/**
+ * Heuristically split flat PDF text into lines by injecting newlines before
+ * known section headers, dates, email, phone, and sentence starts.
+ */
+function splitFlatText(text: string): string {
+    let result = text;
+
+    // Put each section heading on its own line
+    result = result.replace(SECTION_SPLIT_RE, '\n$1');
+
+    // Put dates on their own line  e.g. "Jan 2019 — July 2019" or "2019 - Present"
+    result = result.replace(
+        /(?<!\n)((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|\d{4})\s*[-–—to]+\s*((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|\d{4}|Present|Current)/gi,
+        '\n$&'
+    );
+
+    // Split on bullet separators that PDF extractors often preserve
+    result = result.replace(/[·•◆▪▸►]/g, '\n');
+
+    // Split on a capital letter after a period+space (new sentence = potential new bullet)
+    result = result.replace(/\.\s+([A-Z])/g, '.\n$1');
+
+    // Email and phone on their own line
+    result = result.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '\n$1\n');
+    result = result.replace(/((\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g, '\n$1\n');
+
+    return result;
+}
+
 function extractPersonalInfo(text: string, lines: string[]) {
-    const info = {
-        fullName: '',
-        jobTitle: '',
-        email: '',
-        phone: '',
-        address: '',
-        summary: ''
-    };
+    const info = { fullName: '', jobTitle: '', email: '', phone: '', address: '', summary: '' };
 
     // Email
     const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
     if (emailMatch) info.email = emailMatch[0];
 
-    // Phone
+    // Phone — international or local formats
     const phoneMatch = text.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
     if (phoneMatch) info.phone = phoneMatch[0].trim();
 
-    // Name — first non-empty line that isn't an email/phone/URL and looks like a name
-    const nameRegex = /^[A-Z][a-zA-Z]+([\s'-][A-Z][a-zA-Z]+)+$/;
-    for (const line of lines.slice(0, 5)) {
-        if (nameRegex.test(line) && !line.includes('@') && !line.match(/\d{3}/)) {
-            info.fullName = line;
-            break;
-        }
-    }
-    // Fallback: first line
-    if (!info.fullName && lines.length > 0) {
-        info.fullName = lines[0];
-    }
+    // Name — look in first 5 short lines for a properly-cased name (2+ words, all title-case)
+    const nameRegex = /^[A-Z][a-zA-Z'-]+([\s][A-Z][a-zA-Z'-]+)+$/;
+    for (const line of lines.slice(0, 8)) {
+        const trimmed = line.trim();
+        // Skip lines that are section headers, emails, phone numbers, or URLs
+        if (
+            trimmed.length > 60 ||
+            trimmed.includes('@') ||
+            /\d{5,}/.test(trimmed) ||
+            /^(https?|www)/i.test(trimmed) ||
+            isSectionHeader(trimmed)
+        ) continue;
 
-    // Job title — look for common title patterns in first 6 lines
-    const titleKeywords = /engineer|developer|designer|manager|analyst|consultant|director|specialist|architect|lead|officer|executive|coordinator|administrator/i;
-    for (const line of lines.slice(1, 6)) {
-        if (titleKeywords.test(line) && line.length < 60 && !line.includes('@')) {
-            info.jobTitle = line;
+        if (nameRegex.test(trimmed)) {
+            info.fullName = trimmed;
             break;
         }
     }
 
-    // Address — look for city/state pattern
-    const addressMatch = text.match(/[A-Z][a-zA-Z\s]+,\s*[A-Z]{2}(\s+\d{5})?/);
-    if (addressMatch) info.address = addressMatch[0].trim();
+    // Fallback: first short non-header line
+    if (!info.fullName) {
+        for (const line of lines.slice(0, 5)) {
+            if (line.length < 50 && !line.includes('@') && !/\d{7,}/.test(line) && !isSectionHeader(line)) {
+                // Take only first 1-3 words (in case parser stuck multiple things together)
+                const words = line.split(/\s+/);
+                if (words.length <= 4) {
+                    info.fullName = line;
+                    break;
+                }
+                // Pick first 2-3 title-cased words as the name
+                const nameWords = words.filter(w => /^[A-Z]/.test(w)).slice(0, 3);
+                if (nameWords.length >= 2) {
+                    info.fullName = nameWords.join(' ');
+                    break;
+                }
+            }
+        }
+    }
+
+    // Job title — common title keywords within first 8 lines, short enough to be a title
+    const titleKeywords = /\b(engineer|developer|designer|manager|analyst|consultant|director|specialist|architect|lead|officer|executive|coordinator|administrator|programmer|scientist|intern|trainee|associate)\b/i;
+    for (const line of lines.slice(1, 10)) {
+        if (
+            titleKeywords.test(line) &&
+            line.length < 70 &&
+            !line.includes('@') &&
+            !/\d{4}/.test(line) &&
+            !isSectionHeader(line)
+        ) {
+            info.jobTitle = line.trim();
+            break;
+        }
+    }
+
+    // Address — city, ST  or city, country pattern
+    const addressMatch = text.match(/[A-Z][a-zA-Z\s]+(,\s*[A-Z][a-zA-Z\s]+){1,2}(\s+\d{5,6})?/);
+    if (addressMatch && addressMatch[0].length < 60) info.address = addressMatch[0].trim();
 
     return info;
+}
+
+function isSectionHeader(line: string): boolean {
+    const clean = line.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+    return Object.values(SECTION_KEYWORDS).flat().some(
+        kw => clean === kw || clean === kw + 's'
+    );
 }
 
 function parseExperienceBlocks(lines: string[]) {
     const experiences: any[] = [];
     const datePattern = /((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|\d{4})\s*[-–—to]+\s*((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|\d{4}|Present|Current)/i;
-    const yearPattern = /\b(19|20)\d{2}\b/;
+    const yearOnlyPattern = /\b(19|20)\d{2}\b/;
 
     let current: any = null;
     let id = 1;
 
-    for (const line of lines) {
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
         const dateMatch = line.match(datePattern);
+
         if (dateMatch) {
             if (current) experiences.push(current);
             const parts = dateMatch[0].split(/[-–—to]+/i).map(s => s.trim());
@@ -102,29 +206,30 @@ function parseExperienceBlocks(lines: string[]) {
                 current: isCurrent,
                 description: ''
             };
-            // Try to extract position/company from surrounding context
-            const idx = lines.indexOf(line);
-            if (idx > 0) {
-                const prev = lines[idx - 1];
-                // If previous line has a separator like | or @ or comma, split it
-                if (prev.includes(' | ') || prev.includes(' at ') || prev.includes(' @ ')) {
-                    const sep = prev.includes(' | ') ? ' | ' : prev.includes(' at ') ? ' at ' : ' @ ';
-                    const [pos, comp] = prev.split(sep);
+
+            // Peek at surrounding lines for position/company
+            const prevLine = i > 0 ? lines[i - 1] : '';
+            const prevPrev = i > 1 ? lines[i - 2] : '';
+
+            if (prevLine && !yearOnlyPattern.test(prevLine) && prevLine.length < 100) {
+                if (prevLine.includes(' | ') || prevLine.includes(' at ') || prevLine.includes(' @ ')) {
+                    const sep = prevLine.includes(' | ') ? ' | ' : prevLine.includes(' at ') ? ' at ' : ' @ ';
+                    const [pos, comp] = prevLine.split(sep);
                     current.position = pos.trim();
                     current.company = comp?.trim() || '';
                 } else {
-                    current.position = prev;
+                    current.position = prevLine.trim();
                 }
             }
-            if (idx > 1 && !current.company) {
-                current.company = lines[idx - 2] || '';
+            if (!current.company && prevPrev && !yearOnlyPattern.test(prevPrev) && prevPrev.length < 100) {
+                current.company = prevPrev.trim();
             }
         } else if (current) {
-            if (!current.position && line.length < 80 && !yearPattern.test(line)) {
+            if (!current.position && line.length < 100 && !yearOnlyPattern.test(line)) {
                 current.position = line;
-            } else if (!current.company && line.length < 80 && !yearPattern.test(line) && line !== current.position) {
+            } else if (!current.company && line.length < 100 && !yearOnlyPattern.test(line) && line !== current.position) {
                 current.company = line;
-            } else {
+            } else if (line.length > 0) {
                 current.description += (current.description ? '\n' : '') + line;
             }
         }
@@ -132,16 +237,10 @@ function parseExperienceBlocks(lines: string[]) {
 
     if (current) experiences.push(current);
 
-    // If nothing parsed, create one entry with raw text as description
     if (experiences.length === 0 && lines.length > 0) {
         experiences.push({
-            id: '1',
-            company: '',
-            position: '',
-            location: '',
-            startDate: '',
-            endDate: '',
-            current: false,
+            id: '1', company: '', position: '', location: '',
+            startDate: '', endDate: '', current: false,
             description: lines.join('\n')
         });
     }
@@ -151,45 +250,38 @@ function parseExperienceBlocks(lines: string[]) {
 
 function parseEducationBlocks(lines: string[]) {
     const education: any[] = [];
-    const degreePattern = /\b(bachelor|master|b\.?s\.?|m\.?s\.?|b\.?a\.?|m\.?a\.?|ph\.?d\.?|associate|diploma|certificate|mba|btech|mtech|be|me)\b/i;
-    const yearPattern = /\b(19|20)\d{2}\b/g;
+    const degreePattern = /\b(bachelor|master|b\.?s\.?c?\.?|m\.?s\.?c?\.?|b\.?a\.?|m\.?a\.?|ph\.?d\.?|associate|diploma|certificate|mba|btech|mtech|b\.?e\.?|m\.?e\.?|b\.?tech|m\.?tech)\b/i;
 
     let current: any = null;
     let id = 1;
 
     for (const line of lines) {
         const degreeMatch = line.match(degreePattern);
-        const years = line.match(yearPattern);
+        const years = [...line.matchAll(/\b(19|20)\d{2}\b/g)].map(m => m[0]);
 
         if (degreeMatch) {
             if (current) education.push(current);
-            // Try to split "Bachelor of Science in Computer Science" → degree + field
             const inMatch = line.match(/(.+?)\s+in\s+(.+)/i);
             current = {
                 id: String(id++),
                 school: '',
-                degree: inMatch ? inMatch[1].trim() : line,
+                degree: inMatch ? inMatch[1].trim() : degreeMatch[0],
                 field: inMatch ? inMatch[2].replace(/\d{4}.*/g, '').trim() : '',
-                location: '',
-                startDate: years?.[0] || '',
-                endDate: years?.[1] || '',
-                current: false,
-                description: ''
-            };
-        } else if (years && !current) {
-            current = {
-                id: String(id++),
-                school: '',
-                degree: '',
-                field: '',
                 location: '',
                 startDate: years[0] || '',
                 endDate: years[1] || '',
                 current: false,
                 description: ''
             };
+        } else if (years.length > 0 && !current) {
+            current = {
+                id: String(id++),
+                school: '', degree: '', field: '', location: '',
+                startDate: years[0] || '', endDate: years[1] || '',
+                current: false, description: ''
+            };
         } else if (current) {
-            if (!current.school && line.length < 100) {
+            if (!current.school && line.length < 120 && !/^\d+$/.test(line)) {
                 current.school = line;
             } else {
                 current.description += (current.description ? '\n' : '') + line;
@@ -201,14 +293,8 @@ function parseEducationBlocks(lines: string[]) {
 
     if (education.length === 0 && lines.length > 0) {
         education.push({
-            id: '1',
-            school: lines[0] || '',
-            degree: '',
-            field: '',
-            location: '',
-            startDate: '',
-            endDate: '',
-            current: false,
+            id: '1', school: lines[0] || '', degree: '', field: '', location: '',
+            startDate: '', endDate: '', current: false,
             description: lines.slice(1).join('\n')
         });
     }
@@ -217,50 +303,25 @@ function parseEducationBlocks(lines: string[]) {
 }
 
 function identifySections(lines: string[]) {
-    const sections: { [key: string]: string[] } = {
-        experience: [
-            'experience', 'work history', 'employment', 'professional background', 
-            'work experience', 'professional experience', 'career history', 
-            'employment history', 'work', 'history', 'professional career'
-        ],
-        education: [
-            'education', 'academic', 'qualification', 'academic background',
-            'educational background', 'learning', 'scholastic', 'academics',
-            'degrees', 'training', 'certifications'
-        ],
-        skills: [
-            'skills', 'technologies', 'competencies', 'expertise', 
-            'technical skills', 'core competencies', 'tools', 'proficiencies',
-            'languages', 'core skills', 'tech stack', 'software', 'qualifications'
-        ],
-        summary: [
-            'summary', 'profile', 'objective', 'about me', 'professional summary', 
-            'career objective', 'executive summary', 'personal profile', 'about', 
-            'bio', 'overview', 'professional profile', 'personal statement'
-        ]
-    };
-
-    const sectionContent: { [key: string]: string[] } = {
-        experience: [],
-        education: [],
-        skills: [],
-        summary: []
+    const sectionContent: Record<string, string[]> = {
+        experience: [], education: [], skills: [], summary: []
     };
 
     let currentSection = '';
-    for (const line of lines) {
-        const lowerLine = line.toLowerCase();
-        let foundSection = false;
 
-        for (const [key, keywords] of Object.entries(sections)) {
-            if (keywords.some(kw => lowerLine === kw || lowerLine.startsWith(kw + ':') || lowerLine.startsWith(kw + ' ') || lowerLine === kw.toUpperCase())) {
+    for (const line of lines) {
+        const clean = line.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+
+        let matched = false;
+        for (const [key, keywords] of Object.entries(SECTION_KEYWORDS)) {
+            if (keywords.some(kw => clean === kw || (clean.startsWith(kw) && clean.length < kw.length + 15))) {
                 currentSection = key;
-                foundSection = true;
+                matched = true;
                 break;
             }
         }
 
-        if (!foundSection && currentSection) {
+        if (!matched && currentSection) {
             sectionContent[currentSection].push(line);
         }
     }

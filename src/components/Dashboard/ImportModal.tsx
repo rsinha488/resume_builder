@@ -48,15 +48,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                 }
             });
 
-            // After parsing, we create the resume in the database
-            const createResponse = await axios.post('/api/resumes', {
-                title: response.data.title,
-                data: response.data.data
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            router.push(`/builder/${createResponse.data.id}`);
+            router.push(`/builder/${response.data.id}`);
             onClose();
         } catch (err: any) {
             console.error('Upload error:', err);

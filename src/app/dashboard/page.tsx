@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -11,6 +11,18 @@ import EmptyState from '@/components/Dashboard/EmptyState';
 import { ResumePDF } from '@/components/Builder/ResumePDF';
 import { toast } from 'sonner';
 
+function UpgradeToast() {
+    const searchParams = useSearchParams();
+    useEffect(() => {
+        const upgrade = searchParams.get('upgrade');
+        if (upgrade === 'success') {
+            toast.success('🎉 Welcome to PRO! Your plan has been activated.');
+            window.history.replaceState({}, '', '/dashboard');
+        }
+    }, [searchParams]);
+    return null;
+}
+
 export default function DashboardPage() {
     const [resumes, setResumes] = useState<any[]>([]);
     const [coverLetters, setCoverLetters] = useState<any[]>([]);
@@ -19,7 +31,6 @@ export default function DashboardPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [userPlan, setUserPlan] = useState<{ plan: string; subscriptionType: string; planExpiry: string | null } | null>(null);
     const router = useRouter();
-    const searchParams = useSearchParams();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -57,14 +68,7 @@ export default function DashboardPage() {
             } catch { /* silent */ }
         };
         fetchPlan();
-
-        const upgrade = searchParams.get('upgrade');
-        if (upgrade === 'success') {
-            toast.success('🎉 Welcome to PRO! Your plan has been activated.');
-            // Remove query param from URL without reload
-            window.history.replaceState({}, '', '/dashboard');
-        }
-    }, [searchParams]);
+    }, []);
 
     const createNewResume = async () => {
         const token = localStorage.getItem('token');
@@ -220,6 +224,7 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
+            <Suspense fallback={null}><UpgradeToast /></Suspense>
             <DashboardHeader />
 
             <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
