@@ -40,35 +40,36 @@ export default function ResumePreview({ data, templateId, onSectionClick }: Resu
         templateId: templateId || resume.templateId || (SAMPLE_DATA.templateId as string),
         themeColor: resume.themeColor || (SAMPLE_DATA.themeColor as string),
         fontFamily: resume.fontFamily || (SAMPLE_DATA.fontFamily as string),
-        fontSize: resume.fontSize || (SAMPLE_DATA.fontSize as any),
-        lineSpacing: resume.lineSpacing || (SAMPLE_DATA.lineSpacing as number),
-        sectionSpacing: resume.sectionSpacing || (SAMPLE_DATA.sectionSpacing as number),
-        margins: resume.margins || (SAMPLE_DATA.margins as number),
+        fontSize: resume.fontSize || 'medium',
+        lineSpacing: resume.lineSpacing ?? (SAMPLE_DATA.lineSpacing as number),
+        sectionSpacing: resume.sectionSpacing ?? (SAMPLE_DATA.sectionSpacing as number),
+        margins: resume.margins ?? (SAMPLE_DATA.margins as number),
+        isMultiPage: resume.isMultiPage ?? false,
     };
 
     const finalTemplateId = templateId || resume.templateId;
 
     switch (finalTemplateId) {
         case 'classic':
-            return <ClassicTemplate data={displayData as any} onSectionClick={onSectionClick} />;
+            return <ClassicTemplate data={displayData} onSectionClick={onSectionClick} />;
         case 'primo':
-            return <PrimoTemplate data={displayData as any} onSectionClick={onSectionClick} />;
+            return <PrimoTemplate data={displayData} onSectionClick={onSectionClick} />;
         case 'minimal':
-            return <MinimalTemplate data={displayData as any} onSectionClick={onSectionClick} />;
+            return <MinimalTemplate data={displayData} onSectionClick={onSectionClick} />;
         case 'cascade':
-            return <CascadeTemplate data={displayData as any} onSectionClick={onSectionClick} />;
+            return <CascadeTemplate data={displayData} onSectionClick={onSectionClick} />;
         case 'concept':
-            return <ConceptTemplate data={displayData as any} onSectionClick={onSectionClick} />;
+            return <ConceptTemplate data={displayData} onSectionClick={onSectionClick} />;
         case 'diamond':
-            return <DiamondTemplate data={displayData as any} onSectionClick={onSectionClick} />;
+            return <DiamondTemplate data={displayData} onSectionClick={onSectionClick} />;
         case 'influx':
-            return <InfluxTemplate data={displayData as any} onSectionClick={onSectionClick} />;
+            return <InfluxTemplate data={displayData} onSectionClick={onSectionClick} />;
         case 'vibes':
-            return <VibesTemplate data={displayData as any} onSectionClick={onSectionClick} />;
+            return <VibesTemplate data={displayData} onSectionClick={onSectionClick} />;
         case 'muse':
-            return <MuseTemplate data={displayData as any} onSectionClick={onSectionClick} />;
+            return <MuseTemplate data={displayData} onSectionClick={onSectionClick} />;
         case 'modern':
         default:
-            return <ModernTemplate data={displayData as any} onSectionClick={onSectionClick} />;
+            return <ModernTemplate data={displayData} onSectionClick={onSectionClick} />;
     }
 }

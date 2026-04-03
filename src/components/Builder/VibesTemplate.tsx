@@ -1,8 +1,9 @@
 'use client';
 import { ResumeState } from '@/lib/features/resume/resumeSlice';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaGlobe } from 'react-icons/fa';
+import PreviewSection from './PreviewSection';
 
-export default function VibesTemplate({ data }: { readonly data: ResumeState }) {
+export default function VibesTemplate({ data, onSectionClick }: { readonly data: ResumeState; readonly onSectionClick?: (sectionId: string) => void }) {
     const {
         personalInfo,
         experiences,
@@ -36,69 +37,77 @@ export default function VibesTemplate({ data }: { readonly data: ResumeState }) 
                 className="flex-1 bg-white"
                 style={{ padding: `${margins || 96}px` }}
             >
-                <header className="mb-12">
-                    <h1 className="text-6xl font-black tracking-tighter mb-2 text-gray-900">
-                        {personalInfo?.fullName || 'Your Name'}
-                    </h1>
-                    <h2 className="text-xl font-bold uppercase tracking-[0.2em]" style={{ color: themeColor }}>
-                        {personalInfo?.jobTitle || 'Your Professional Title'}
-                    </h2>
-                </header>
+                <PreviewSection sectionId="personal" onClick={onSectionClick} title="Personal Info">
+                    <header className="mb-12">
+                        <h1 className="text-6xl font-black tracking-tighter mb-2 text-gray-900">
+                            {personalInfo?.fullName || 'Your Name'}
+                        </h1>
+                        <h2 className="text-xl font-bold uppercase tracking-[0.2em]" style={{ color: themeColor }}>
+                            {personalInfo?.jobTitle || 'Your Professional Title'}
+                        </h2>
+                    </header>
+                </PreviewSection>
 
                 <div className="flex flex-col" style={{ gap: `${sectionSpacing}px` }}>
                     {/* Summary */}
                     {personalInfo?.summary && (
-                        <section>
-                            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-300 mb-6">About Me</h3>
-                            <p className={`${fontSizeMap[fontSize || 'medium']} leading-relaxed text-gray-700 whitespace-pre-line`}>
-                                {personalInfo.summary}
-                            </p>
-                        </section>
+                        <PreviewSection sectionId="summary" onClick={onSectionClick} title="Summary">
+                            <section>
+                                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-300 mb-6">About Me</h3>
+                                <p className={`${fontSizeMap[fontSize || 'medium']} leading-relaxed text-gray-700 whitespace-pre-line`}>
+                                    {personalInfo.summary}
+                                </p>
+                            </section>
+                        </PreviewSection>
                     )}
 
                     {/* Experience */}
                     {experiences?.length > 0 && (
-                        <section>
-                            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-300 mb-8 text-right pr-4 border-r-4" style={{ borderColor: themeColor }}>Experience</h3>
-                            <div className="space-y-10">
-                                {experiences?.map((exp) => (
-                                    <div key={exp.id}>
-                                        <div className="flex justify-between items-baseline mb-2">
-                                            <h4 className="text-xl font-black text-gray-900">{exp.position}</h4>
-                                            <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                                                {exp.startDate} — {exp.current ? 'Present' : exp.endDate}
-                                            </span>
+                        <PreviewSection sectionId="experience" onClick={onSectionClick} title="Experience">
+                            <section>
+                                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-300 mb-8 text-right pr-4 border-r-4" style={{ borderColor: themeColor }}>Experience</h3>
+                                <div className="space-y-10">
+                                    {experiences?.map((exp) => (
+                                        <div key={exp.id}>
+                                            <div className="flex justify-between items-baseline mb-2">
+                                                <h4 className="text-xl font-black text-gray-900">{exp.position}</h4>
+                                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                                                    {exp.startDate} — {exp.current ? 'Present' : exp.endDate}
+                                                </span>
+                                            </div>
+                                            <div className="text-sm font-bold mb-4" style={{ color: themeColor }}>{exp.company}</div>
+                                            <p className={`${fontSizeMap[fontSize || 'medium']} text-gray-600 whitespace-pre-line leading-relaxed`}>
+                                                {exp.description}
+                                            </p>
                                         </div>
-                                        <div className="text-sm font-bold mb-4" style={{ color: themeColor }}>{exp.company}</div>
-                                        <p className={`${fontSizeMap[fontSize || 'medium']} text-gray-600 whitespace-pre-line leading-relaxed`}>
-                                            {exp.description}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
+                                    ))}
+                                </div>
+                            </section>
+                        </PreviewSection>
                     )}
 
                     {/* Education */}
                     {education?.length > 0 && (
-                        <section>
-                            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-300 mb-8 text-right pr-4 border-r-4" style={{ borderColor: themeColor }}>Education</h3>
-                            <div className="space-y-6">
-                                {education?.map((edu) => (
-                                    <div key={edu.id}>
-                                        <div className="flex justify-between items-baseline mb-2">
-                                            <h4 className="text-lg font-black text-gray-900">{edu.school}</h4>
-                                            <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                                                {edu.startDate} — {edu.endDate}
-                                            </span>
+                        <PreviewSection sectionId="education" onClick={onSectionClick} title="Education">
+                            <section>
+                                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-gray-300 mb-8 text-right pr-4 border-r-4" style={{ borderColor: themeColor }}>Education</h3>
+                                <div className="space-y-6">
+                                    {education?.map((edu) => (
+                                        <div key={edu.id}>
+                                            <div className="flex justify-between items-baseline mb-2">
+                                                <h4 className="text-lg font-black text-gray-900">{edu.school}</h4>
+                                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                                                    {edu.startDate} — {edu.endDate}
+                                                </span>
+                                            </div>
+                                            <div className={`${fontSizeMap[fontSize || 'medium']} text-gray-600`}>
+                                                <span className="font-bold">{edu.degree}</span> in {edu.field}
+                                            </div>
                                         </div>
-                                        <div className={`${fontSizeMap[fontSize || 'medium']} text-gray-600`}>
-                                            <span className="font-bold">{edu.degree}</span> in {edu.field}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
+                                    ))}
+                                </div>
+                            </section>
+                        </PreviewSection>
                     )}
                 </div>
             </main>
@@ -131,19 +140,21 @@ export default function VibesTemplate({ data }: { readonly data: ResumeState }) 
 
                 {/* Skills */}
                 {skills?.length > 0 && (
-                    <section>
-                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-6">Skills</h3>
-                        <div className="flex flex-col gap-3">
-                            {skills?.map((skill) => (
-                                <div key={skill} className="space-y-1">
-                                    <div className="text-xs font-bold text-gray-700 uppercase tracking-wider">{skill}</div>
-                                    <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                                        <div className="h-full rounded-full" style={{ backgroundColor: themeColor, width: '85%' }} />
+                    <PreviewSection sectionId="skills" onClick={onSectionClick} title="Skills">
+                        <section>
+                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-6">Skills</h3>
+                            <div className="flex flex-col gap-3">
+                                {skills?.map((skill) => (
+                                    <div key={skill} className="space-y-1">
+                                        <div className="text-xs font-bold text-gray-700 uppercase tracking-wider">{skill}</div>
+                                        <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                                            <div className="h-full rounded-full" style={{ backgroundColor: themeColor, width: '85%' }} />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                                ))}
+                            </div>
+                        </section>
+                    </PreviewSection>
                 )}
             </aside>
         </div>

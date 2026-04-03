@@ -34,6 +34,7 @@ export interface Education {
     description: string;
 }
 
+
 export interface ResumeState {
     id?: string | null;
     title: string;
