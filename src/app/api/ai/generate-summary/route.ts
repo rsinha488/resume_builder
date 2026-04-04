@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import Groq from 'groq-sdk';
 import { getUserFromRequest } from '@/lib/auth';
 import { checkProAccess } from '@/lib/planGuard';
 
-const client = new Anthropic();
+const client = new Groq({
+    apiKey: process.env.GROQ_API_KEY
+});
 
 export async function POST(req: Request) {
     try {
@@ -25,9 +27,8 @@ Experience: ${experiences.slice(0, 3).map((e: any) =>
             `${e.position} at ${e.company}`).join(', ')}
         `.trim();
 
-        const message = await client.messages.create({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 200,
+        const chatCompletion = await client.chat.completions.create({
+            model: 'llama-3.3-70b-versatile',
             messages: [{
                 role: 'user',
                 content: `Write a professional resume summary (3 sentences max, 80-120 words) for this person.
@@ -35,10 +36,12 @@ ATS-optimized, no first-person pronouns, highlight their strongest value.
 Return ONLY the summary text.
 
 ${context}`
-            }]
+            }],
+            max_tokens: 300,
+            temperature: 0.7,
         });
 
-        const summary = (message.content[0] as { text: string }).text.trim();
+        const summary = chatCompletion.choices[0]?.message?.content?.trim() || '';
         return NextResponse.json({ summary });
     } catch (error) {
         console.error('AI generate-summary error:', error);

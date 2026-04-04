@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import Groq from 'groq-sdk';
 import { getUserFromRequest } from '@/lib/auth';
 import { checkProAccess } from '@/lib/planGuard';
 
-const client = new Anthropic();
+const client = new Groq({
+    apiKey: process.env.GROQ_API_KEY
+});
 
 export async function POST(req: Request) {
     try {
@@ -20,9 +22,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Description is required' }, { status: 400 });
         }
 
-        const message = await client.messages.create({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 300,
+        const chatCompletion = await client.chat.completions.create({
+            model: 'llama-3.3-70b-versatile',
             messages: [{
                 role: 'user',
                 content: `Rewrite this resume experience description for a ${jobTitle || 'professional'} role. 
@@ -30,10 +31,12 @@ Use strong action verbs, add quantifiable metrics where reasonable, and make it 
 Return ONLY the rewritten text, no explanation, no bullet points prefix.
 
 Original: ${description}`
-            }]
+            }],
+            max_tokens: 500,
+            temperature: 0.7,
         });
 
-        const rewritten = (message.content[0] as { text: string }).text.trim();
+        const rewritten = chatCompletion.choices[0]?.message?.content?.trim() || '';
         return NextResponse.json({ rewritten });
     } catch (error) {
         console.error('AI rewrite-bullet error:', error);
