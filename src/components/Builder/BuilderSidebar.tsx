@@ -17,11 +17,6 @@ const MODES = [
 export default function BuilderSidebar({ currentMode, onModeChange }: BuilderSidebarProps) {
     return (
         <aside className="w-24 bg-surface-950 flex flex-col items-center py-10 gap-8 border-r border-white/5 z-20">
-            {/* Logo placeholder/Small Logo */}
-            <div className="w-12 h-12 bg-primary-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-primary-600/20 mb-4 animate-fade-in">
-                R
-            </div>
-
             <nav className="flex flex-col gap-6">
                 {MODES.map((mode, i) => {
                     const Icon = mode.icon;

@@ -40,6 +40,8 @@ export default function ThemeSelector({ userPlan, onUpgrade }: ThemeSelectorProp
         colorInputRef.current?.click();
     };
 
+    const isCustomColor = themeColor && !COLOR_PALETTES.some(p => p.primary === themeColor);
+
     return (
         <div className="space-y-16 animate-fade-in-up pb-20">
             {/* Color Palettes */}
