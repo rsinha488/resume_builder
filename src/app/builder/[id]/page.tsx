@@ -393,7 +393,15 @@ export default function BuilderPage() {
 
                                     </>
                                 )}
-                                {currentMode === 'analysis' && <AtsScoreDisplay onFixClick={handleSectionClick} />}
+                                {currentMode === 'analysis' && (
+                                    <AtsScoreDisplay 
+                                        userPlan={userPlan}
+                                        aiUsageCount={aiUsageCount}
+                                        onUsageUpdate={setAiUsageCount}
+                                        onUpgrade={() => setIsUpgradeModalOpen(true)}
+                                        onFixClick={handleSectionClick} 
+                                    />
+                                )}
                                 {currentMode === 'finalize' && (
                                     <div className="text-center space-y-12 py-16 animate-fade-in-up">
                                         <div className="flex justify-center">
