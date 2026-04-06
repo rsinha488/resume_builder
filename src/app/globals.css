@@ -39,8 +39,7 @@
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
 textarea,
 select {
-  @apply bg-white border border-surface-200 rounded-xl px-4 py-2 placeholder:text-surface-400 focus-visible:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all;
-  color: #111827 !important;
+  @apply bg-white border border-surface-200 rounded-xl px-4 py-2 placeholder:text-surface-400 focus-visible:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all text-surface-900;
 }
 
 input:not([type="checkbox"]):not([type="radio"])::placeholder,

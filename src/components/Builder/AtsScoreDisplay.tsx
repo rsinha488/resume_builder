@@ -102,7 +102,7 @@ export default function AtsScoreDisplay({ userPlan, aiUsageCount, onUsageUpdate,
                             value={jobDescription}
                             onChange={(e) => setJobDescription(e.target.value)}
                             rows={4}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-sm text-surface-200 placeholder:text-surface-600 focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500/50 outline-none resize-none transition-all"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-sm text-white placeholder:text-surface-400 focus:ring-1 focus:ring-primary-500/50 focus:border-primary-500/50 outline-none resize-none transition-all"
                             placeholder="Paste the Job Description (JD) here for a specific match rate analysis..."
                         />
                         <div className="absolute bottom-4 right-4 flex gap-2">
