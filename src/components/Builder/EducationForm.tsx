@@ -33,6 +33,19 @@ export default function EducationForm() {
         dispatch(addEducation(newEdu));
     };
 
+    const parseDateValue = (dateStr: string | undefined) => {
+        if (!dateStr) return { month: '', year: '' };
+        if (dateStr.includes('/')) {
+            const [m, y] = dateStr.split('/');
+            return { month: m, year: y };
+        }
+        if (dateStr.includes('-')) {
+            const [y, m] = dateStr.split('-');
+            return { month: m, year: y };
+        }
+        return { month: '', year: '' };
+    };
+
     const handleChange = (id: string, field: keyof Education, value: any) => {
         const edu = education?.find(e => e.id === id);
         if (edu) {
@@ -127,16 +140,16 @@ export default function EducationForm() {
                                 <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     <select
-                                        value={edu.startDate?.split('/')[0] || ''}
-                                        onChange={(e) => handleDateChange(edu.id, 'startDate', e.target.value, edu.startDate?.split('/')[1] || '')}
+                                        value={parseDateValue(edu.startDate).month}
+                                        onChange={(e) => handleDateChange(edu.id, 'startDate', e.target.value, parseDateValue(edu.startDate).year)}
                                         className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
                                     >
                                         <option value="" disabled>Month</option>
                                         {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                                     </select>
                                     <select
-                                        value={edu.startDate?.split('/')[1] || ''}
-                                        onChange={(e) => handleDateChange(edu.id, 'startDate', edu.startDate?.split('/')[0] || '', e.target.value)}
+                                        value={parseDateValue(edu.startDate).year}
+                                        onChange={(e) => handleDateChange(edu.id, 'startDate', parseDateValue(edu.startDate).month, e.target.value)}
                                         className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
                                     >
                                         <option value="" disabled>Year</option>
@@ -149,8 +162,8 @@ export default function EducationForm() {
                                 <div className="grid grid-cols-2 gap-2">
                                     <select
                                         disabled={edu.current}
-                                        value={edu.current ? '' : (edu.endDate?.split('/')[0] || '')}
-                                        onChange={(e) => handleDateChange(edu.id, 'endDate', e.target.value, edu.endDate?.split('/')[1] || '')}
+                                        value={edu.current ? '' : parseDateValue(edu.endDate).month}
+                                        onChange={(e) => handleDateChange(edu.id, 'endDate', e.target.value, parseDateValue(edu.endDate).year)}
                                         className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
                                     >
                                         <option value="" disabled>{edu.current ? 'Present' : 'Month'}</option>
@@ -158,8 +171,8 @@ export default function EducationForm() {
                                     </select>
                                     <select
                                         disabled={edu.current}
-                                        value={edu.current ? '' : (edu.endDate?.split('/')[1] || '')}
-                                        onChange={(e) => handleDateChange(edu.id, 'endDate', edu.endDate?.split('/')[0] || '', e.target.value)}
+                                        value={edu.current ? '' : parseDateValue(edu.endDate).year}
+                                        onChange={(e) => handleDateChange(edu.id, 'endDate', parseDateValue(edu.endDate).month, e.target.value)}
                                         className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
                                     >
                                         <option value="" disabled>{edu.current ? 'Present' : 'Year'}</option>

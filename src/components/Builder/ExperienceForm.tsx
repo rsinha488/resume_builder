@@ -45,6 +45,19 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
         dispatch(addExperience(newExp));
     };
 
+    const parseDateValue = (dateStr: string | undefined) => {
+        if (!dateStr) return { month: '', year: '' };
+        if (dateStr.includes('/')) {
+            const [m, y] = dateStr.split('/');
+            return { month: m, year: y };
+        }
+        if (dateStr.includes('-')) {
+            const [y, m] = dateStr.split('-');
+            return { month: m, year: y };
+        }
+        return { month: '', year: '' };
+    };
+
     const handleChange = (id: string, field: keyof Experience, value: any) => {
         const exp = experiences?.find(e => e.id === id);
         if (exp) {
@@ -154,16 +167,16 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                 <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     <select
-                                        value={exp.startDate?.split('/')[0] || ''}
-                                        onChange={(e) => handleDateChange(exp.id, 'startDate', e.target.value, exp.startDate?.split('/')[1] || '')}
+                                        value={parseDateValue(exp.startDate).month}
+                                        onChange={(e) => handleDateChange(exp.id, 'startDate', e.target.value, parseDateValue(exp.startDate).year)}
                                         className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
                                     >
                                         <option value="" disabled>Month</option>
                                         {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                                     </select>
                                     <select
-                                        value={exp.startDate?.split('/')[1] || ''}
-                                        onChange={(e) => handleDateChange(exp.id, 'startDate', exp.startDate?.split('/')[0] || '', e.target.value)}
+                                        value={parseDateValue(exp.startDate).year}
+                                        onChange={(e) => handleDateChange(exp.id, 'startDate', parseDateValue(exp.startDate).month, e.target.value)}
                                         className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
                                     >
                                         <option value="" disabled>Year</option>
@@ -176,8 +189,8 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                 <div className="grid grid-cols-2 gap-2">
                                     <select
                                         disabled={exp.current}
-                                        value={exp.current ? '' : (exp.endDate?.split('/')[0] || '')}
-                                        onChange={(e) => handleDateChange(exp.id, 'endDate', e.target.value, exp.endDate?.split('/')[1] || '')}
+                                        value={exp.current ? '' : parseDateValue(exp.endDate).month}
+                                        onChange={(e) => handleDateChange(exp.id, 'endDate', e.target.value, parseDateValue(exp.endDate).year)}
                                         className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
                                     >
                                         <option value="" disabled>{exp.current ? 'Present' : 'Month'}</option>
@@ -185,8 +198,8 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                     </select>
                                     <select
                                         disabled={exp.current}
-                                        value={exp.current ? '' : (exp.endDate?.split('/')[1] || '')}
-                                        onChange={(e) => handleDateChange(exp.id, 'endDate', exp.endDate?.split('/')[0] || '', e.target.value)}
+                                        value={exp.current ? '' : parseDateValue(exp.endDate).year}
+                                        onChange={(e) => handleDateChange(exp.id, 'endDate', parseDateValue(exp.endDate).month, e.target.value)}
                                         className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
                                     >
                                         <option value="" disabled>{exp.current ? 'Present' : 'Year'}</option>

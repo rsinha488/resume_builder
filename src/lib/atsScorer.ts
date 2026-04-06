@@ -17,6 +17,15 @@ const KEYWORDS: Record<string, string[]> = {
     'product manager': ['roadmap', 'agile', 'scrum', 'user stories', 'strategy', 'analytics', 'stakeholder', 'product lifecycle'],
 };
 
+const DATE_REGEX = /^(0[1-9]|1[0-2])\/\d{4}$/; // MM/YYYY
+
+function isDateValid(date: string | undefined): boolean {
+    if (!date) return false;
+    // Handle both MM/YYYY and YYYY-MM for the transition period
+    const altRegex = /^\d{4}-(0[1-9]|1[0-2])$/; 
+    return DATE_REGEX.test(date) || altRegex.test(date) || date.toLowerCase() === 'present';
+}
+
 function evaluatePersonalInfo(personalInfo: any, suggestions: any[]): number {
     let score = 0;
     if (!personalInfo) {
@@ -72,16 +81,15 @@ function evaluateExperience(experiences: any[], suggestions: any[]): number {
     if (hasBulletPoints) totalScore += 15;
     else suggestions.push({ type: 'improvement', message: 'Format job descriptions with bullet points for easier AI/ATS scanning.', targetSection: 'experience' });
 
-    // Date consistency check
-    const dateRegex = /^(0[1-9]|1[0-2])\/\d{4}$/; // MM/YYYY
-    const datesValid = experiences.every(exp => 
-        (exp.startDate && (dateRegex.test(exp.startDate) || exp.startDate.toLowerCase() === 'present')) &&
-        (exp.current || (exp.endDate && (dateRegex.test(exp.endDate) || exp.endDate.toLowerCase() === 'present')))
+    // Date consistency check - Only check records that have content to avoid noise
+    const recordsWithContent = experiences.filter(exp => exp.company || exp.position);
+    const datesValid = recordsWithContent.every(exp => 
+        isDateValid(exp.startDate) && (exp.current || isDateValid(exp.endDate))
     );
 
-    if (!datesValid) {
-        suggestions.push({ type: 'improvement', message: 'Ensure all dates follow the MM/YYYY format for consistency.', targetSection: 'experience' });
-    } else {
+    if (recordsWithContent.length > 0 && !datesValid) {
+        suggestions.push({ type: 'improvement', message: 'Ensure all experience dates follow the MM/YYYY format for consistency.', targetSection: 'experience' });
+    } else if (recordsWithContent.length > 0) {
         totalScore += 5;
     }
 
@@ -136,8 +144,20 @@ export function calculateAtsScore(resume: ResumeState): ScoreResult {
     score += evaluatePersonalInfo(resume.personalInfo, suggestions);
     score += evaluateSummary(resume.personalInfo?.summary, suggestions);
     score += evaluateExperience(resume.experiences, suggestions);
-    score += (resume.education?.length > 0 ? 10 : 0);
-    if (resume.education?.length === 0) suggestions.push({ type: 'improvement', message: 'Add your educational background.' });
+    // Education check
+    if (resume.education?.length > 0) {
+        score += 10;
+        const eduWithContent = resume.education.filter(e => e.school || e.degree);
+        const eduDatesValid = eduWithContent.every(e => 
+            isDateValid(e.startDate) && (e.current || isDateValid(e.endDate))
+        );
+        if (eduWithContent.length > 0 && !eduDatesValid) {
+            suggestions.push({ type: 'improvement', message: 'Ensure all education dates follow the MM/YYYY format.', targetSection: 'education' });
+        }
+    } else {
+        suggestions.push({ type: 'improvement', message: 'Add your educational background.', targetSection: 'education' });
+    }
+    
     score += evaluateSkills(resume.skills, suggestions);
     score += evaluateKeywords(resume, suggestions);
 
@@ -152,7 +172,9 @@ export function calculateAtsScore(resume: ResumeState): ScoreResult {
 
     score = Math.min(100, Math.round(score));
 
-    if (score >= 80) {
+    const hasPendingImprovements = suggestions.some(s => s.type === 'critical' || s.type === 'improvement');
+
+    if (score >= 80 && !hasPendingImprovements) {
         suggestions.unshift({ type: 'success', message: 'Great job! Your resume is highly ATS-optimized.' });
     } else if (score >= 50) {
         suggestions.unshift({ type: 'improvement', message: 'Good start, but there is room for improvement.' });
