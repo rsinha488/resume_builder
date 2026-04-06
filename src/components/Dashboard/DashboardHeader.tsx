@@ -41,8 +41,8 @@ export default function DashboardHeader() {
 
     useEffect(() => {
         fetchProfile();
-        window.addEventListener('profile-updated', fetchProfile);
-        return () => window.removeEventListener('profile-updated', fetchProfile);
+        globalThis.addEventListener('profile-updated', fetchProfile);
+        return () => globalThis.removeEventListener('profile-updated', fetchProfile);
     }, []);
 
     const handleLogout = async () => {
@@ -52,78 +52,99 @@ export default function DashboardHeader() {
     };
 
     return (
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
-                <div className="flex items-center gap-12">
-                    <Link href="/dashboard" className="flex items-center gap-2 group">
-                        <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-primary-600/20 group-hover:scale-110 transition-transform">
+        <header className="bg-white/80 backdrop-blur-md border-b border-surface-100 sticky top-0 z-40">
+            <div className="max-w-full mx-auto px-8 h-20 flex justify-between items-center">
+                <div className="flex items-center gap-16">
+                    <Link href="/dashboard" className="flex items-center gap-3 group">
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-xl shadow-primary-600/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                             R
                         </div>
-                        <span className="text-xl font-black tracking-tight text-gray-900">RESUME<span className="text-primary-600">BUILDER</span></span>
+                        <span className="text-xl font-black tracking-tight text-surface-900 group-hover:text-primary-600 transition-colors">RESUME<span className="text-primary-600">BUILDER</span></span>
                     </Link>
-
-                    <nav className="hidden md:flex items-center gap-8 h-16">
+ 
+                    <nav className="hidden lg:flex items-center gap-10 h-20">
                         <Link
                             href="/dashboard"
-                            className={`text-sm font-bold h-full flex items-center px-1 border-b-2 transition-all ${pathname === '/dashboard'
+                            className={`text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center px-1 border-b-2 transition-all relative group/nav ${pathname === '/dashboard'
                                 ? 'text-primary-600 border-primary-600'
-                                : 'text-gray-500 border-transparent hover:text-gray-900 hover:border-gray-200'}`}
+                                : 'text-surface-400 border-transparent hover:text-surface-900'}`}
                         >
                             My Documents
+                            {pathname !== '/dashboard' && <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 group-hover/nav:w-full transition-all duration-300" />}
                         </Link>
                         <Link
                             href="/templates"
-                            className={`text-sm font-bold h-full flex items-center px-1 border-b-2 transition-all ${pathname === '/templates'
+                            className={`text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center px-1 border-b-2 transition-all relative group/nav ${pathname === '/templates'
                                 ? 'text-primary-600 border-primary-600'
-                                : 'text-gray-500 border-transparent hover:text-gray-900 hover:border-gray-200'}`}
+                                : 'text-surface-400 border-transparent hover:text-surface-900'}`}
                         >
                             Templates
+                            {pathname !== '/templates' && <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary-600 group-hover/nav:w-full transition-all duration-300" />}
                         </Link>
                     </nav>
                 </div>
-
-                <div className="flex items-center gap-6">
+ 
+                <div className="flex items-center gap-8">
                     <button
                         onClick={() => setIsImportModalOpen(true)}
-                        className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all"
+                        className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-surface-600 hover:text-primary-600 hover:bg-primary-50 rounded-2xl transition-all border border-transparent hover:border-primary-100"
                     >
-                        <FaFileImport /> Import Resume
+                        <FaFileImport className="text-xs" /> Import Resume
                     </button>
-
-                    <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors relative group" aria-label="Notifications">
+ 
+                    <button className="relative w-10 h-10 flex items-center justify-center text-surface-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all group" aria-label="Notifications">
                         <FaBell size={20} className="group-hover:rotate-12 transition-transform" />
-                        <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                        <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                     </button>
-
+ 
                     <div className="relative" ref={menuRef}>
                         <button
                             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                            className="flex items-center gap-3 p-1.5 pl-4 rounded-xl border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+                            className={`flex items-center gap-4 p-1 rounded-2xl border transition-all duration-300 ${
+                                isUserMenuOpen 
+                                ? 'bg-surface-50 border-primary-200 ring-4 ring-primary-500/10' 
+                                : 'border-surface-100 hover:border-surface-200 hover:bg-surface-50'
+                            }`}
                         >
-                            <span className="text-sm font-bold text-gray-700">{userName || 'My Account'}</span>
-                            <div className="w-8 h-8 rounded-lg overflow-hidden bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-sm flex-shrink-0">
-                                {userAvatar
-                                    ? <Image src={userAvatar} alt="avatar" width={32} height={32} className="object-cover w-full h-full" />
-                                    : userName ? userName.charAt(0).toUpperCase() : <FaUserCircle size={20} />}
+                            <div className="w-9 h-9 rounded-xl overflow-hidden bg-primary-100 flex items-center justify-center text-primary-700 font-black text-sm flex-shrink-0 shadow-inner">
+                                {(() => {
+                                    if (userAvatar) return <Image src={userAvatar} alt="avatar" width={36} height={36} className="object-cover w-full h-full" />;
+                                    if (userName) return userName.charAt(0).toUpperCase();
+                                    return <FaUserCircle size={22} />;
+                                })()}
+                            </div>
+                            <div className="hidden sm:block text-left pr-4">
+                                <p className="text-[10px] font-black text-surface-900 uppercase tracking-widest leading-none mb-1">{userName || 'My Account'}</p>
+                                <p className="text-[9px] font-bold text-surface-400 uppercase tracking-widest leading-none">Settings</p>
                             </div>
                         </button>
-
+ 
                         {isUserMenuOpen && (
-                            <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 animate-in fade-in zoom-in-95 duration-200">
-                                <div className="px-4 py-3 border-b border-gray-100">
-                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Account</p>
-                                    <p className="text-sm font-bold text-gray-900 truncate">{userName || 'My Account'}</p>
-                                    {userEmail && <p className="text-xs text-gray-400 truncate mt-0.5">{userEmail}</p>}
+                            <div className="absolute right-0 mt-4 w-72 bg-white rounded-3xl shadow-premium border border-surface-100 py-3 animate-fade-in-up">
+                                <div className="px-6 py-4 border-b border-surface-50">
+                                    <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest mb-2">Authenticated as</p>
+                                    <p className="text-sm font-black text-surface-900 truncate">
+                                        {userName || 'My Account'}
+                                    </p>
+                                    {userEmail && <p className="text-xs font-medium text-surface-400 truncate mt-1">{userEmail}</p>}
                                 </div>
-                                <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50 hover:text-primary-600 transition-colors">
-                                    <FaUser size={14} /> Profile Settings
-                                </Link>
-                                <button
-                                    onClick={handleLogout}
-                                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
-                                >
-                                    <FaSignOutAlt size={14} /> Logout
-                                </button>
+                                <div className="p-2 space-y-1">
+                                    <Link href="/profile" className="flex items-center gap-3 px-4 py-3 text-xs font-bold text-surface-600 hover:bg-surface-50 hover:text-primary-600 rounded-2xl transition-all group">
+                                        <div className="w-8 h-8 rounded-xl bg-surface-50 flex items-center justify-center group-hover:bg-primary-50 transition-colors">
+                                            <FaUser size={12} />
+                                        </div>
+                                        Personal Settings
+                                    </Link>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-red-500 hover:bg-red-50 rounded-2xl transition-all group"
+                                    >
+                                        <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+                                            <FaSignOutAlt size={12} />
+                                        </div>
+                                        Sign Out Safely
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>

@@ -16,23 +16,30 @@ const MODES = [
 
 export default function BuilderSidebar({ currentMode, onModeChange }: BuilderSidebarProps) {
     return (
-        <aside className="w-20 bg-gray-900 flex flex-col items-center py-8 gap-4 border-r border-gray-800 z-20">
-            <nav className="flex flex-col gap-4">
-                {MODES.map((mode) => {
+        <aside className="w-24 bg-surface-950 flex flex-col items-center py-10 gap-8 border-r border-white/5 z-20">
+            {/* Logo placeholder/Small Logo */}
+            <div className="w-12 h-12 bg-primary-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-primary-600/20 mb-4 animate-fade-in">
+                R
+            </div>
+
+            <nav className="flex flex-col gap-6">
+                {MODES.map((mode, i) => {
                     const Icon = mode.icon;
                     const isActive = currentMode === mode.id;
                     return (
                         <button
                             key={mode.id}
                             onClick={() => onModeChange(mode.id)}
-                            className={`group relative p-4 rounded-xl transition-all ${isActive
-                                ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/20'
-                                : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                            className={`group relative p-4 rounded-2xl transition-all duration-300 animate-fade-in-up ${isActive
+                                ? 'bg-primary-600 text-white shadow-xl shadow-primary-600/30'
+                                : 'text-surface-500 hover:text-white hover:bg-white/5'
                                 }`}
+                            style={{ animationDelay: `${i * 100}ms` }}
                         >
-                            <Icon size={20} />
-                            <span className="absolute left-full ml-4 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50 transition-opacity">
+                            <Icon size={22} className={`${isActive ? 'scale-110' : 'scale-100'} transition-transform duration-300`} />
+                            <span className="absolute left-full ml-5 px-3 py-1.5 bg-surface-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0 pointer-events-none whitespace-nowrap z-50 transition-all duration-300 backdrop-blur-md border border-white/10 shadow-xl">
                                 {mode.label}
+                                <div className="absolute left-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 bg-surface-800 rotate-45 border-l border-b border-white/10" />
                             </span>
                         </button>
                     );

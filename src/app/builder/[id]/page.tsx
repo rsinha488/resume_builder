@@ -61,8 +61,10 @@ export default function BuilderPage() {
             }, { headers: { Authorization: `Bearer ${token}` } });
             dispatch(updatePersonalInfo({ summary: res.data.summary }));
             toast.success('Summary generated!');
-        } catch {
-            toast.error('Failed to generate summary.');
+        } catch (error: any) {
+            console.error('Generate summary error:', error);
+            const msg = error.response?.data?.error || 'Failed to generate summary.';
+            toast.error(msg);
         } finally {
             setGeneratingSummary(false);
         }
@@ -258,69 +260,74 @@ export default function BuilderPage() {
                         currentMode={currentMode}
                     />
                     {/* Header Actions */}
-                    <header className="flex-shrink-0 h-16 bg-white border-b border-gray-200 px-8 flex justify-between items-center z-10">
+                    <header className="flex-shrink-0 h-20 bg-white/80 backdrop-blur-md border-b border-surface-100 px-8 flex justify-between items-center z-20">
                         <div className="flex items-center gap-4">
-                            <h1 className="text-lg font-bold text-gray-900">
-                                {currentMode === 'content' ? contentSteps[currentContentStep].title : currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}
+                            <h1 className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em]">
+                                {currentMode === 'content' ? `Step ${currentContentStep + 1}: ${contentSteps[currentContentStep].title}` : currentMode}
                             </h1>
                         </div>
 
-                        <div className="flex gap-3">
+                        <div className="flex gap-4">
                             <button
                                 onClick={handleFillSampleData}
-                                className="inline-flex items-center px-3 py-1.5 text-sm border border-primary-200 text-primary-600 rounded-md hover:bg-primary-50 transition-colors"
+                                className="hidden lg:flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-surface-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all border border-transparent hover:border-primary-100"
                             >
-                                <FaEdit className="mr-2" /> Fill Sample
+                                <FaEdit className="text-xs" /> Auto-Fill
                             </button>
-                            <button
-                                onClick={handleDownloadTxt}
-                                className="inline-flex items-center px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-                            >
-                                <FaFileAlt className="mr-2" /> .TXT
-                            </button>
-                            {userPlan === 'PRO' ? (
-                                <>
-                                    <button
-                                        onClick={handleDownloadDocx}
-                                        className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                                    >
-                                        <FaFileAlt className="mr-2" /> .DOCX
-                                    </button>
-                                    <PDFDownloadLink
-                                        document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
-                                        fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
-                                        className="inline-flex items-center px-3 py-1.5 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
-                                    >
-                                        {({ loading }) => (
-                                            <>
-                                                <FaDownload className="mr-2" /> {loading ? '...' : 'PDF'}
-                                            </>
-                                        )}
-                                    </PDFDownloadLink>
-                                </>
-                            ) : (
+                            
+                            <div className="h-6 w-px bg-surface-100 my-auto hidden lg:block" />
+
+                            <div className="flex gap-2">
                                 <button
-                                    onClick={() => setIsUpgradeModalOpen(true)}
-                                    className="inline-flex items-center px-3 py-1.5 text-sm bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors"
+                                    onClick={handleDownloadTxt}
+                                    className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-surface-500 hover:text-surface-900 bg-surface-50 hover:bg-surface-100 rounded-xl transition-all"
                                 >
-                                    <FaCrown className="mr-2" /> Upgrade
+                                    .TXT
                                 </button>
-                            )}
+                                {userPlan === 'PRO' ? (
+                                    <>
+                                        <button
+                                            onClick={handleDownloadDocx}
+                                            className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all"
+                                        >
+                                            .DOCX
+                                        </button>
+                                        <PDFDownloadLink
+                                            document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
+                                            fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
+                                            className="btn-primary !px-6 !py-2 !rounded-xl !text-[10px] !font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-primary-600/20"
+                                        >
+                                            {({ loading }) => (
+                                                <>
+                                                    <FaDownload size={10} /> {loading ? '...' : 'Export PDF'}
+                                                </>
+                                            )}
+                                        </PDFDownloadLink>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={() => setIsUpgradeModalOpen(true)}
+                                        className="btn-primary !bg-amber-500 hover:!bg-amber-600 !px-6 !py-2 !rounded-xl !text-[10px] !font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-amber-500/20"
+                                    >
+                                        <FaCrown size={10} /> Get Pro
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </header>
 
                     {/* Editor Area — scrolls independently, bottom bar stays pinned */}
-                    <div id="editor-area" className="flex-1 overflow-y-auto min-h-0 pb-24 p-8 scroll-smooth">
-                        <div className="max-w-3xl mx-auto">
+                    <div id="editor-area" className="flex-1 overflow-y-auto min-h-0 pb-32 p-10 scroll-smooth bg-surface-50/50">
+                        <div className="max-w-4xl mx-auto">
                             {currentMode === 'content' && (
-                                <div className="flex mb-8 gap-4 overflow-x-auto pb-2">
+                                <div className="flex mb-10 gap-3 overflow-x-auto pb-4 no-scrollbar">
                                     {contentSteps.map((step, index) => (
                                         <button
                                             key={step.id}
                                             onClick={() => setCurrentContentStep(index)}
-                                            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${index === currentContentStep
-                                                ? 'bg-primary-600 text-white shadow-md'
-                                                : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
+                                            className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${index === currentContentStep
+                                                ? 'bg-surface-900 text-white shadow-xl shadow-surface-900/20 -translate-y-0.5'
+                                                : 'bg-white text-surface-400 hover:text-surface-600 border border-surface-100 hover:border-surface-200'
                                                 }`}
                                         >
                                             {step.title}
@@ -329,7 +336,7 @@ export default function BuilderPage() {
                                 </div>
                             )}
 
-                            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                            <div className={`${currentMode === 'content' ? 'bg-white p-10 lg:p-16' : ''} rounded-[2.5rem] shadow-premium border border-surface-100/50 relative overflow-hidden`}>
                                 {currentMode === 'templates' && (
                                     <TemplateSelector
                                         userPlan={userPlan}
@@ -350,30 +357,47 @@ export default function BuilderPage() {
                                         {currentContentStep === 3 && <SkillsForm />}
                                         {currentContentStep === 4 && <ExtraSections />}
                                         {currentContentStep === 5 && (
-                                            <div className="space-y-6">
-                                                <div className="flex justify-between items-center">
-                                                    <label htmlFor="summary-large" className="block text-sm font-semibold text-gray-700">Professional Summary</label>
+                                            <div className="space-y-8 animate-fade-in-up">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <h2 className="text-2xl font-black text-surface-900 mb-1">Professional Summary</h2>
+                                                        <p className="text-sm text-surface-500 font-medium">Capture attention with a powerful opening.</p>
+                                                    </div>
                                                     <button
                                                         type="button"
                                                         onClick={handleGenerateSummary}
                                                         disabled={generatingSummary}
-                                                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors"
+                                                        className="group/magic flex items-center gap-2"
                                                     >
-                                                        {generatingSummary
-                                                            ? <><FaSpinner className="animate-spin" size={10} /> Generating...</>
-                                                            : <><FaMagic size={10} /> Generate with AI</>
-                                                        }
+                                                        <div className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                                                            generatingSummary 
+                                                            ? 'bg-surface-100 text-surface-400 font-bold' 
+                                                            : 'bg-primary-600 text-white shadow-lg shadow-primary-600/20 hover:bg-primary-700 hover:-translate-y-0.5 active:scale-95'
+                                                        }`}>
+                                                            {generatingSummary
+                                                                ? <><FaSpinner className="animate-spin" size={10} /> Generating Summary...</>
+                                                                : <><FaMagic size={10} className="group-hover/magic:rotate-12 transition-transform" /> Write with Groq AI</>
+                                                            }
+                                                        </div>
                                                     </button>
                                                 </div>
-                                                <p className="text-sm text-gray-500">Write a short, catchy summary that highlights your best qualities and experiences.</p>
-                                                <textarea
-                                                    id="summary-large"
-                                                    value={resume.personalInfo?.summary}
-                                                    onChange={(e) => dispatch(updatePersonalInfo({ summary: e.target.value }))}
-                                                    rows={10}
-                                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none resize-none text-lg"
-                                                    placeholder="e.g. Passionate Software Engineer with 5+ years of experience..."
-                                                />
+
+                                                <div className="relative group">
+                                                    <div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 to-purple-500/20 rounded-3xl blur opacity-0 group-focus-within:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                                                    <textarea
+                                                        id="summary-large"
+                                                        value={resume.personalInfo?.summary}
+                                                        onChange={(e) => dispatch(updatePersonalInfo({ summary: e.target.value }))}
+                                                        rows={12}
+                                                        className="relative w-full p-8 bg-white border border-surface-100 rounded-3xl shadow-sm focus:ring-0 focus:border-primary-500 outline-none resize-none text-lg text-surface-700 leading-relaxed font-medium transition-all"
+                                                        placeholder="e.g. Accomplished Software Engineer with a passion for building scalable web applications and 5+ years of experience in JavaScript frameworks..."
+                                                    />
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-3 p-4 bg-surface-50 rounded-2xl border border-surface-100 italic">
+                                                    <span className="text-lg">💡</span>
+                                                    <p className="text-xs text-surface-500 font-medium">Keep it concise. 3-5 sentences that highlight your most relevant experience and skills for the job you want.</p>
+                                                </div>
                                             </div>
                                         )}
 
@@ -381,41 +405,69 @@ export default function BuilderPage() {
                                 )}
                                 {currentMode === 'analysis' && <AtsScoreDisplay />}
                                 {currentMode === 'finalize' && (
-                                    <div className="text-center space-y-8 py-12">
+                                    <div className="text-center space-y-12 py-16 animate-fade-in-up">
                                         <div className="flex justify-center">
-                                            <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center shadow-inner">
-                                                <FaCheck size={48} />
+                                            <div className="relative">
+                                                <div className="absolute -inset-4 bg-green-500/20 rounded-full blur-2xl animate-pulse"></div>
+                                                <div className="relative w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-premium ring-8 ring-green-50 text-green-500">
+                                                    <FaCheck size={56} className="animate-float" />
+                                                </div>
                                             </div>
                                         </div>
                                         <div>
-                                            <h2 className="text-3xl font-black text-gray-900 mb-2">You're all set!</h2>
-                                            <p className="text-gray-600 text-lg">Your professional resume is ready for download.</p>
+                                            <h2 className="text-4xl font-black text-surface-900 mb-3 tracking-tight">You're all set!</h2>
+                                            <p className="text-surface-500 text-lg font-medium max-w-md mx-auto">
+                                                Your professional resume is polished and ready to make an impact.
+                                            </p>
                                         </div>
 
-                                        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
                                             <button
                                                 onClick={handleDownloadTxt}
-                                                className="w-full sm:w-auto px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center"
+                                                className="premium-card p-6 flex flex-col items-center gap-4 hover:border-surface-200 transition-all hover:-translate-y-1 group"
                                             >
-                                                <FaFileAlt className="mr-2" /> Download .TXT
+                                                <div className="w-14 h-14 rounded-2xl bg-surface-50 flex items-center justify-center text-surface-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
+                                                    <FaFileAlt size={24} />
+                                                </div>
+                                                <div className="text-center">
+                                                    <p className="text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Plain Text</p>
+                                                    <p className="text-[10px] font-bold text-surface-400">Best for simple ATS</p>
+                                                </div>
+                                                <span className="mt-2 text-[10px] font-black text-primary-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Download .TXT</span>
                                             </button>
 
                                             {userPlan === 'PRO' ? (
                                                 <>
                                                     <button
                                                         onClick={handleDownloadDocx}
-                                                        className="w-full sm:w-auto px-8 py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg flex items-center justify-center"
+                                                        className="premium-card p-6 flex flex-col items-center gap-4 border-blue-100 hover:border-blue-200 transition-all hover:-translate-y-1 group"
                                                     >
-                                                        <FaFileAlt className="mr-2" /> Download .DOCX
+                                                        <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                                            <FaFileAlt size={24} />
+                                                        </div>
+                                                        <div className="text-center">
+                                                            <p className="text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Microsoft Word</p>
+                                                            <p className="text-[10px] font-bold text-surface-400">Fully editable format</p>
+                                                        </div>
+                                                        <span className="mt-2 text-[10px] font-black text-blue-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Download .DOCX</span>
                                                     </button>
                                                     <PDFDownloadLink
                                                         document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
                                                         fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
-                                                        className="w-full sm:w-auto px-8 py-4 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-all shadow-lg flex items-center justify-center"
+                                                        className="premium-card p-6 flex flex-col items-center gap-4 border-primary-100 hover:border-primary-200 transition-all hover:-translate-y-1 group"
                                                     >
                                                         {({ loading }) => (
                                                             <>
-                                                                <FaDownload className="mr-2" /> {loading ? 'Generating...' : 'Download PDF'}
+                                                                <div className="w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors">
+                                                                    <FaDownload size={24} />
+                                                                </div>
+                                                                <div className="text-center">
+                                                                    <p className="text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Adobe PDF</p>
+                                                                    <p className="text-[10px] font-bold text-surface-400">Perfect for printing</p>
+                                                                </div>
+                                                                <span className="mt-2 text-[10px] font-black text-primary-600 uppercase tracking-widest">
+                                                                    {loading ? 'Preparing...' : 'Download .PDF'}
+                                                                </span>
                                                             </>
                                                         )}
                                                     </PDFDownloadLink>
@@ -423,17 +475,26 @@ export default function BuilderPage() {
                                             ) : (
                                                 <button
                                                     onClick={() => setIsUpgradeModalOpen(true)}
-                                                    className="w-full sm:w-auto px-8 py-4 bg-amber-500 text-white rounded-xl font-bold hover:bg-amber-600 transition-all shadow-lg flex items-center justify-center animate-bounce"
+                                                    className="premium-card p-6 flex flex-col items-center gap-4 border-amber-100 bg-amber-50/10 hover:bg-amber-50/50 transition-all hover:-translate-y-1 group"
                                                 >
-                                                    <FaCrown className="mr-2" /> Upgrade to Download PDF
+                                                    <div className="w-14 h-14 rounded-2xl bg-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-500/20 group-hover:rotate-12 transition-transform">
+                                                        <FaCrown size={24} />
+                                                    </div>
+                                                    <div className="text-center">
+                                                        <p className="text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Premium Formats</p>
+                                                        <p className="text-[10px] font-bold text-surface-400">PDF & Word export</p>
+                                                    </div>
+                                                    <span className="mt-2 text-[10px] font-black text-amber-600 uppercase tracking-widest animate-pulse">Upgrade to Unlock</span>
                                                 </button>
                                             )}
                                         </div>
 
                                         {userPlan !== 'PRO' && (
-                                            <p className="text-sm text-gray-500 italic">
-                                                Free users can download in .TXT format. Upgrade for PDF and Word formats.
-                                            </p>
+                                            <div className="mt-12 p-6 bg-surface-50 rounded-3xl border border-surface-100 inline-block">
+                                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em]">
+                                                    Free users can download in .TXT format. Upgrade for world-class PDF and Word exports.
+                                                </p>
+                                            </div>
                                         )}
                                     </div>
                                 )}

@@ -49,119 +49,149 @@ export default function ExperienceForm() {
                 dispatch(updateExperience({ ...exp, description: res.data.rewritten }));
             }
             toast.success('Description rewritten!');
-        } catch {
-            toast.error('Failed to rewrite. Please try again.');
+        } catch (error: any) {
+            console.error('Rewrite bullet error:', error);
+            const msg = error.response?.data?.error || 'Failed to rewrite. Please try again.';
+            toast.error(msg);
         } finally {
             setRewriting(null);
         }
     };
 
     return (
-        <div className="space-y-8">
-            {experiences?.map((exp, index) => (
-                <div key={exp.id} className="p-6 border border-gray-200 rounded-xl relative group bg-gray-50/50">
-                    <button
-                        onClick={() => {
-                            dispatch(removeExperience(exp.id));
-                            toast.success('Experience removed');
-                        }}
-                        className="absolute top-4 right-4 text-gray-400 hover:text-red-600 transition-colors"
-                    >
-                        <FaTrash size={16} />
-                    </button>
-                    <h3 className="text-lg font-bold text-gray-800 mb-6">Experience #{index + 1}</h3>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div>
-                            <label htmlFor={`company-${exp.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Company</label>
-                            <input
-                                id={`company-${exp.id}`}
-                                type="text"
-                                value={exp.company}
-                                onChange={(e) => handleChange(exp.id, 'company', e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-                                placeholder="Google"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor={`position-${exp.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Position</label>
-                            <input
-                                id={`position-${exp.id}`}
-                                type="text"
-                                value={exp.position}
-                                onChange={(e) => handleChange(exp.id, 'position', e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-                                placeholder="Senior Developer"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor={`startDate-${exp.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Start Date</label>
-                            <input
-                                id={`startDate-${exp.id}`}
-                                type="text"
-                                value={exp.startDate}
-                                onChange={(e) => handleChange(exp.id, 'startDate', e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
-                                placeholder="Jan 2020"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor={`endDate-${exp.id}`} className="block text-sm font-semibold text-gray-700 mb-1">End Date</label>
-                            <input
-                                id={`endDate-${exp.id}`}
-                                type="text"
-                                value={exp.endDate}
-                                onChange={(e) => handleChange(exp.id, 'endDate', e.target.value)}
-                                disabled={exp.current}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none disabled:bg-gray-100"
-                                placeholder="Present"
-                            />
-                        </div>
-                        <div className="sm:col-span-2 flex items-center">
-                            <input
-                                type="checkbox"
-                                id={`current-${exp.id}`}
-                                checked={exp.current}
-                                onChange={(e) => handleChange(exp.id, 'current', e.target.checked)}
-                                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                            />
-                            <label htmlFor={`current-${exp.id}`} className="ml-2 block text-sm text-gray-700">
-                                I currently work here
-                            </label>
-                        </div>
-                        <div className="sm:col-span-2">
-                            <label htmlFor={`description-${exp.id}`} className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-                            <textarea
-                                id={`description-${exp.id}`}
-                                value={exp.description}
-                                onChange={(e) => handleChange(exp.id, 'description', e.target.value)}
-                                rows={4}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none resize-none"
-                                placeholder="Describe your responsibilities and achievements..."
-                            />
-
-                            <button
-                                type="button"
-                                onClick={() => handleRewriteBullet(exp.id, exp.description, personalInfo?.jobTitle || '')}
-                                disabled={rewriting === exp.id || !exp.description?.trim()}
-                                className="mt-2 flex items-center gap-2 text-xs font-semibold text-purple-600 hover:text-purple-700 disabled:opacity-40 transition-colors"
-                            >
-                                {rewriting === exp.id
-                                    ? <><FaSpinner className="animate-spin" size={11} /> Rewriting...</>
-                                    : <><FaMagic size={11} /> Rewrite with AI</>
-                                }
-                            </button>
-                        </div>
-
-                    </div>
+        <div className="space-y-10 animate-fade-in-up">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-black text-surface-900 mb-2">Work Experience</h2>
+                    <p className="text-sm text-surface-500 font-medium">Highlight your career achievements.</p>
                 </div>
-            ))}
+                <div className="px-4 py-2 bg-primary-50 rounded-2xl border border-primary-100 text-primary-700 text-xs font-black uppercase tracking-widest animate-pulse">
+                    Step 2 of 5
+                </div>
+            </div>
+
+            <div className="space-y-8">
+                {experiences?.map((exp, index) => (
+                    <div key={exp.id} className="premium-card p-8 relative group animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                        <button
+                            onClick={() => {
+                                dispatch(removeExperience(exp.id));
+                                toast.success('Experience removed');
+                            }}
+                            className="absolute top-6 right-6 w-10 h-10 rounded-xl flex items-center justify-center text-surface-300 hover:text-red-500 hover:bg-red-50 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                        >
+                            <FaTrash size={16} />
+                        </button>
+                        
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-10 h-10 rounded-xl bg-surface-900 text-white flex items-center justify-center font-black text-lg shadow-lg">
+                                {index + 1}
+                            </div>
+                            <h3 className="text-xl font-black text-surface-900">Experience</h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                            <div className="space-y-2">
+                                <label htmlFor={`company-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Company / Organization</label>
+                                <input
+                                    id={`company-${exp.id}`}
+                                    type="text"
+                                    value={exp.company}
+                                    onChange={(e) => handleChange(exp.id, 'company', e.target.value)}
+                                    className="w-full"
+                                    placeholder="e.g. Google"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor={`position-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Your Job Title</label>
+                                <input
+                                    id={`position-${exp.id}`}
+                                    type="text"
+                                    value={exp.position}
+                                    onChange={(e) => handleChange(exp.id, 'position', e.target.value)}
+                                    className="w-full"
+                                    placeholder="e.g. Senior Product Designer"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor={`startDate-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
+                                <input
+                                    id={`startDate-${exp.id}`}
+                                    type="text"
+                                    value={exp.startDate}
+                                    onChange={(e) => handleChange(exp.id, 'startDate', e.target.value)}
+                                    className="w-full"
+                                    placeholder="MM/YYYY"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label htmlFor={`endDate-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">End Date</label>
+                                <input
+                                    id={`endDate-${exp.id}`}
+                                    type="text"
+                                    value={exp.endDate}
+                                    onChange={(e) => handleChange(exp.id, 'endDate', e.target.value)}
+                                    disabled={exp.current}
+                                    className="w-full"
+                                    placeholder={exp.current ? 'Present' : 'MM/YYYY'}
+                                />
+                            </div>
+                            <div className="sm:col-span-2 flex items-center gap-3 p-4 bg-surface-50 rounded-2xl border border-surface-100 transition-colors hover:border-primary-200">
+                                <input
+                                    type="checkbox"
+                                    id={`current-${exp.id}`}
+                                    checked={exp.current}
+                                    onChange={(e) => handleChange(exp.id, 'current', e.target.checked)}
+                                    className="h-5 w-5 !rounded-lg text-primary-600 focus:ring-primary-500 border-surface-300"
+                                />
+                                <label htmlFor={`current-${exp.id}`} className="text-sm font-bold text-surface-700 select-none cursor-pointer">
+                                    I currently work here
+                                </label>
+                            </div>
+                            <div className="sm:col-span-2 space-y-3">
+                                <div className="flex items-center justify-between ml-1">
+                                    <label htmlFor={`description-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest">Job Description</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRewriteBullet(exp.id, exp.description, personalInfo?.jobTitle || '')}
+                                        disabled={rewriting === exp.id || !exp.description?.trim()}
+                                        className="flex items-center gap-2 group/magic"
+                                    >
+                                        <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                                            rewriting === exp.id 
+                                            ? 'bg-surface-100 text-surface-400' 
+                                            : 'bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white hover:shadow-lg hover:shadow-primary-600/20 active:scale-95'
+                                        }`}>
+                                            {rewriting === exp.id
+                                                ? <><FaSpinner className="animate-spin" size={10} /> Rewriting...</>
+                                                : <><FaMagic size={10} className="group-hover/magic:rotate-12 transition-transform" /> Rewrite with Groq AI</>
+                                            }
+                                        </div>
+                                    </button>
+                                </div>
+                                <textarea
+                                    id={`description-${exp.id}`}
+                                    value={exp.description}
+                                    onChange={(e) => handleChange(exp.id, 'description', e.target.value)}
+                                    rows={5}
+                                    className="w-full resize-none p-5"
+                                    placeholder="Focus on achievements and quantifiable results (e.g. Increased sales by 20%...)"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
 
             <button
                 onClick={handleAdd}
-                className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-primary-500 hover:text-primary-600 transition-all flex items-center justify-center font-semibold"
+                className="group w-full py-10 border-4 border-dashed border-surface-100 rounded-4xl text-surface-400 hover:border-primary-500/30 hover:bg-primary-50/30 hover:text-primary-600 transition-all duration-300 flex flex-col items-center justify-center gap-3 animate-fade-in"
             >
-                <FaPlus className="mr-2" /> Add Experience
+                <div className="w-14 h-14 rounded-2xl bg-white shadow-premium flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all">
+                    <FaPlus className="text-surface-300 group-hover:text-primary-600 transition-colors" size={20} />
+                </div>
+                <span className="font-black uppercase tracking-[0.2em] text-[10px]">Add Work Experience</span>
             </button>
         </div>
     );

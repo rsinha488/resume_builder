@@ -2,33 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+  }
+
+  body {
+    @apply bg-surface-50 text-surface-900 font-sans selection:bg-primary-100 selection:text-primary-900 antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-glass;
+  }
+
+  .premium-card {
+    @apply bg-white rounded-3xl border border-surface-100 shadow-premium hover:shadow-premium-hover transition-all duration-300;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white rounded-2xl font-semibold shadow-lg shadow-primary-600/25 hover:bg-primary-700 hover:-translate-y-0.5 active:scale-95 transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 bg-white text-surface-700 border border-surface-100 rounded-2xl font-semibold hover:bg-surface-50 hover:border-surface-200 hover:-translate-y-0.5 active:scale-95 transition-all duration-200;
+  }
 }
 
 /* Global input / textarea visibility */
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
 textarea,
 select {
-  color: #111827 !important; /* gray-900 — always dark regardless of Tailwind utility classes */
+  @apply bg-white border border-surface-200 rounded-xl px-4 py-2 placeholder:text-surface-400 focus-visible:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all;
+  color: #111827 !important;
 }
 
 input:not([type="checkbox"]):not([type="radio"])::placeholder,
 textarea::placeholder {
-  color: #9ca3af !important; /* gray-400 — visible but clearly a placeholder */
+  @apply text-surface-400;
   opacity: 1;
 }

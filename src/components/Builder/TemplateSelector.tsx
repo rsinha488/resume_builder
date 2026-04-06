@@ -27,23 +27,29 @@ export default function TemplateSelector({ userPlan, onUpgradeRequired }: Templa
     };
 
     return (
-        <div className="space-y-6">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl shadow-blue-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl">
-                        <FaMagic />
+        <div className="space-y-10 animate-fade-in-up">
+            {/* Gallery Promo Card */}
+            <div className="relative group overflow-hidden rounded-[2.5rem] bg-surface-950 p-10 text-white shadow-2xl shadow-primary-900/20">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/20 blur-[100px] rounded-full -mr-32 -mt-32 transition-all group-hover:scale-150 duration-700" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/10 blur-[100px] rounded-full -ml-32 -mb-32" />
+                
+                <div className="relative flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/10 flex items-center justify-center text-3xl shadow-inner">
+                            <FaMagic className="text-primary-400 animate-pulse" />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black tracking-tight mb-1">Template Gallery</h3>
+                            <p className="text-surface-400 text-sm font-medium">Explore our collection of high-impact layouts.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-lg font-bold">Advanced Template Selection</h3>
-                        <p className="text-blue-100 text-sm">Preview all layouts in high fidelity</p>
-                    </div>
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="px-8 py-4 bg-white text-surface-950 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-primary-50 transition-all shadow-xl active:scale-95 shrink-0"
+                    >
+                        Browse all templates
+                    </button>
                 </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="px-6 py-3 bg-white text-blue-600 rounded-xl font-bold hover:bg-blue-50 transition-all shadow-lg"
-                >
-                    Open Template Gallery
-                </button>
             </div>
 
             <TemplateSelectionModal
@@ -54,47 +60,49 @@ export default function TemplateSelector({ userPlan, onUpgradeRequired }: Templa
                 onUpgrade={onUpgradeRequired}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {TEMPLATES.map((template) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                {TEMPLATES.map((template, index) => (
                     <button
                         key={template.id}
                         onClick={() => handleSelect(template.id, template.isPremium)}
-                        className={`relative cursor-pointer rounded-xl border-2 transition-all overflow-hidden group text-left ${selectedTemplateId === template.id
-                            ? 'border-primary-600 ring-2 ring-primary-100'
-                            : 'border-gray-200 hover:border-primary-300'
+                        className={`relative cursor-pointer rounded-[2rem] border-2 transition-all duration-500 overflow-hidden group text-left flex flex-col animate-fade-in-up ${
+                            selectedTemplateId === template.id
+                            ? 'border-primary-600 shadow-2xl ring-8 ring-primary-500/5 -translate-y-1'
+                            : 'border-surface-100 hover:border-primary-200 hover:shadow-xl hover:-translate-y-1 bg-white'
                             }`}
+                        style={{ animationDelay: `${index * 100}ms` }}
                     >
                         {/* Template Thumbnail Preview */}
-                        <div className="aspect-[3/4] bg-gray-100 flex flex-col items-center overflow-hidden relative group-hover:bg-gray-200 transition-colors border-b p-4">
-                            <div className="w-[210mm] min-h-[297mm] transform scale-[0.16] origin-top shadow-lg border border-gray-200 pointer-events-none bg-white">
+                        <div className="aspect-[3/4] bg-surface-50 flex flex-col items-center overflow-hidden relative transition-colors p-6 group-hover:bg-surface-100/50">
+                            <div className="w-[210mm] min-h-[297mm] transform scale-[0.18] origin-top shadow-2xl border border-surface-100 pointer-events-none bg-white rounded-sm">
                                 <ResumePreview templateId={template.id} />
+                            </div>
+                            
+                            {/* Overlay for selection */}
+                            <div className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
+                                selectedTemplateId === template.id 
+                                ? 'bg-primary-600/5 backdrop-blur-[1px]' 
+                                : 'bg-transparent group-hover:bg-surface-900/5'
+                            }`}>
+                                {selectedTemplateId === template.id && (
+                                    <div className="bg-primary-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl animate-in zoom-in duration-300">
+                                        <FaCheck size={28} />
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        {template.isPremium && (
-                            <div className="absolute top-3 right-3 bg-amber-500 text-white p-1.5 rounded-full shadow-lg">
-                                <FaCrown size={14} />
-                            </div>
-                        )}
-
-                        {selectedTemplateId === template.id && (
-                            <div className="absolute inset-0 bg-primary-600/10 flex items-center justify-center">
-                                <div className="bg-primary-600 text-white p-2 rounded-full shadow-lg">
-                                    <FaCheck size={20} />
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="p-4 bg-white">
-                            <div className="flex justify-between items-center mb-1">
-                                <h3 className="font-bold text-gray-900">{template.name}</h3>
+                        <div className="p-8 bg-white mt-auto border-t border-surface-50">
+                            <div className="flex justify-between items-start mb-2">
+                                <h3 className="font-black text-surface-900 text-lg tracking-tight group-hover:text-primary-600 transition-colors uppercase">{template.name}</h3>
                                 {template.isPremium && (
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-0.5 rounded">
-                                        Premium
-                                    </span>
+                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 border border-amber-100 rounded-full">
+                                        <FaCrown size={10} />
+                                        <span className="text-[9px] font-black uppercase tracking-widest">Premium</span>
+                                    </div>
                                 )}
                             </div>
-                            <p className="text-xs text-gray-500 line-clamp-2">{template.description}</p>
+                            <p className="text-xs text-surface-500 font-medium leading-relaxed line-clamp-2">{template.description}</p>
                         </div>
                     </button>
                 ))}

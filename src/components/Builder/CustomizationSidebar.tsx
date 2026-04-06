@@ -21,43 +21,57 @@ export default function CustomizationSidebar() {
     const { themeColor, fontFamily } = useAppSelector((state) => state.resume);
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-10 animate-fade-in">
             {/* Color Picker */}
             <section>
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                    <FaPalette className="text-primary-600" /> Theme Color
+                <h3 className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                    <FaPalette className="text-primary-500" /> Theme Palette
                 </h3>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-4 gap-4">
                     {COLORS.map((color) => (
                         <button
                             key={color}
                             onClick={() => dispatch(updateThemeColor(color))}
-                            className={`w-10 h-10 rounded-full border-2 transition-all ${themeColor === color ? 'border-primary-600 scale-110 shadow-md' : 'border-transparent hover:scale-105'
+                            className={`w-10 h-10 rounded-xl transition-all duration-300 relative group ${themeColor === color 
+                                ? 'scale-110 ring-2 ring-primary-500 ring-offset-4 ring-offset-white shadow-lg shadow-primary-500/20' 
+                                : 'hover:scale-105'
                                 }`}
                             style={{ backgroundColor: color }}
                             title={color}
-                        />
+                        >
+                            {themeColor === color && (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-2 h-2 rounded-full bg-white shadow-sm" />
+                                </div>
+                            )}
+                        </button>
                     ))}
                 </div>
             </section>
 
             {/* Font Picker */}
             <section>
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                    <FaFont className="text-primary-600" /> Typography
+                <h3 className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                    <FaFont className="text-primary-500" /> Typography
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-3">
                     {FONTS.map((font) => (
                         <button
                             key={font.name}
                             onClick={() => dispatch(updateFontFamily(font.value))}
-                            className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${fontFamily === font.value
-                                    ? 'border-primary-600 bg-primary-50 text-primary-900 font-bold'
-                                    : 'border-gray-100 hover:border-gray-200 text-gray-600'
+                            className={`w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-300 group ${fontFamily === font.value
+                                    ? 'border-primary-500 bg-primary-50/50 text-surface-900 shadow-sm'
+                                    : 'border-surface-100 hover:border-surface-200 text-surface-500 hover:text-surface-700 bg-white'
                                 }`}
-                            style={{ fontFamily: font.value }}
                         >
-                            {font.name}
+                            <div className="flex items-center justify-between">
+                                <span className={`${fontFamily === font.value ? 'font-black' : 'font-medium'}`} style={{ fontFamily: font.value }}>
+                                    {font.name}
+                                </span>
+                                {fontFamily === font.value && (
+                                    <div className="w-2 h-2 rounded-full bg-primary-500" />
+                                )}
+                            </div>
                         </button>
                     ))}
                 </div>

@@ -76,119 +76,110 @@ const PRO_FEATURES = [
 
 export default function HomePage() {
     return (
-        <div className="bg-white overflow-x-hidden">
+        <div className="bg-surface-50 min-h-screen selection:bg-primary-100 selection:text-primary-900">
 
             {/* ── HERO ── */}
-            <section className="relative isolate px-6 pt-20 pb-32 lg:px-8 bg-gradient-to-br from-slate-50 via-white to-blue-50">
+            <section className="relative isolate px-6 pt-32 pb-40 lg:px-8 bg-gradient-to-b from-white to-surface-50 overflow-hidden">
                 {/* background blobs */}
                 <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
-                    <div className="absolute -top-40 -right-40 w-[700px] h-[700px] rounded-full bg-primary-100/50 blur-3xl" />
-                    <div className="absolute top-60 -left-40 w-[500px] h-[500px] rounded-full bg-indigo-100/40 blur-3xl" />
+                    <div className="absolute -top-[10%] -right-[10%] w-[600px] h-[600px] rounded-full bg-primary-100/30 blur-[100px] animate-pulse" />
+                    <div className="absolute top-[20%] -left-[10%] w-[500px] h-[500px] rounded-full bg-indigo-100/20 blur-[80px]" />
                 </div>
 
                 <div className="mx-auto max-w-4xl text-center">
                     {/* badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 border border-primary-100 text-primary-700 text-sm font-semibold mb-8">
-                        <FaRocket size={12} /> Trusted by 10,000+ job seekers
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-surface-200 text-surface-600 text-sm font-medium mb-10 shadow-sm animate-fade-in">
+                        <FaRocket className="text-primary-600" size={12} /> Trusted by 10,000+ job seekers
                     </div>
 
-                    <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-gray-900 leading-[1.08]">
+                    <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight text-surface-900 leading-[0.95] mb-8 animate-fade-in-up [animation-delay:200ms]">
                         Build a resume that
                         <span className="block text-primary-600 mt-2">gets you hired.</span>
                     </h1>
 
-                    <p className="mt-8 text-xl leading-8 text-gray-500 max-w-2xl mx-auto">
+                    <p className="mt-10 text-xl leading-relaxed text-surface-500 max-w-2xl mx-auto animate-fade-in-up [animation-delay:400ms]">
                         Create a professional, ATS-optimized resume in minutes. Choose from stunning templates,
-                        customize every detail, and download as a perfect PDF — for free.
+                        customize every detail, and download as a perfect PDF.
                     </p>
 
-                    <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-6 animate-fade-in-up [animation-delay:600ms]">
                         <Link
                             href="/register"
-                            className="group inline-flex items-center gap-3 px-8 py-4 bg-primary-600 text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary-600/25 hover:bg-primary-700 hover:shadow-primary-600/40 hover:-translate-y-0.5 transition-all duration-200"
+                            className="btn-primary text-lg !px-10 !py-5"
                         >
                             Build My Resume — Free
-                            <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+                            <FaArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
                         </Link>
                         <Link
                             href="/login"
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-gray-700 rounded-2xl font-bold text-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                            className="btn-secondary text-lg !px-10 !py-5"
                         >
                             Sign In
                         </Link>
                     </div>
 
-                    <p className="mt-5 text-sm text-gray-400">No credit card required &mdash; free forever on the base plan</p>
+                    <p className="mt-8 text-sm text-surface-400 animate-fade-in [animation-delay:800ms]">No credit card required &mdash; free forever on the base plan</p>
                 </div>
 
                 {/* hero visual — mock resume card */}
-                <div className="mt-20 mx-auto max-w-5xl px-4">
-                    <div className="relative rounded-3xl bg-white shadow-2xl shadow-gray-200 border border-gray-100 overflow-hidden">
+                <div className="mt-24 mx-auto max-w-5xl px-4 animate-fade-in-up [animation-delay:1000ms]">
+                    <div className="relative rounded-4xl bg-white shadow-2xl border border-surface-100 overflow-hidden transform hover:scale-[1.01] transition-transform duration-500">
                         {/* window chrome */}
-                        <div className="flex items-center gap-2 px-5 py-3 bg-gray-50 border-b border-gray-100">
+                        <div className="flex items-center gap-2 px-6 py-4 bg-surface-50/50 border-b border-surface-100 backdrop-blur-sm">
                             <span className="w-3 h-3 rounded-full bg-red-400" />
                             <span className="w-3 h-3 rounded-full bg-yellow-400" />
                             <span className="w-3 h-3 rounded-full bg-green-400" />
-                            <span className="ml-4 text-xs text-gray-400 font-mono">resumebuilder.app/builder</span>
+                            <span className="ml-6 text-xs text-surface-400 font-mono tracking-widest uppercase">resumebuilder.app/builder</span>
                         </div>
                         {/* mock UI */}
-                        <div className="grid grid-cols-3 gap-0 min-h-[340px]">
+                        <div className="grid grid-cols-3 gap-0 min-h-[400px]">
                             {/* sidebar */}
-                            <div className="col-span-1 bg-gray-50 border-r border-gray-100 p-5 space-y-3">
-                                <div className="h-3 w-20 bg-primary-200 rounded-full" />
+                            <div className="col-span-1 bg-surface-50/30 border-r border-surface-100 p-8 space-y-4">
+                                <div className="h-4 w-28 bg-primary-100 rounded-lg mb-6" />
                                 {['Personal Info', 'Experience', 'Education', 'Skills'].map((label) => (
-                                    <div key={label} className="flex items-center gap-2 p-2 rounded-xl bg-white border border-gray-100 shadow-sm">
-                                        <div className="w-6 h-6 rounded-lg bg-primary-100 flex-shrink-0" />
-                                        <div className="h-2.5 bg-gray-200 rounded-full flex-1" />
+                                    <div key={label} className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-surface-100 shadow-sm">
+                                        <div className="w-8 h-8 rounded-xl bg-primary-50 flex-shrink-0" />
+                                        <div className="h-3 bg-surface-100 rounded-full flex-1" />
                                     </div>
                                 ))}
-                                <div className="mt-4 p-3 rounded-xl bg-primary-600/10 border border-primary-100">
-                                    <div className="text-[10px] font-bold text-primary-700 mb-1.5">ATS SCORE</div>
+                                <div className="mt-8 p-5 rounded-3xl bg-primary-600 text-white shadow-xl shadow-primary-600/30">
+                                    <div className="text-[10px] font-black uppercase tracking-widest mb-2 opacity-80">ATS SCORE</div>
                                     <div className="flex items-end gap-1">
-                                        <span className="text-2xl font-black text-primary-600">87</span>
-                                        <span className="text-xs text-primary-400 mb-0.5">/100</span>
+                                        <span className="text-3xl font-black">87</span>
+                                        <span className="text-xs mb-1 opacity-70">/100</span>
                                     </div>
-                                    <div className="mt-1.5 h-1.5 rounded-full bg-primary-100 overflow-hidden">
-                                        <div className="h-full w-[87%] bg-primary-500 rounded-full" />
+                                    <div className="mt-3 h-2 rounded-full bg-white/20 overflow-hidden">
+                                        <div className="h-full w-[87%] bg-white rounded-full" />
                                     </div>
                                 </div>
                             </div>
                             {/* resume preview */}
-                            <div className="col-span-2 p-6 space-y-4">
+                            <div className="col-span-2 p-10 space-y-6">
                                 <div className="flex items-start justify-between">
-                                    <div className="space-y-1.5">
-                                        <div className="h-5 w-40 bg-gray-800 rounded-full" />
-                                        <div className="h-3 w-28 bg-primary-400 rounded-full" />
-                                        <div className="flex gap-2 mt-1">
-                                            <div className="h-2.5 w-20 bg-gray-200 rounded-full" />
-                                            <div className="h-2.5 w-16 bg-gray-200 rounded-full" />
+                                    <div className="space-y-4">
+                                        <div className="h-8 w-56 bg-surface-900 rounded-xl" />
+                                        <div className="h-4 w-36 bg-primary-500 rounded-lg" />
+                                        <div className="flex gap-3">
+                                            <div className="h-3 w-24 bg-surface-200 rounded-full" />
+                                            <div className="h-3 w-32 bg-surface-200 rounded-full" />
                                         </div>
                                     </div>
-                                    <div className="w-14 h-14 rounded-xl bg-primary-100 border-2 border-primary-200 flex-shrink-0" />
+                                    <div className="w-20 h-20 rounded-3xl bg-surface-100 border border-surface-200 animate-float" />
                                 </div>
-                                <div className="border-t border-gray-100 pt-3 space-y-1.5">
-                                    <div className="h-2.5 w-16 bg-primary-500 rounded-full" />
-                                    <div className="h-2 w-full bg-gray-100 rounded-full" />
-                                    <div className="h-2 w-5/6 bg-gray-100 rounded-full" />
-                                    <div className="h-2 w-4/6 bg-gray-100 rounded-full" />
+                                <div className="border-t border-surface-100 pt-6 space-y-3">
+                                    <div className="h-3 w-20 bg-primary-600 rounded-lg" />
+                                    <div className="h-2.5 w-full bg-surface-50 rounded-full" />
+                                    <div className="h-2.5 w-5/6 bg-surface-50 rounded-full" />
+                                    <div className="h-2.5 w-4/6 bg-surface-50 rounded-full" />
                                 </div>
-                                <div className="border-t border-gray-100 pt-3 space-y-2">
-                                    <div className="h-2.5 w-20 bg-primary-500 rounded-full" />
+                                <div className="border-t border-surface-100 pt-6 space-y-4">
+                                    <div className="h-3 w-32 bg-primary-600 rounded-lg" />
                                     {[1, 2].map((i) => (
-                                        <div key={i} className="pl-3 border-l-2 border-primary-200 space-y-1">
-                                            <div className="h-2.5 w-36 bg-gray-300 rounded-full" />
-                                            <div className="h-2 w-24 bg-gray-200 rounded-full" />
-                                            <div className="h-2 w-full bg-gray-100 rounded-full" />
+                                        <div key={i} className="pl-4 border-l-2 border-primary-100 space-y-2">
+                                            <div className="h-3 w-48 bg-surface-300 rounded-lg" />
+                                            <div className="h-2.5 w-full bg-surface-50 rounded-full" />
                                         </div>
                                     ))}
-                                </div>
-                                <div className="border-t border-gray-100 pt-3">
-                                    <div className="h-2.5 w-16 bg-primary-500 rounded-full mb-2" />
-                                    <div className="flex flex-wrap gap-2">
-                                        {[60, 80, 50, 70, 55].map((w, i) => (
-                                            <div key={i} className="h-5 rounded-full bg-primary-50 border border-primary-100" style={{ width: `${w}px` }} />
-                                        ))}
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -197,36 +188,43 @@ export default function HomePage() {
             </section>
 
             {/* ── SOCIAL PROOF STRIP ── */}
-            <section className="py-10 bg-gray-900">
-                <div className="mx-auto max-w-5xl px-6 flex flex-col sm:flex-row items-center justify-center gap-10 sm:gap-20 text-center">
-                    {[['10,000+', 'Resumes created'], ['95%', 'Interview success rate'], ['4.9 / 5', 'Average rating'], ['2 min', 'Avg. time to first resume']].map(([stat, label]) => (
-                        <div key={label}>
-                            <div className="text-3xl font-black text-white">{stat}</div>
-                            <div className="text-sm text-gray-400 mt-1">{label}</div>
+            <section className="py-12 bg-surface-900 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent" />
+                <div className="mx-auto max-w-5xl px-6 flex flex-col sm:flex-row items-center justify-center gap-12 sm:gap-24 text-center">
+                    {[
+                        ['10,000+', 'Resumes created'],
+                        ['95%', 'Interview success rate'],
+                        ['4.9 / 5', 'Average rating'],
+                        ['2 min', 'Avg. time to first resume']
+                    ].map(([stat, label]) => (
+                        <div key={label} className="animate-fade-in">
+                            <div className="text-4xl font-black text-white mb-1">{stat}</div>
+                            <div className="text-xs font-bold text-surface-400 uppercase tracking-widest">{label}</div>
                         </div>
                     ))}
                 </div>
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent" />
             </section>
 
             {/* ── FEATURES ── */}
-            <section className="py-28 bg-white">
+            <section className="py-32 bg-white relative">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <span className="text-sm font-bold text-primary-600 uppercase tracking-widest">Features</span>
-                        <h2 className="mt-3 text-4xl sm:text-5xl font-black text-gray-900">Everything you need to land the job</h2>
-                        <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
+                    <div className="text-center mb-24">
+                        <span className="text-sm font-bold text-primary-600 uppercase tracking-[0.3em] mb-4 block">Capabilities</span>
+                        <h2 className="text-4xl sm:text-6xl font-black text-surface-900 leading-[1.1]">Everything you need to <br />land the job</h2>
+                        <p className="mt-6 text-xl text-surface-500 max-w-2xl mx-auto">
                             From blank page to job-ready PDF — we handle the hard parts so you can focus on your story.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {FEATURES.map((f) => (
-                            <div key={f.title} className="group p-8 rounded-2xl border border-gray-100 hover:border-primary-100 hover:shadow-xl hover:shadow-primary-50 transition-all duration-300">
-                                <div className="w-12 h-12 rounded-xl bg-primary-600 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform shadow-lg shadow-primary-600/20">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                        {FEATURES.map((f, i) => (
+                            <div key={f.title} className="premium-card p-10 group animate-fade-in-up" style={{ animationDelay: `${i * 100}ms` }}>
+                                <div className="w-14 h-14 rounded-2xl bg-primary-600 text-white flex items-center justify-center mb-8 group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-xl shadow-primary-600/20">
                                     {f.icon}
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">{f.title}</h3>
-                                <p className="text-gray-500 leading-relaxed text-sm">{f.desc}</p>
+                                <h3 className="text-xl font-bold text-surface-900 mb-4">{f.title}</h3>
+                                <p className="text-surface-500 leading-relaxed">{f.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -234,28 +232,16 @@ export default function HomePage() {
             </section>
 
             {/* ── HOW IT WORKS ── */}
-            <section className="py-24 bg-white">
+            <section className="py-32 bg-surface-50/50">
                 <div className="mx-auto max-w-6xl px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-black text-gray-900">
-                            Just four simple steps to download your resume:
+                    <div className="text-center mb-20">
+                        <h2 className="text-4xl sm:text-5xl font-black text-surface-900 leading-tight">
+                            Just four simple steps to <br />your dream job
                         </h2>
                     </div>
 
                     {/* Steps row */}
-                    <div className="relative grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
-
-                        {/* Dashed arcs — desktop only */}
-                        <svg aria-hidden className="hidden md:block absolute top-[80px] left-0 w-full h-16 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 900 60">
-                            <path d="M112,50 Q225,0 338,50" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="6 5" />
-                            <path d="M338,50 Q451,0 562,50" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="6 5" />
-                            <path d="M562,50 Q675,0 788,50" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="6 5" />
-                            {/* arrowheads */}
-                            <polygon points="336,44 342,52 330,52" fill="#cbd5e1" />
-                            <polygon points="560,44 566,52 554,52" fill="#cbd5e1" />
-                            <polygon points="786,44 792,52 780,52" fill="#cbd5e1" />
-                        </svg>
-
+                    <div className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
                         {[
                             {
                                 label: 'Pick a template.',
@@ -263,34 +249,28 @@ export default function HomePage() {
                                 accent: 'bg-primary-600',
                                 illustration: (
                                     <div className="relative w-full h-full flex items-end justify-center">
-                                        {/* mini resume card */}
-                                        <div className="w-20 bg-white rounded shadow-md border border-gray-200 p-1.5 space-y-1">
+                                        <div className="w-20 bg-white rounded shadow-md border border-gray-200 p-1.5 space-y-1 transform -rotate-3 transition-transform group-hover:rotate-0">
                                             <div className="h-2.5 w-full bg-primary-600 rounded-sm" />
                                             <div className="h-1.5 w-3/4 bg-gray-200 rounded-full" />
                                             <div className="h-1 w-full bg-gray-100 rounded-full" />
                                             <div className="h-1 w-5/6 bg-gray-100 rounded-full" />
-                                            <div className="h-1 w-4/6 bg-gray-100 rounded-full" />
                                             <div className="mt-1 h-1.5 w-1/2 bg-primary-400 rounded-full" />
-                                            <div className="h-1 w-full bg-gray-100 rounded-full" />
-                                            <div className="h-1 w-5/6 bg-gray-100 rounded-full" />
                                         </div>
-                                        {/* pointing hand */}
                                         <div className="absolute -bottom-1 -right-1 text-2xl select-none" style={{ transform: 'scaleX(-1)' }}>👆</div>
                                     </div>
                                 ),
                             },
                             {
-                                label: 'Fill in the blanks using expert tips.',
+                                label: 'Fill in the blanks.',
                                 color: 'bg-indigo-50',
                                 accent: 'bg-indigo-600',
                                 illustration: (
                                     <div className="relative w-full h-full flex items-end justify-center">
-                                        <div className="w-20 bg-white rounded shadow-md border border-gray-200 p-1.5 space-y-1">
+                                        <div className="w-20 bg-white rounded shadow-md border border-gray-200 p-1.5 space-y-1 transform rotate-2">
                                             <div className="h-2.5 w-full bg-indigo-600 rounded-sm" />
-                                            <div className="h-1.5 w-3/4 bg-gray-200 rounded-full" />
-                                            {[1,2,3,4].map(i => (
+                                            {[1, 2, 3].map(i => (
                                                 <div key={i} className="flex gap-1">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-300 flex-shrink-0 mt-0.5" />
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-200 flex-shrink-0 mt-0.5" />
                                                     <div className="h-1 flex-1 bg-gray-100 rounded-full mt-0.5" />
                                                 </div>
                                             ))}
@@ -300,16 +280,14 @@ export default function HomePage() {
                                 ),
                             },
                             {
-                                label: 'Personalise your document.',
-                                color: 'bg-teal-50',
-                                accent: 'bg-teal-500',
+                                label: 'Personalise style.',
+                                color: 'bg-violet-50',
+                                accent: 'bg-violet-500',
                                 illustration: (
                                     <div className="relative w-full h-full flex items-end justify-center">
-                                        <div className="w-20 bg-white rounded shadow-md border border-gray-200 p-1.5 space-y-1">
-                                            <div className="h-2.5 w-full bg-teal-500 rounded-sm" />
-                                            <div className="h-1.5 w-3/4 bg-gray-200 rounded-full" />
-                                            <div className="flex gap-1 mt-1">
-                                                {['bg-primary-400','bg-teal-400','bg-amber-400','bg-red-400'].map(c => (
+                                        <div className="w-20 bg-white rounded shadow-md border border-gray-200 p-1.5 space-y-1 transform -rotate-2">
+                                            <div className="flex gap-1 mb-1">
+                                                {['bg-primary-400', 'bg-violet-400', 'bg-amber-400'].map(c => (
                                                     <div key={c} className={`w-3 h-3 rounded-full ${c}`} />
                                                 ))}
                                             </div>
@@ -321,50 +299,38 @@ export default function HomePage() {
                                 ),
                             },
                             {
-                                label: 'Download in PDF.',
+                                label: 'Download PDF.',
                                 color: 'bg-amber-50',
                                 accent: 'bg-amber-500',
                                 illustration: (
                                     <div className="relative w-full h-full flex items-end justify-center">
-                                        {/* stacked cards to suggest multiple formats */}
-                                        <div className="relative w-20">
-                                            <div className="absolute top-2 left-2 w-20 bg-amber-100 rounded shadow border border-amber-200 p-1.5 space-y-1 opacity-60">
-                                                <div className="h-2.5 w-full bg-amber-300 rounded-sm" />
-                                                <div className="h-1 w-3/4 bg-amber-200 rounded-full" />
-                                            </div>
-                                            <div className="relative w-20 bg-white rounded shadow-md border border-gray-200 p-1.5 space-y-1">
-                                                <div className="h-2.5 w-full bg-amber-500 rounded-sm" />
-                                                <div className="h-1.5 w-3/4 bg-gray-200 rounded-full" />
-                                                <div className="h-1 w-full bg-gray-100 rounded-full" />
-                                                <div className="h-1 w-5/6 bg-gray-100 rounded-full" />
-                                            </div>
+                                        <div className="w-20 bg-white rounded shadow-md border border-gray-200 p-1.5 space-y-1 transform rotate-3">
+                                            <div className="h-2.5 w-full bg-amber-500 rounded-sm" />
+                                            <div className="h-1 w-full bg-gray-100 rounded-full" />
+                                            <div className="h-1 w-5/6 bg-gray-100 rounded-full" />
                                         </div>
                                         <div className="absolute -bottom-1 -right-1 text-2xl select-none">⬇️</div>
                                     </div>
                                 ),
                             },
                         ].map((step, i) => (
-                            <div key={i} className="flex flex-col items-center text-center gap-5">
-                                {/* illustration box */}
-                                <div className={`relative w-full aspect-[4/3] ${step.color} rounded-2xl flex items-center justify-center p-4 overflow-visible`}>
+                            <div key={step.label} className="flex flex-col items-center text-center gap-6 group animate-fade-in-up" style={{ animationDelay: `${i * 150}ms` }}>
+                                <div className={`relative w-full aspect-[4/3] ${step.color} rounded-3xl flex items-center justify-center p-6 border border-surface-100`}>
                                     {step.illustration}
                                 </div>
-
-                                {/* numbered bubble */}
-                                <div className={`w-10 h-10 rounded-full ${step.accent} text-white font-black text-lg flex items-center justify-center shadow-lg`}>
+                                <div className={`w-12 h-12 rounded-full ${step.accent} text-white font-black text-xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform`}>
                                     {i + 1}
                                 </div>
-
-                                <p className="text-gray-700 font-medium text-sm leading-snug max-w-[140px]">{step.label}</p>
+                                <p className="text-surface-900 font-bold text-lg leading-snug">{step.label}</p>
                             </div>
                         ))}
                     </div>
 
                     {/* CTA */}
-                    <div className="mt-16 flex justify-center">
+                    <div className="mt-20 flex justify-center">
                         <Link
                             href="/register"
-                            className="px-10 py-4 bg-primary-600 text-white rounded-full font-black text-sm uppercase tracking-widest shadow-xl shadow-primary-600/25 hover:bg-primary-700 hover:-translate-y-0.5 transition-all"
+                            className="btn-primary !rounded-full !px-12 !py-4 text-sm uppercase tracking-[0.2em]"
                         >
                             Create Your Resume
                         </Link>
@@ -373,25 +339,30 @@ export default function HomePage() {
             </section>
 
             {/* ── TESTIMONIALS ── */}
-            <section className="py-28 bg-white">
+            <section className="py-32 bg-white">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <span className="text-sm font-bold text-primary-600 uppercase tracking-widest">Testimonials</span>
-                        <h2 className="mt-3 text-4xl sm:text-5xl font-black text-gray-900">People love ResumeBuilder</h2>
+                    <div className="text-center mb-24">
+                        <span className="text-sm font-bold text-primary-600 uppercase tracking-[0.3em] mb-4 block">Success Stories</span>
+                        <h2 className="text-4xl sm:text-5xl font-black text-surface-900 leading-tight">People love ResumeBuilder</h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {TESTIMONIALS.map((t) => (
-                            <div key={t.name} className="p-8 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col gap-5">
-                                <div className="flex gap-1">
-                                    {Array.from({ length: t.rating }).map((_, i) => (
-                                        <FaStar key={i} className="text-amber-400" size={16} />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                        {TESTIMONIALS.map((t, i) => (
+                            <div key={t.name} className="p-10 rounded-3xl bg-surface-50 border border-surface-100 flex flex-col gap-6 animate-fade-in-up" style={{ animationDelay: `${i * 100}ms` }}>
+                                <div className="flex gap-1.5">
+                                    {Array.from({ length: t.rating }).map((_, j) => (
+                                        <FaStar key={j} className="text-amber-400" size={18} />
                                     ))}
                                 </div>
-                                <p className="text-gray-700 leading-relaxed flex-1">&ldquo;{t.body}&rdquo;</p>
-                                <div>
-                                    <div className="font-bold text-gray-900">{t.name}</div>
-                                    <div className="text-sm text-gray-400">{t.role}</div>
+                                <p className="text-surface-700 leading-relaxed italic text-lg flex-1">&ldquo;{t.body}&rdquo;</p>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg">
+                                        {t.name[0]}
+                                    </div>
+                                    <div>
+                                        <div className="font-bold text-surface-900">{t.name}</div>
+                                        <div className="text-sm text-surface-400 font-medium">{t.role}</div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -400,59 +371,66 @@ export default function HomePage() {
             </section>
 
             {/* ── PRICING ── */}
-            <section className="py-28 bg-gray-50">
+            <section className="py-32 bg-surface-50/50">
                 <div className="mx-auto max-w-5xl px-6 lg:px-8">
-                    <div className="text-center mb-20">
-                        <span className="text-sm font-bold text-primary-600 uppercase tracking-widest">Pricing</span>
-                        <h2 className="mt-3 text-4xl sm:text-5xl font-black text-gray-900">Simple, transparent pricing</h2>
-                        <p className="mt-4 text-lg text-gray-500">Start free. Upgrade only when you&apos;re ready.</p>
+                    <div className="text-center mb-24">
+                        <span className="text-sm font-bold text-primary-600 uppercase tracking-[0.3em] mb-4 block">Fair Pricing</span>
+                        <h2 className="text-4xl sm:text-5xl font-black text-surface-900 leading-tight">Simple, transparent plans</h2>
+                        <p className="mt-6 text-xl text-surface-500">Start free. Upgrade only when you&apos;re ready.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
                         {/* Free */}
-                        <div className="p-8 bg-white rounded-2xl border border-gray-200 shadow-sm">
-                            <div className="mb-6">
-                                <h3 className="text-2xl font-bold text-gray-900">Free</h3>
-                                <div className="mt-3 flex items-end gap-1">
-                                    <span className="text-5xl font-black text-gray-900">$0</span>
-                                    <span className="text-gray-400 mb-2">forever</span>
+                        <div className="p-12 bg-white rounded-4xl border border-surface-200 shadow-premium group hover:-translate-y-2 transition-all duration-300">
+                            <div className="mb-10">
+                                <h3 className="text-2xl font-bold text-surface-900 mb-4">Basic</h3>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-6xl font-black text-surface-900">$0</span>
+                                    <span className="text-surface-400 font-bold uppercase tracking-widest text-sm">forever</span>
                                 </div>
                             </div>
-                            <ul className="space-y-3 mb-8">
+                            <ul className="space-y-5 mb-12">
                                 {FREE_FEATURES.map((f) => (
-                                    <li key={f} className="flex items-center gap-3 text-gray-600">
-                                        <FaCheck className="text-green-500 flex-shrink-0" />
+                                    <li key={f} className="flex items-center gap-4 text-surface-600 font-medium">
+                                        <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                                            <FaCheck className="text-green-600" size={10} />
+                                        </div>
                                         {f}
                                     </li>
                                 ))}
                             </ul>
-                            <Link href="/register" className="block w-full text-center py-3.5 bg-gray-100 text-gray-800 rounded-xl font-bold hover:bg-gray-200 transition-colors">
+                            <Link href="/register" className="btn-secondary w-full !rounded-2xl !py-4 text-lg">
                                 Get Started Free
                             </Link>
                         </div>
 
                         {/* Pro */}
-                        <div className="relative p-8 bg-primary-600 rounded-2xl shadow-2xl shadow-primary-600/30">
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-400 text-gray-900 px-4 py-1 rounded-full text-sm font-black uppercase tracking-wider flex items-center gap-1.5">
-                                <FaCrown size={12} /> Most Popular
+                        <div className="relative p-12 bg-primary-600 rounded-4xl shadow-2xl shadow-primary-600/40 text-white group hover:-translate-y-2 transition-all duration-300 overflow-hidden">
+                            <div className="absolute top-0 right-0 p-8 opacity-10">
+                                <FaCrown size={120} />
                             </div>
-                            <div className="mb-6">
-                                <h3 className="text-2xl font-bold text-white">Pro</h3>
-                                <div className="mt-3 flex items-end gap-1">
-                                    <span className="text-5xl font-black text-white">$5.95</span>
-                                    <span className="text-primary-200 mb-2">/ month</span>
+                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-amber-400 text-surface-900 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-lg z-10">
+                                <FaCrown size={14} /> Recommended
+                            </div>
+                            <div className="mb-10 relative z-10">
+                                <h3 className="text-2xl font-bold text-white/90 mb-4">Professional</h3>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-6xl font-black text-white">$5.95</span>
+                                    <span className="text-primary-100 font-bold uppercase tracking-widest text-sm">/ month</span>
                                 </div>
-                                <p className="text-primary-200 text-sm mt-1">Billed annually at $71.40</p>
+                                <p className="text-primary-100 text-sm mt-2 font-medium opacity-80">Billed annually at $71.40</p>
                             </div>
-                            <ul className="space-y-3 mb-8">
+                            <ul className="space-y-5 mb-12 relative z-10">
                                 {PRO_FEATURES.map((f) => (
-                                    <li key={f} className="flex items-center gap-3 text-primary-100">
-                                        <FaCheck className="text-white flex-shrink-0" />
+                                    <li key={f} className="flex items-center gap-4 text-primary-50 font-medium">
+                                        <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                                            <FaCheck className="text-white" size={10} />
+                                        </div>
                                         {f}
                                     </li>
                                 ))}
                             </ul>
-                            <Link href="/register" className="block w-full text-center py-3.5 bg-white text-primary-600 rounded-xl font-black hover:bg-primary-50 transition-colors shadow-lg">
+                            <Link href="/register" className="block w-full text-center py-4 bg-white text-primary-600 rounded-2xl font-black text-lg hover:bg-primary-50 transition-all shadow-xl group-hover:scale-[1.02]">
                                 Start Pro Trial — $2.70
                             </Link>
                         </div>
@@ -461,48 +439,56 @@ export default function HomePage() {
             </section>
 
             {/* ── CTA ── */}
-            <section className="py-28 bg-gray-900 relative overflow-hidden">
-                <div aria-hidden className="absolute inset-0 -z-10">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-primary-600/20 blur-3xl" />
+            <section className="py-28 bg-surface-900 relative overflow-hidden">
+                <div aria-hidden className="absolute inset-0">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] rounded-full bg-primary-600/20 blur-[120px] animate-pulse" />
                 </div>
-                <div className="mx-auto max-w-3xl px-6 text-center">
-                    <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-primary-600/20 border border-primary-500/30 text-primary-400 text-sm font-semibold">
-                        <FaRocket size={12} /> Join 10,000+ job seekers
+                <div className="mx-auto max-w-4xl px-6 text-center relative z-10">
+                    <div className="inline-flex items-center gap-3 mb-10 px-6 py-2 rounded-full bg-white/5 border border-white/10 text-primary-400 text-sm font-bold uppercase tracking-widest">
+                        <FaRocket size={14} /> Join 10,000+ job seekers
                     </div>
-                    <h2 className="text-4xl sm:text-5xl font-black text-white leading-tight">
-                        Your dream job is one resume away.
+                    <h2 className="text-5xl sm:text-7xl font-black text-white leading-[1.1] mb-10">
+                        Your dream job is <br />one resume away.
                     </h2>
-                    <p className="mt-6 text-lg text-gray-400">
+                    <p className="text-xl text-surface-400 mb-14 max-w-2xl mx-auto font-medium">
                         Stop settling for generic templates. Build something that truly represents you — in minutes.
                     </p>
                     <Link
                         href="/register"
-                        className="group inline-flex items-center gap-3 mt-10 px-10 py-5 bg-primary-600 text-white rounded-2xl font-bold text-xl shadow-2xl shadow-primary-600/30 hover:bg-primary-500 hover:-translate-y-1 transition-all duration-200"
+                        className="group inline-flex items-center gap-4 px-12 py-6 bg-primary-600 text-white rounded-3xl font-black text-2xl shadow-[0_20px_50px_-15px_rgba(124,58,237,0.5)] hover:bg-primary-500 hover:-translate-y-2 transition-all duration-300"
                     >
                         Build My Resume Now
-                        <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+                        <FaArrowRight className="group-hover:translate-x-2 transition-transform" />
                     </Link>
-                    <p className="mt-5 text-sm text-gray-500">Free to start. No credit card required.</p>
+                    <p className="mt-8 text-surface-500 font-medium">Free to start. No credit card required.</p>
                 </div>
             </section>
 
             {/* ── FOOTER ── */}
-            <footer className="bg-gray-950 py-12 px-6">
-                <div className="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-6">
-                    {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-primary-600/20 group-hover:scale-110 transition-transform">
-                            R
-                        </div>
-                        <span className="text-xl font-black tracking-tight text-white">RESUME<span className="text-primary-400">BUILDER</span></span>
-                    </Link>
+            <footer className="bg-surface-950 py-20 px-6 border-t border-white/5">
+                <div className="mx-auto max-w-7xl">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-12 mb-16">
+                        {/* Logo */}
+                        <Link href="/" className="flex items-center gap-3 group">
+                            <div className="w-12 h-12 bg-primary-600 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-primary-600/20 group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                                R
+                            </div>
+                            <span className="text-2xl font-black tracking-tight text-white uppercase italic">RESUME<span className="text-primary-500">BUILDER</span></span>
+                        </Link>
 
-                    <div className="flex items-center gap-8 text-sm text-gray-500">
-                        <Link href="/login" className="hover:text-gray-300 transition-colors">Sign In</Link>
-                        <Link href="/register" className="hover:text-gray-300 transition-colors">Sign Up</Link>
+                        <div className="flex items-center gap-10 text-sm font-bold uppercase tracking-widest text-surface-500">
+                            <Link href="/login" className="hover:text-primary-400 transition-colors">Sign In</Link>
+                            <Link href="/register" className="hover:text-primary-400 transition-colors">Sign Up</Link>
+                        </div>
                     </div>
 
-                    <p className="text-sm text-gray-600">&copy; {new Date().getFullYear()} ResumeBuilder. All rights reserved.</p>
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-12 border-t border-white/5">
+                        <p className="text-sm text-surface-600 font-medium">&copy; {new Date().getFullYear()} ResumeBuilder. All rights reserved.</p>
+                        <div className="flex gap-8 text-xs font-bold uppercase tracking-widest text-surface-600">
+                            <Link href="#" className="hover:text-surface-400 transition-colors">Privacy</Link>
+                            <Link href="#" className="hover:text-surface-400 transition-colors">Terms</Link>
+                        </div>
+                    </div>
                 </div>
             </footer>
         </div>

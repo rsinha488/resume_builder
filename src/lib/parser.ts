@@ -4,21 +4,25 @@ import { ResumeState } from './features/resume/resumeSlice';
 const SECTION_KEYWORDS: Record<string, string[]> = {
     experience: [
         'work experience', 'professional experience', 'employment history', 'work history',
-        'career history', 'professional background', 'employment', 'experience', 'work'
+        'career history', 'professional background', 'employment', 'experience', 'work',
+        'past experience', 'career progression', 'work profile', 'experience & achievements'
     ],
     education: [
         'educational background', 'academic background', 'education', 'academic',
-        'qualification', 'degrees', 'training', 'certifications'
+        'qualification', 'degrees', 'training', 'certifications', 'academics',
+        'educational qualifications', 'academic profile', 'university', 'college'
     ],
     skills: [
         'technical skills', 'core competencies', 'key skills', 'core skills',
         'tech stack', 'technologies', 'competencies', 'expertise', 'skills',
-        'tools', 'proficiencies', 'software', 'qualifications', 'languages'
+        'tools', 'proficiencies', 'software', 'qualifications', 'languages',
+        'hard skills', 'soft skills', 'computer skills', 'it skills', 'areas of expertise'
     ],
     summary: [
         'professional summary', 'career objective', 'executive summary',
         'personal profile', 'professional profile', 'personal statement',
-        'about me', 'summary', 'profile', 'objective', 'about', 'bio', 'overview'
+        'about me', 'summary', 'profile', 'objective', 'about', 'bio', 'overview',
+        'career summary'
     ]
 };
 

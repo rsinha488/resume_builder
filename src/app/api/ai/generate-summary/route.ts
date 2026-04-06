@@ -19,12 +19,16 @@ export async function POST(req: Request) {
 
         const { personalInfo, experiences, skills } = await req.json();
 
+        const safePersonalInfo = personalInfo || {};
+        const safeSkills = Array.isArray(skills) ? skills : [];
+        const safeExperiences = Array.isArray(experiences) ? experiences : [];
+
         const context = `
-Name: ${personalInfo.fullName}
-Job Title: ${personalInfo.jobTitle}
-Skills: ${skills.slice(0, 10).join(', ')}
-Experience: ${experiences.slice(0, 3).map((e: any) =>
-            `${e.position} at ${e.company}`).join(', ')}
+Name: ${safePersonalInfo.fullName || 'Professional'}
+Job Title: ${safePersonalInfo.jobTitle || 'Candidate'}
+Skills: ${safeSkills.slice(0, 10).join(', ')}
+Experience: ${safeExperiences.slice(0, 3).map((e: any) =>
+            `${e.position || 'Employee'} at ${e.company || 'Company'}`).join(', ')}
         `.trim();
 
         const chatCompletion = await client.chat.completions.create({
