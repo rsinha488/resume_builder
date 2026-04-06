@@ -88,7 +88,7 @@ function evaluateExperience(experiences: any[], suggestions: any[]): number {
     );
 
     if (recordsWithContent.length > 0 && !datesValid) {
-        suggestions.push({ type: 'improvement', message: 'Ensure all experience dates follow the MM/YYYY format for consistency.', targetSection: 'experience' });
+        suggestions.push({ type: 'improvement', message: 'Ensure all dates include both Month and Year in MM/YYYY format (e.g., 01/2024).', targetSection: 'experience' });
     } else if (recordsWithContent.length > 0) {
         totalScore += 5;
     }

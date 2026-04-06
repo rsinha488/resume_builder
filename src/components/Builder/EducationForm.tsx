@@ -36,12 +36,14 @@ export default function EducationForm() {
     const parseDateValue = (dateStr: string | undefined) => {
         if (!dateStr) return { month: '', year: '' };
         if (dateStr.includes('/')) {
-            const [m, y] = dateStr.split('/');
-            return { month: m, year: y };
+            const parts = dateStr.split('/');
+            return { month: parts[0] || '', year: parts[1] || '' };
         }
         if (dateStr.includes('-')) {
-            const [y, m] = dateStr.split('-');
-            return { month: m, year: y };
+            const parts = dateStr.split('-');
+            // Legacy YYYY-MM
+            if (parts[0].length === 4) return { month: parts[1] || '', year: parts[0] };
+            return { month: parts[0] || '', year: parts[1] || '' };
         }
         return { month: '', year: '' };
     };
@@ -54,7 +56,7 @@ export default function EducationForm() {
     };
 
     const handleDateChange = (id: string, field: 'startDate' | 'endDate', month: string, year: string) => {
-        if (!month || !year) return;
+        // Save whatever we have so the UI updates the dropdown immediately
         handleChange(id, field, `${month}/${year}`);
     };
 
