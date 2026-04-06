@@ -77,13 +77,15 @@ export default function EducationForm() {
                 {education?.map((edu, index) => (
                     <div key={edu.id} className="premium-card p-8 relative group animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
                         <button
+                            type="button"
+                            aria-label="Remove education entry"
                             onClick={() => {
                                 dispatch(removeEducation(edu.id));
                                 toast.success('Education removed');
                             }}
-                            className="absolute top-6 right-6 w-10 h-10 rounded-xl flex items-center justify-center text-surface-300 hover:text-red-500 hover:bg-red-50 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                            className="absolute top-8 right-8 p-2 text-surface-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                         >
-                            <FaTrash size={16} />
+                            <FaTrash size={14} aria-hidden="true" />
                         </button>
                         
                         <div className="flex items-center gap-4 mb-8">
@@ -188,13 +190,15 @@ export default function EducationForm() {
             </div>
 
             <button
+                type="button"
+                aria-label="Add education entry"
                 onClick={handleAdd}
                 className="group w-full py-10 border-4 border-dashed border-surface-100 rounded-4xl text-surface-400 hover:border-primary-500/30 hover:bg-primary-50/30 hover:text-primary-600 transition-all duration-300 flex flex-col items-center justify-center gap-3 animate-fade-in"
             >
-                <div className="w-14 h-14 rounded-2xl bg-white shadow-premium flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all">
-                    <FaPlus className="text-surface-300 group-hover:text-primary-600 transition-colors" size={20} />
+                <div className="w-12 h-12 rounded-2xl bg-surface-50 group-hover:bg-primary-100 flex items-center justify-center transition-colors">
+                    <FaPlus size={20} aria-hidden="true" />
                 </div>
-                <span className="font-black uppercase tracking-[0.2em] text-[10px]">Add Education Record</span>
+                <span className="font-black uppercase tracking-widest text-[10px]">Add Education entry</span>
             </button>
         </div>
     );

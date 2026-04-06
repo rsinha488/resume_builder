@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef } from 'react';
-import { FaCloudUploadAlt, FaTimes, FaFilePdf, FaFileWord, FaSpinner } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaTimes, FaFilePdf, FaFileWord, FaSpinner, FaFileUpload } from 'react-icons/fa';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
@@ -66,8 +66,13 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                         <h2 className="text-2xl font-black text-gray-900 tracking-tight">Import Existing Resume</h2>
                         <p className="text-gray-500 font-medium">Upload your PDF or DOCX file to get started.</p>
                     </div>
-                    <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                        <FaTimes size={24} />
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                        aria-label="Close modal"
+                    >
+                        <FaTimes size={20} aria-hidden="true" />
                     </button>
                 </div>
 
@@ -90,6 +95,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                                 </div>
                             </div>
                             <button
+                                type="button"
                                 onClick={() => setFile(null)}
                                 className="text-sm font-bold text-red-600 hover:text-red-700 transition-colors"
                             >
@@ -97,12 +103,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                             </button>
                         </div>
                     ) : (
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
-                            className="w-full border-2 border-dashed border-gray-200 rounded-2xl p-12 text-center hover:border-primary-400 hover:bg-primary-50/30 transition-all cursor-pointer group outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent"
-                            aria-label="Upload resume file"
-                        >
+                        <div className="w-full border-2 border-dashed border-gray-200 rounded-2xl p-12 text-center hover:border-primary-400 hover:bg-primary-50/30 transition-all cursor-pointer group outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent">
                             <input
                                 type="file"
                                 ref={fileInputRef}
@@ -112,8 +113,22 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                             />
                             <FaCloudUploadAlt className="mx-auto h-16 w-16 text-gray-300 group-hover:text-primary-400 transition-colors mb-4" />
                             <p className="text-lg font-bold text-gray-700 mb-1">Click or drag and drop to upload</p>
-                            <p className="text-sm text-gray-400">PDF, DOCX (Max 5MB)</p>
-                        </button>
+                            <p className="text-sm text-gray-400 mb-6">PDF, DOCX (Max 5MB)</p>
+                            
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <button
+                                    type="button"
+                                    disabled={loading}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-primary-600 text-white font-bold rounded-2xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20 disabled:opacity-50"
+                                    aria-label="Upload PDF or Word file"
+                                    aria-busy={loading}
+                                >
+                                    {loading ? <FaSpinner className="animate-spin" aria-hidden="true" /> : <FaFileUpload aria-hidden="true" />}
+                                    Upload PDF / Word
+                                </button>
+                            </div>
+                        </div>
                     )}
 
                     {error && (
@@ -124,19 +139,23 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
 
                     <div className="mt-8 flex gap-4">
                         <button
+                            type="button"
                             onClick={onClose}
                             className="flex-1 px-6 py-4 border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-all"
                         >
                             Cancel
                         </button>
                         <button
+                            type="button"
                             onClick={handleUpload}
                             disabled={!file || loading}
                             className="flex-1 px-6 py-4 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-all shadow-xl shadow-primary-600/20 flex items-center justify-center gap-2"
+                            aria-label="Start importing resume"
+                            aria-busy={loading}
                         >
                             {loading ? (
                                 <>
-                                    <FaSpinner className="animate-spin" /> Importing...
+                                    <FaSpinner className="animate-spin" aria-hidden="true" /> Importing...
                                 </>
                             ) : (
                                 'Start Importing'

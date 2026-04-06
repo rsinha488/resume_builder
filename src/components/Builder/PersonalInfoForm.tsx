@@ -18,7 +18,7 @@ export default function PersonalInfoForm({ userPlan, aiUsageCount, onUsageUpdate
     const resume = useAppSelector((state) => state.resume);
     const personalInfo = resume.personalInfo;
     const [uploading, setUploading] = useState(false);
-    const [generatingSummary, setGeneratingSummary] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -31,7 +31,7 @@ export default function PersonalInfoForm({ userPlan, aiUsageCount, onUsageUpdate
             return;
         }
 
-        setGeneratingSummary(true);
+        setAiLoading(true);
         const token = localStorage.getItem('token');
         try {
             const res = await axios.post('/api/ai/generate-summary', {
@@ -43,13 +43,13 @@ export default function PersonalInfoForm({ userPlan, aiUsageCount, onUsageUpdate
             if (res.data.newUsageCount !== undefined) {
                 onUsageUpdate(res.data.newUsageCount);
             }
-            toast.success('Summary generated!');
+            toast.success('Professional summary generated!');
         } catch (error: any) {
-            console.error('Generate summary error:', error);
+            console.error('Summary generation error:', error);
             const msg = error.response?.data?.error || 'Failed to generate summary.';
             toast.error(msg);
         } finally {
-            setGeneratingSummary(false);
+            setAiLoading(false);
         }
     };
 
@@ -207,19 +207,17 @@ export default function PersonalInfoForm({ userPlan, aiUsageCount, onUsageUpdate
                         <button
                             type="button"
                             onClick={handleGenerateSummary}
-                            disabled={generatingSummary}
-                            className="group/magic flex items-center gap-2"
+                            disabled={aiLoading}
+                            className="flex items-center gap-2 group/magic"
+                            aria-label="Generate professional summary with AI"
+                            aria-busy={aiLoading}
                         >
-                            <div className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-                                generatingSummary 
-                                ? 'bg-surface-100 text-surface-400 font-bold' 
-                                : 'bg-primary-600 text-white shadow-lg shadow-primary-600/20 hover:bg-primary-700 hover:-translate-y-0.5 active:scale-95'
-                            }`}>
-                                {generatingSummary
-                                    ? <><FaSpinner className="animate-spin" size={10} /> Generating...</>
-                                    : <><FaMagic size={10} className="group-hover/magic:rotate-12 transition-transform" /> Write with AI</>
-                                }
+                            <div className="w-8 h-8 rounded-lg bg-surface-50 group-hover/magic:bg-primary-50 flex items-center justify-center transition-colors">
+                                {aiLoading ? <FaSpinner className="animate-spin text-primary-600" aria-hidden="true" /> : <FaMagic className="text-primary-600" aria-hidden="true" />}
                             </div>
+                            <span className="text-[10px] font-black text-surface-400 group-hover/magic:text-primary-600 uppercase tracking-widest transition-colors">
+                                {aiLoading ? 'Generating...' : 'AI Generated Summary'}
+                            </span>
                         </button>
                     </div>
                 </div>

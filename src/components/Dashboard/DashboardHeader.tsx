@@ -88,20 +88,30 @@ export default function DashboardHeader() {
     
                     <div className="flex items-center gap-8">
                         <button
+                            type="button"
                             onClick={() => setIsImportModalOpen(true)}
                             className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-surface-600 hover:text-primary-600 hover:bg-primary-50 rounded-2xl transition-all border border-transparent hover:border-primary-100"
+                            aria-label="Import existing resume"
                         >
-                            <FaFileImport className="text-xs" /> Import Resume
+                            <FaFileImport className="text-xs" aria-hidden="true" /> Import Resume
                         </button>
     
-                        <button className="relative w-10 h-10 flex items-center justify-center text-surface-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all group" aria-label="Notifications">
-                            <FaBell size={20} className="group-hover:rotate-12 transition-transform" />
-                            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                        <button
+                            type="button"
+                            className="relative w-10 h-10 flex items-center justify-center text-surface-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all group"
+                            aria-label="View notifications"
+                        >
+                            <FaBell size={20} className="group-hover:rotate-12 transition-transform" aria-hidden="true" />
+                            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" aria-hidden="true"></span>
                         </button>
     
                         <div className="relative" ref={menuRef}>
                             <button
+                                type="button"
                                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                                aria-label="Open user profile menu"
+                                aria-haspopup="true"
+                                aria-expanded={isUserMenuOpen}
                                 className={`flex items-center gap-4 p-1 rounded-2xl border transition-all duration-300 ${
                                     isUserMenuOpen 
                                     ? 'bg-surface-50 border-primary-200 ring-4 ring-primary-500/10' 
@@ -112,7 +122,7 @@ export default function DashboardHeader() {
                                     {(() => {
                                         if (userAvatar) return <Image src={userAvatar} alt="avatar" width={36} height={36} className="object-cover w-full h-full" />;
                                         if (userName) return userName.charAt(0).toUpperCase();
-                                        return <FaUserCircle size={22} />;
+                                        return <FaUserCircle size={22} aria-hidden="true" />;
                                     })()}
                                 </div>
                                 <div className="hidden sm:block text-left pr-4">

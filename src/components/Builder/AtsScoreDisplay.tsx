@@ -114,8 +114,8 @@ export default function AtsScoreDisplay({ userPlan, aiUsageCount, onUsageUpdate,
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
                                 <span className="relative flex items-center gap-2">
                                     {analyzing 
-                                        ? <><FaSpinner className="animate-spin" /> Analyzing...</> 
-                                        : <><FaSearch /> Run Deep Scan</>
+                                        ? <><FaSpinner className="animate-spin" aria-hidden="true" /> Analyzing...</> 
+                                        : <><FaSearch aria-hidden="true" /> Run Deep Scan</>
                                     }
                                 </span>
                             </button>
@@ -287,8 +287,10 @@ function SuggestionCard({ item, onFixClick }: { item: any, onFixClick?: (s: stri
             </div>
             {item.targetSection && onFixClick && (
                 <button
+                    type="button"
                     onClick={() => onFixClick(item.targetSection)}
                     className="shrink-0 px-4 py-2 bg-white/50 hover:bg-white text-[10px] font-black uppercase tracking-widest rounded-xl border border-black/5 transition-all active:scale-95 shadow-sm"
+                    aria-label={`Fix issue: ${item.message}`}
                 >
                     Fix Now
                 </button>

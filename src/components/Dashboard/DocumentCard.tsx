@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { FaEllipsisV, FaEdit, FaTrash, FaCopy, FaDownload, FaFileAlt } from 'react-icons/fa';
+import { FaEllipsisV, FaEdit, FaTrash, FaCopy, FaDownload, FaFileAlt, FaSpinner } from 'react-icons/fa';
 import ResumePreview from '@/components/Builder/ResumePreview';
 import ConfirmModal from '@/components/ConfirmModal';
 
@@ -20,6 +20,7 @@ interface DocumentCardProps {
 export default function DocumentCard({ id, title, updatedAt, type, templateId, resumeData, onDelete, onDuplicate, onDownload }: DocumentCardProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [loadingAction, setLoadingAction] = useState<'duplicate' | 'download' | 'delete' | null>(null);
 
     const editUrl = type === 'resume' ? `/builder/${id}` : `/cover-letter/${id}`;
 
@@ -69,12 +70,14 @@ export default function DocumentCard({ id, title, updatedAt, type, templateId, r
                     </h3>
                     <div className="relative">
                         <button
+                            type="button"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
                             aria-label="Document actions"
+                            aria-haspopup="true"
                             aria-expanded={isMenuOpen}
                         >
-                            <FaEllipsisV size={14} />
+                            <FaEllipsisV size={14} aria-hidden="true" />
                         </button>
 
                         {isMenuOpen && (
@@ -92,23 +95,44 @@ export default function DocumentCard({ id, title, updatedAt, type, templateId, r
                                         <FaEdit className="text-gray-400" /> Edit
                                     </Link>
                                     <button
-                                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                                        onClick={() => { onDuplicate(id); setIsMenuOpen(false); }}
+                                        type="button"
+                                        disabled={!!loadingAction}
+                                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                        onClick={async () => { 
+                                            setLoadingAction('duplicate');
+                                            await onDuplicate(id); 
+                                            setLoadingAction(null);
+                                            setIsMenuOpen(false); 
+                                        }}
+                                        aria-label="Duplicate this document"
+                                        aria-busy={loadingAction === 'duplicate'}
                                     >
-                                        <FaCopy className="text-gray-400" /> Duplicate
+                                        {loadingAction === 'duplicate' ? <FaSpinner className="animate-spin" aria-hidden="true" /> : <FaCopy className="text-gray-400" aria-hidden="true" />} Duplicate
                                     </button>
                                     <button
-                                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                                        onClick={() => { onDownload(id); setIsMenuOpen(false); }}
+                                        type="button"
+                                        disabled={!!loadingAction}
+                                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                        onClick={async () => { 
+                                            setLoadingAction('download');
+                                            await onDownload(id); 
+                                            setLoadingAction(null);
+                                            setIsMenuOpen(false); 
+                                        }}
+                                        aria-label="Download as PDF"
+                                        aria-busy={loadingAction === 'download'}
                                     >
-                                        <FaDownload className="text-gray-400" /> Download
+                                        {loadingAction === 'download' ? <FaSpinner className="animate-spin" aria-hidden="true" /> : <FaDownload className="text-gray-400" aria-hidden="true" />} Download
                                     </button>
                                     <div className="h-px bg-gray-100 my-1" />
                                     <button
+                                        type="button"
+                                        disabled={!!loadingAction}
                                         onClick={() => { setShowConfirm(true); setIsMenuOpen(false); }}
-                                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                                        aria-label="Delete this document"
                                     >
-                                        <FaTrash /> Delete
+                                        <FaTrash aria-hidden="true" /> Delete
                                     </button>
                                 </div>
                             </>
@@ -126,7 +150,12 @@ export default function DocumentCard({ id, title, updatedAt, type, templateId, r
                 title={`Delete ${type === 'resume' ? 'Resume' : 'Cover Letter'}`}
                 message={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
                 confirmLabel="Delete"
-                onConfirm={() => { onDelete(id); setShowConfirm(false); }}
+                onConfirm={async () => { 
+                    setLoadingAction('delete');
+                    await onDelete(id); 
+                    setLoadingAction(null);
+                    setShowConfirm(false); 
+                }}
                 onCancel={() => setShowConfirm(false)}
             />
         </div>

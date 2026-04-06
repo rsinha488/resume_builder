@@ -76,11 +76,14 @@ export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: Upgr
                             </ul>
 
                             <button
+                                type="button"
                                 onClick={() => handleUpgrade('TRIAL')}
                                 disabled={!!loading}
                                 className="w-full py-4 bg-white border-2 border-primary-600 text-primary-600 rounded-xl font-bold text-lg hover:bg-primary-50 transition-all disabled:opacity-50 flex items-center justify-center"
+                                aria-label="Select 14-Day Trial Plan"
+                                aria-busy={loading === 'TRIAL'}
                             >
-                                {loading === 'TRIAL' ? <FaSpinner className="animate-spin mr-2" /> : null}
+                                {loading === 'TRIAL' ? <FaSpinner className="animate-spin mr-2" aria-hidden="true" /> : null}
                                 Select Trial
                             </button>
                         </div>
@@ -114,11 +117,14 @@ export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: Upgr
                             </ul>
 
                             <button
+                                type="button"
                                 onClick={() => handleUpgrade('ANNUAL')}
                                 disabled={!!loading}
                                 className="w-full py-4 bg-primary-600 text-white rounded-xl font-bold text-lg shadow-lg hover:bg-primary-700 hover:scale-[1.02] transition-all disabled:opacity-50 flex items-center justify-center"
+                                aria-label="Select Annual Plan"
+                                aria-busy={loading === 'ANNUAL'}
                             >
-                                {loading === 'ANNUAL' ? <FaSpinner className="animate-spin mr-2" /> : <FaCrown className="mr-2" />}
+                                {loading === 'ANNUAL' ? <FaSpinner className="animate-spin mr-2" aria-hidden="true" /> : <FaCrown className="mr-2" aria-hidden="true" />}
                                 Get Started Now
                             </button>
                         </div>

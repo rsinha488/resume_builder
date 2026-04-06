@@ -126,6 +126,8 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                 {experiences?.map((exp, index) => (
                     <div key={exp.id} className="premium-card p-8 relative group animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
                         <button
+                            type="button"
+                            aria-label="Remove experience"
                             onClick={() => {
                                 dispatch(removeExperience(exp.id));
                                 toast.success('Experience removed');
@@ -226,6 +228,7 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                     <label htmlFor={`description-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest">Job Description</label>
                                     <button
                                         type="button"
+                                        aria-label="Rewrite description with AI"
                                         onClick={() => handleRewriteBullet(exp.id, exp.description, personalInfo?.jobTitle || '')}
                                         disabled={rewriting === exp.id || !exp.description?.trim()}
                                         className="flex items-center gap-2 group/magic"
@@ -257,6 +260,8 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
             </div>
 
             <button
+                type="button"
+                aria-label="Add work experience"
                 onClick={handleAdd}
                 className="group w-full py-10 border-4 border-dashed border-surface-100 rounded-4xl text-surface-400 hover:border-primary-500/30 hover:bg-primary-50/30 hover:text-primary-600 transition-all duration-300 flex flex-col items-center justify-center gap-3 animate-fade-in"
             >

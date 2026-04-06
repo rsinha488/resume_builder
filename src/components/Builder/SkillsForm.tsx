@@ -9,9 +9,10 @@ export default function SkillsForm() {
     const dispatch = useAppDispatch();
     const skills = useAppSelector((state) => state.resume.skills);
     const [newSkill, setNewSkill] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
 
-    const handleAdd = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleAddSkill = () => {
         if (newSkill.trim() && !skills?.includes(newSkill.trim())) {
             dispatch(updateSkills([...skills, newSkill.trim()]));
             setNewSkill('');
@@ -38,7 +39,7 @@ export default function SkillsForm() {
             </div>
 
             <div className="premium-card p-8 space-y-8">
-                <form onSubmit={handleAdd} className="flex gap-4">
+                <form className="flex gap-4">
                     <div className="flex-1 relative group">
                         <input
                             type="text"
@@ -52,8 +53,11 @@ export default function SkillsForm() {
                         </div>
                     </div>
                     <button
-                        type="submit"
-                        className="btn-primary !px-8 !py-4 !rounded-2xl !text-xs !font-black uppercase tracking-widest flex items-center gap-2"
+                        type="button"
+                        onClick={handleAddSkill}
+                        disabled={!newSkill.trim()}
+                        className="px-8 py-3 bg-primary-600 text-white font-bold rounded-2xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-600/20 active:scale-95 disabled:opacity-50"
+                        aria-label="Add new skill to list"
                     >
                         Add Skill
                     </button>
@@ -68,10 +72,12 @@ export default function SkillsForm() {
                         >
                             <span className="uppercase tracking-wider">{skill}</span>
                             <button
+                                type="button"
                                 onClick={() => handleRemove(skill)}
-                                className="w-5 h-5 rounded-lg flex items-center justify-center text-surface-300 hover:text-red-500 hover:bg-red-50 transition-all"
+                                className="w-6 h-6 rounded-lg bg-white/20 hover:bg-white/40 flex items-center justify-center transition-colors"
+                                aria-label={`Remove skill ${skill}`}
                             >
-                                <FaTimes size={10} />
+                                <FaTimes size={10} aria-hidden="true" />
                             </button>
                         </div>
                     ))}
