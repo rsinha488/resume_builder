@@ -84,7 +84,7 @@ Experience: ${safeExperiences.slice(0, 3).map((e: any) =>
                 data: { aiUsageCount: { increment: 1 } },
                 select: { aiUsageCount: true }
             });
-            newUsageCount = updatedUser.aiUsageCount;
+            newUsageCount = updatedUser.aiUsageCount || 0;
         }
 
         return NextResponse.json({ summary: finalSummary, newUsageCount });

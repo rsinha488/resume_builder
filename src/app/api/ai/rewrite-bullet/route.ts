@@ -83,7 +83,7 @@ export async function POST(req: Request) {
                 data: { aiUsageCount: { increment: 1 } },
                 select: { aiUsageCount: true }
             });
-            newUsageCount = updatedUser.aiUsageCount;
+            newUsageCount = updatedUser.aiUsageCount || 0;
         }
 
         return NextResponse.json({ rewritten: finalRewritten, newUsageCount });
