@@ -36,38 +36,43 @@ Experience: ${safeExperiences.slice(0, 3).map((e: any) =>
             model: 'llama-3.3-70b-versatile',
             messages: [{
                 role: 'user',
-                content: `You are a professional resume SUMMARY rewriting agent.
+                content: `You are an expert resume writer specializing in FAANG/MAANG-level resumes.
 
-            Rewrite this into a strong PROFESSIONAL SUMMARY section for a ${safePersonalInfo.jobTitle || 'professional'} role.
+Rewrite the given content into a high-impact PROFESSIONAL SUMMARY for a ${safePersonalInfo.jobTitle || 'professional'} role.
 
-            Ensure the summary:
-            - is concise, confident, and impactful
-            - highlights the candidate’s strongest value proposition
-            - is achievement-focused with measurable impact where possible
-            - uses strong, professional language
-            - is ATS-optimized with relevant keywords
-            - is written in third person (no first-person pronouns)
-            - is limited to 3 sentences (80–120 words total)
+The summary MUST:
+- avoid generic buzzwords (e.g., "results-driven", "team player", "hardworking")
+- clearly state years of experience (if present)
+- highlight core technical expertise or domain specialization
+- include 1–2 measurable achievements or impact signals where possible
+- reflect ownership, scale, or complexity of work
+- be ATS-optimized with relevant keywords
+- be written in third person (no first-person pronouns)
+- be exactly 2–3 sentences (60–100 words max)
+- sound sharp, modern, and specific (like top-tier tech resumes)
 
-            DO NOT:
-            - add skills or experience not provided
-            - include placeholder content
-            - include explanations or formatting outside the response
+DO NOT:
+- repeat the candidate’s full name
+- add information not provided
+- use vague or filler language
+- include soft-skill-heavy statements without proof
+- include explanations or extra text
 
-            Return ONLY valid JSON in this format:
+Return ONLY valid JSON in this format:
 
-            {
-            "summary": "string"
-            }
+{
+  "summary": "string"
+}
 
-            User Summary: ${context}`
+User Summary:
+${context}`
             }],
-            max_tokens: 300,
-            temperature: 0.7,
+            max_tokens: 250,
+            temperature: 0.5,
         });
 
         const rawContent = chatCompletion.choices[0]?.message?.content?.trim() || '';
-        
+
         let finalSummary = '';
         try {
             const jsonMatch = rawContent.match(/{[\s\S]*}/);

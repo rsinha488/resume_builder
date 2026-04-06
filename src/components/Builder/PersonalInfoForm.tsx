@@ -3,17 +3,54 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { updatePersonalInfo } from '@/lib/features/resume/resumeSlice';
 import { useState } from 'react';
 import axios from 'axios';
-import { FaCamera, FaSpinner } from 'react-icons/fa';
+import { FaCamera, FaSpinner, FaMagic } from 'react-icons/fa';
 import { toast } from 'sonner';
 
-export default function PersonalInfoForm() {
+interface PersonalInfoFormProps {
+    readonly userPlan: 'FREE' | 'PRO';
+    readonly aiUsageCount: number;
+    readonly onUsageUpdate: (count: number) => void;
+    readonly onUpgrade: () => void;
+}
+
+export default function PersonalInfoForm({ userPlan, aiUsageCount, onUsageUpdate, onUpgrade }: PersonalInfoFormProps) {
     const dispatch = useAppDispatch();
-    const personalInfo = useAppSelector((state) => state.resume.personalInfo);
+    const resume = useAppSelector((state) => state.resume);
+    const personalInfo = resume.personalInfo;
     const [uploading, setUploading] = useState(false);
+    const [generatingSummary, setGeneratingSummary] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         dispatch(updatePersonalInfo({ [name]: value }));
+    };
+
+    const handleGenerateSummary = async () => {
+        if (userPlan === 'FREE' && aiUsageCount >= 50) {
+            onUpgrade();
+            return;
+        }
+
+        setGeneratingSummary(true);
+        const token = localStorage.getItem('token');
+        try {
+            const res = await axios.post('/api/ai/generate-summary', {
+                personalInfo: resume.personalInfo,
+                experiences: resume.experiences,
+                skills: resume.skills,
+            }, { headers: { Authorization: `Bearer ${token}` } });
+            dispatch(updatePersonalInfo({ summary: res.data.summary }));
+            if (res.data.newUsageCount !== undefined) {
+                onUsageUpdate(res.data.newUsageCount);
+            }
+            toast.success('Summary generated!');
+        } catch (error: any) {
+            console.error('Generate summary error:', error);
+            const msg = error.response?.data?.error || 'Failed to generate summary.';
+            toast.error(msg);
+        } finally {
+            setGeneratingSummary(false);
+        }
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,20 +191,56 @@ export default function PersonalInfoForm() {
                     />
                 </div>
             </div>
-            <div className="space-y-2">
-                <div className="flex items-center justify-between mb-1">
-                    <label htmlFor="summary" className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Professional Summary</label>
-                    <span className="text-[10px] text-surface-300 font-bold uppercase tracking-widest">Recommended: 300-500 chars</span>
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                        <label htmlFor="summary" className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Professional Summary</label>
+                        <p className="text-[10px] text-surface-300 font-bold uppercase tracking-widest ml-1">Recommended: 300-500 chars</p>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                        {userPlan === 'FREE' && (
+                            <span className="text-[10px] font-bold text-surface-500 bg-surface-50 border border-surface-200 px-3 py-1.5 rounded-xl shadow-sm">
+                                Free AI Uses: {aiUsageCount}/50
+                            </span>
+                        )}
+                        <button
+                            type="button"
+                            onClick={handleGenerateSummary}
+                            disabled={generatingSummary}
+                            className="group/magic flex items-center gap-2"
+                        >
+                            <div className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                                generatingSummary 
+                                ? 'bg-surface-100 text-surface-400 font-bold' 
+                                : 'bg-primary-600 text-white shadow-lg shadow-primary-600/20 hover:bg-primary-700 hover:-translate-y-0.5 active:scale-95'
+                            }`}>
+                                {generatingSummary
+                                    ? <><FaSpinner className="animate-spin" size={10} /> Generating...</>
+                                    : <><FaMagic size={10} className="group-hover/magic:rotate-12 transition-transform" /> Write with AI</>
+                                }
+                            </div>
+                        </button>
+                    </div>
                 </div>
-                <textarea
-                    id="summary"
-                    name="summary"
-                    value={personalInfo?.summary ?? ''}
-                    onChange={handleChange}
-                    rows={6}
-                    className="w-full resize-none p-5"
-                    placeholder="Briefly describe your professional background and key achievements..."
-                />
+
+                <div className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 to-purple-500/20 rounded-3xl blur opacity-0 group-focus-within:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                    <textarea
+                        id="summary"
+                        name="summary"
+                        value={personalInfo?.summary ?? ''}
+                        onChange={handleChange}
+                        rows={8}
+                        className="relative w-full p-8 bg-white border border-surface-100 rounded-3xl shadow-sm focus:ring-0 focus:border-primary-500 outline-none resize-none text-base text-surface-700 leading-relaxed font-medium transition-all"
+                        placeholder="Briefly describe your professional background and key achievements..."
+                    />
+                </div>
+                
+                <div className="flex items-center gap-3 p-4 bg-surface-50 rounded-2xl border border-surface-100 italic">
+                    <span className="text-lg">💡</span>
+                    <p className="text-[10px] text-surface-500 font-medium">Keep it concise. 3-5 sentences that highlight your most relevant experience and skills.</p>
+                </div>
             </div>
         </div>
     );

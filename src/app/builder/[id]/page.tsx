@@ -33,7 +33,6 @@ const contentSteps = [
     { id: 'education', title: 'Education' },
     { id: 'skills', title: 'Skills' },
     { id: 'extra', title: 'Extra Sections' },
-    { id: 'summary', title: 'Professional Summary' },
 ];
 
 export default function BuilderPage() {
@@ -49,35 +48,7 @@ export default function BuilderPage() {
     const [userPlan, setUserPlan] = useState<'FREE' | 'PRO'>('FREE');
     const [aiUsageCount, setAiUsageCount] = useState(0);
     const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-    const [generatingSummary, setGeneratingSummary] = useState(false);
 
-    const handleGenerateSummary = async () => {
-        if (userPlan === 'FREE' && aiUsageCount >= 50) {
-            setIsUpgradeModalOpen(true);
-            return;
-        }
-
-        setGeneratingSummary(true);
-        const token = localStorage.getItem('token');
-        try {
-            const res = await axios.post('/api/ai/generate-summary', {
-                personalInfo: resume.personalInfo,
-                experiences: resume.experiences,
-                skills: resume.skills,
-            }, { headers: { Authorization: `Bearer ${token}` } });
-            dispatch(updatePersonalInfo({ summary: res.data.summary }));
-            if (res.data.newUsageCount !== undefined) {
-                setAiUsageCount(res.data.newUsageCount);
-            }
-            toast.success('Summary generated!');
-        } catch (error: any) {
-            console.error('Generate summary error:', error);
-            const msg = error.response?.data?.error || 'Failed to generate summary.';
-            toast.error(msg);
-        } finally {
-            setGeneratingSummary(false);
-        }
-    };
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -117,7 +88,9 @@ export default function BuilderPage() {
         fetchData();
     }, [id, dispatch, router]);
 
-    const handleSave = async () => {
+    const handleSave = async (silent = false) => {
+        if (saving || loading) return;
+        
         setSaving(true);
         const token = localStorage.getItem('token');
         try {
@@ -125,16 +98,28 @@ export default function BuilderPage() {
                 title: resume.personalInfo?.fullName || 'My Resume',
                 data: resume
             }, { headers: { Authorization: `Bearer ${token}` } });
-            toast.success('Resume saved successfully!');
+            if (!silent) toast.success('Progress saved!');
         } catch (error) {
             console.error('Error saving resume:', error);
-            toast.error('Failed to save resume. Please try again.');
+            if (!silent) toast.error('Failed to save. Please try again.');
         } finally {
             setSaving(false);
         }
     };
 
+    // Autosave Effect
+    useEffect(() => {
+        if (loading) return;
+
+        const timer = setTimeout(() => {
+            handleSave(true);
+        }, 3000); // 3 second debounce
+
+        return () => clearTimeout(timer);
+    }, [resume, loading]);
+
     const handleNext = () => {
+        handleSave();
         if (currentMode === 'templates') setCurrentMode('design');
         else if (currentMode === 'design') setCurrentMode('content');
         else if (currentMode === 'content') {
@@ -148,6 +133,7 @@ export default function BuilderPage() {
     };
 
     const handleBack = () => {
+        handleSave(true);
         if (currentMode === 'finalize') setCurrentMode('analysis');
         else if (currentMode === 'analysis') {
             setCurrentContentStep(contentSteps.length - 1);
@@ -282,6 +268,7 @@ export default function BuilderPage() {
                 <BuilderSidebar
                     currentMode={currentMode}
                     onModeChange={(mode) => {
+                        handleSave(true);
                         setCurrentMode(mode);
                         if (mode === 'content') setCurrentContentStep(0);
                     }}
@@ -358,7 +345,10 @@ export default function BuilderPage() {
                                     {contentSteps.map((step, index) => (
                                         <button
                                             key={step.id}
-                                            onClick={() => setCurrentContentStep(index)}
+                                            onClick={() => {
+                                                handleSave(true);
+                                                setCurrentContentStep(index);
+                                            }}
                                             className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${index === currentContentStep
                                                 ? 'bg-surface-900 text-white shadow-xl shadow-surface-900/20 -translate-y-0.5'
                                                 : 'bg-white text-surface-400 hover:text-surface-600 border border-surface-100 hover:border-surface-200'
@@ -385,7 +375,12 @@ export default function BuilderPage() {
                                 )}
                                 {currentMode === 'content' && (
                                     <>
-                                        {currentContentStep === 0 && <PersonalInfoForm />}
+                                        {currentContentStep === 0 && <PersonalInfoForm 
+                                            userPlan={userPlan} 
+                                            aiUsageCount={aiUsageCount}
+                                            onUsageUpdate={setAiUsageCount}
+                                            onUpgrade={() => setIsUpgradeModalOpen(true)} 
+                                        />}
                                         {currentContentStep === 1 && <ExperienceForm 
                                             userPlan={userPlan} 
                                             aiUsageCount={aiUsageCount}
@@ -395,57 +390,6 @@ export default function BuilderPage() {
                                         {currentContentStep === 2 && <EducationForm />}
                                         {currentContentStep === 3 && <SkillsForm />}
                                         {currentContentStep === 4 && <ExtraSections />}
-                                        {currentContentStep === 5 && (
-                                            <div className="space-y-8 animate-fade-in-up">
-                                                <div className="flex items-center justify-between">
-                                                    <div>
-                                                        <h2 className="text-2xl font-black text-surface-900 mb-1">Professional Summary</h2>
-                                                        <p className="text-sm text-surface-500 font-medium">Capture attention with a powerful opening.</p>
-                                                    </div>
-                                                    <div className="flex items-center gap-3">
-                                                        {userPlan === 'FREE' && (
-                                                            <span className="text-[10px] font-bold text-surface-500 bg-surface-50 border border-surface-200 px-3 py-1.5 rounded-xl shadow-sm">
-                                                                Free AI Uses: {aiUsageCount}/50
-                                                            </span>
-                                                        )}
-                                                        <button
-                                                            type="button"
-                                                            onClick={handleGenerateSummary}
-                                                            disabled={generatingSummary}
-                                                            className="group/magic flex items-center gap-2"
-                                                        >
-                                                            <div className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-                                                                generatingSummary 
-                                                                ? 'bg-surface-100 text-surface-400 font-bold' 
-                                                                : 'bg-primary-600 text-white shadow-lg shadow-primary-600/20 hover:bg-primary-700 hover:-translate-y-0.5 active:scale-95'
-                                                            }`}>
-                                                                {generatingSummary
-                                                                    ? <><FaSpinner className="animate-spin" size={10} /> Generating Summary...</>
-                                                                    : <><FaMagic size={10} className="group-hover/magic:rotate-12 transition-transform" /> Write with Groq AI</>
-                                                                }
-                                                            </div>
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <div className="relative group">
-                                                    <div className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 to-purple-500/20 rounded-3xl blur opacity-0 group-focus-within:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-                                                    <textarea
-                                                        id="summary-large"
-                                                        value={resume.personalInfo?.summary}
-                                                        onChange={(e) => dispatch(updatePersonalInfo({ summary: e.target.value }))}
-                                                        rows={12}
-                                                        className="relative w-full p-8 bg-white border border-surface-100 rounded-3xl shadow-sm focus:ring-0 focus:border-primary-500 outline-none resize-none text-lg text-surface-700 leading-relaxed font-medium transition-all"
-                                                        placeholder="e.g. Accomplished Software Engineer with a passion for building scalable web applications and 5+ years of experience in JavaScript frameworks..."
-                                                    />
-                                                </div>
-                                                
-                                                <div className="flex items-center gap-3 p-4 bg-surface-50 rounded-2xl border border-surface-100 italic">
-                                                    <span className="text-lg">💡</span>
-                                                    <p className="text-xs text-surface-500 font-medium">Keep it concise. 3-5 sentences that highlight your most relevant experience and skills for the job you want.</p>
-                                                </div>
-                                            </div>
-                                        )}
 
                                     </>
                                 )}
