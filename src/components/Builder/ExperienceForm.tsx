@@ -30,10 +30,12 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
 
     // Add state per experience (keyed by experience id)
     const [rewriting, setRewriting] = useState<string | null>(null);
+    const [expandedId, setExpandedId] = useState<string | null>(experiences?.[0]?.id || null);
 
     const handleAdd = () => {
+        const id = uuidv4();
         const newExp: Experience = {
-            id: uuidv4(),
+            id,
             company: '',
             position: '',
             location: '',
@@ -43,6 +45,7 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
             description: '',
         };
         dispatch(addExperience(newExp));
+        setExpandedId(id);
     };
 
     const parseDateValue = (dateStr: string | undefined) => {
@@ -121,141 +124,173 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                 </div>
             </div>
 
-            <div className="space-y-8">
-                {experiences?.map((exp, index) => (
-                    <div key={exp.id} className="premium-card p-4 sm:p-8 relative group animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
-                        <button
-                            type="button"
-                            aria-label="Remove experience"
-                            onClick={() => {
-                                dispatch(removeExperience(exp.id));
-                                toast.success('Experience removed');
-                            }}
-                            className="absolute top-4 right-4 sm:top-6 sm:right-6 w-12 h-12 rounded-xl flex items-center justify-center text-surface-300 hover:text-red-500 hover:bg-red-50 transition-all duration-300 xl:opacity-0 xl:group-hover:opacity-100"
+            <div className="space-y-4">
+                {experiences?.map((exp, index) => {
+                    const isExpanded = exp.id === expandedId;
+                    
+                    return (
+                        <div 
+                            key={exp.id} 
+                            className={`premium-card p-4 sm:p-8 relative group animate-fade-in-up transition-all duration-300 ${
+                                isExpanded ? 'ring-2 ring-primary-500/50 shadow-2xl' : 'hover:border-primary-200'
+                            }`} 
+                            style={{ animationDelay: `${index * 100}ms` }}
                         >
-                            <FaTrash size={16} />
-                        </button>
-                        
-                        <div className="flex items-center gap-4 mb-6 sm:mb-8">
-                            <div className="w-10 h-10 rounded-xl bg-surface-900 text-white flex items-center justify-center font-black text-lg shadow-lg">
-                                {index + 1}
-                            </div>
-                            <h3 className="text-lg sm:text-xl font-black text-surface-900">Experience</h3>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-                            <div className="space-y-2">
-                                <label htmlFor={`company-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Company / Organization</label>
-                                <input
-                                    id={`company-${exp.id}`}
-                                    type="text"
-                                    value={exp.company}
-                                    onChange={(e) => handleChange(exp.id, 'company', e.target.value)}
-                                    className="w-full text-base"
-                                    placeholder="e.g. Google"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor={`position-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Your Job Title</label>
-                                <input
-                                    id={`position-${exp.id}`}
-                                    type="text"
-                                    value={exp.position}
-                                    onChange={(e) => handleChange(exp.id, 'position', e.target.value)}
-                                    className="w-full text-base"
-                                    placeholder="e.g. Senior Product Designer"
-                                />
-                            </div>
-                            <div className="space-y-4">
-                                <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <select
-                                        value={parseDateValue(exp.startDate).month}
-                                        onChange={(e) => handleDateChange(exp.id, 'startDate', e.target.value, parseDateValue(exp.startDate).year)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
-                                    >
-                                        <option value="" disabled>Month</option>
-                                        {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-                                    </select>
-                                    <select
-                                        value={parseDateValue(exp.startDate).year}
-                                        onChange={(e) => handleDateChange(exp.id, 'startDate', parseDateValue(exp.startDate).month, e.target.value)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
-                                    >
-                                        <option value="" disabled>Year</option>
-                                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                                    </select>
+                            {/* Actions Header - always visible */}
+                            <div className="flex items-center justify-between mb-0 group/header cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : exp.id)}>
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs shadow-sm transition-colors ${
+                                        isExpanded ? 'bg-surface-900 text-white' : 'bg-surface-50 text-surface-400'
+                                    }`}>
+                                        {index + 1}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className={`text-base font-black transition-colors truncate ${isExpanded ? 'text-surface-900' : 'text-surface-600'}`}>
+                                            {exp.position || "Untitled Position"}
+                                        </h3>
+                                        {!isExpanded && (
+                                            <p className="text-[10px] font-bold text-surface-400 uppercase tracking-widest truncate">
+                                                {exp.company || "Company"} • {exp.startDate || "Date"}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="space-y-4">
-                                <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">End Date</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <select
-                                        disabled={exp.current}
-                                        value={exp.current ? '' : parseDateValue(exp.endDate).month}
-                                        onChange={(e) => handleDateChange(exp.id, 'endDate', e.target.value, parseDateValue(exp.endDate).year)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
-                                    >
-                                        <option value="" disabled>{exp.current ? 'Present' : 'Month'}</option>
-                                        {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-                                    </select>
-                                    <select
-                                        disabled={exp.current}
-                                        value={exp.current ? '' : parseDateValue(exp.endDate).year}
-                                        onChange={(e) => handleDateChange(exp.id, 'endDate', parseDateValue(exp.endDate).month, e.target.value)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
-                                    >
-                                        <option value="" disabled>{exp.current ? 'Present' : 'Year'}</option>
-                                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="sm:col-span-2 flex items-center gap-3 p-5 sm:p-4 bg-surface-50 rounded-2xl border border-surface-100 transition-colors hover:border-primary-200 min-h-[48px]">
-                                <input
-                                    type="checkbox"
-                                    id={`current-${exp.id}`}
-                                    checked={exp.current}
-                                    onChange={(e) => handleChange(exp.id, 'current', e.target.checked)}
-                                    className="h-6 w-6 !rounded-lg text-primary-600 focus:ring-primary-500 border-surface-300"
-                                />
-                                <label htmlFor={`current-${exp.id}`} className="text-sm sm:text-base font-bold text-surface-700 select-none cursor-pointer">
-                                    I currently work here
-                                </label>
-                            </div>
-                            <div className="sm:col-span-2 space-y-3">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 ml-1">
-                                    <label htmlFor={`description-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest">Job Description</label>
+                                
+                                <div className="flex items-center gap-2">
                                     <button
                                         type="button"
-                                        aria-label="Rewrite description with AI"
-                                        onClick={() => handleRewriteBullet(exp.id, exp.description, personalInfo?.jobTitle || '')}
-                                        disabled={rewriting === exp.id || !exp.description?.trim()}
-                                        className="flex items-center gap-2 group/magic w-fit"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            dispatch(removeExperience(exp.id));
+                                            toast.success('Experience removed');
+                                        }}
+                                        className="w-10 h-10 rounded-xl flex items-center justify-center text-surface-300 hover:text-red-500 hover:bg-red-50 transition-all duration-300"
                                     >
-                                        <div className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 min-h-[44px] ${
-                                            rewriting === exp.id 
-                                            ? 'bg-surface-100 text-surface-400' 
-                                            : 'bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white hover:shadow-lg hover:shadow-primary-600/20 active:scale-95'
-                                        }`}>
-                                            {rewriting === exp.id
-                                                ? <><FaSpinner className="animate-spin" size={10} /> Rewriting...</>
-                                                : <><FaMagic size={10} className="group-hover/magic:rotate-12 transition-transform" /> Rewrite with Groq AI</>
-                                            }
-                                        </div>
+                                        <FaTrash size={14} />
                                     </button>
+                                    <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-180 text-primary-500' : 'text-surface-300'}`}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </div>
                                 </div>
-                                <textarea
-                                    id={`description-${exp.id}`}
-                                    value={exp.description}
-                                    onChange={(e) => handleChange(exp.id, 'description', e.target.value)}
-                                    rows={5}
-                                    className="w-full resize-none p-5 text-base leading-relaxed"
-                                    placeholder="Focus on achievements and quantifiable results (e.g. Increased sales by 20%...)"
-                                />
                             </div>
+
+                            {/* Form Content - only visible when expanded */}
+                            {isExpanded && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mt-8 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="space-y-2">
+                                        <label htmlFor={`company-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Company / Organization</label>
+                                        <input
+                                            id={`company-${exp.id}`}
+                                            type="text"
+                                            value={exp.company}
+                                            onChange={(e) => handleChange(exp.id, 'company', e.target.value)}
+                                            className="w-full text-base"
+                                            placeholder="e.g. Google"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor={`position-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Your Job Title</label>
+                                        <input
+                                            id={`position-${exp.id}`}
+                                            type="text"
+                                            value={exp.position}
+                                            onChange={(e) => handleChange(exp.id, 'position', e.target.value)}
+                                            className="w-full text-base"
+                                            placeholder="e.g. Senior Product Designer"
+                                        />
+                                    </div>
+                                    <div className="space-y-4">
+                                        <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <select
+                                                value={parseDateValue(exp.startDate).month}
+                                                onChange={(e) => handleDateChange(exp.id, 'startDate', e.target.value, parseDateValue(exp.startDate).year)}
+                                                className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                            >
+                                                <option value="" disabled>Month</option>
+                                                {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                            </select>
+                                            <select
+                                                value={parseDateValue(exp.startDate).year}
+                                                onChange={(e) => handleDateChange(exp.id, 'startDate', parseDateValue(exp.startDate).month, e.target.value)}
+                                                className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                            >
+                                                <option value="" disabled>Year</option>
+                                                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">End Date</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <select
+                                                disabled={exp.current}
+                                                value={exp.current ? '' : parseDateValue(exp.endDate).month}
+                                                onChange={(e) => handleDateChange(exp.id, 'endDate', e.target.value, parseDateValue(exp.endDate).year)}
+                                                className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
+                                            >
+                                                <option value="" disabled>{exp.current ? 'Present' : 'Month'}</option>
+                                                {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                            </select>
+                                            <select
+                                                disabled={exp.current}
+                                                value={exp.current ? '' : parseDateValue(exp.endDate).year}
+                                                onChange={(e) => handleDateChange(exp.id, 'endDate', parseDateValue(exp.endDate).month, e.target.value)}
+                                                className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
+                                            >
+                                                <option value="" disabled>{exp.current ? 'Present' : 'Year'}</option>
+                                                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="sm:col-span-2 flex items-center gap-3 p-5 sm:p-4 bg-surface-50 rounded-2xl border border-surface-100 transition-colors hover:border-primary-200 min-h-[48px]">
+                                        <input
+                                            type="checkbox"
+                                            id={`current-${exp.id}`}
+                                            checked={exp.current}
+                                            onChange={(e) => handleChange(exp.id, 'current', e.target.checked)}
+                                            className="h-6 w-6 !rounded-lg text-primary-600 focus:ring-primary-500 border-surface-300"
+                                        />
+                                        <label htmlFor={`current-${exp.id}`} className="text-sm sm:text-base font-bold text-surface-700 select-none cursor-pointer">
+                                            I currently work here
+                                        </label>
+                                    </div>
+                                    <div className="sm:col-span-2 space-y-3">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 ml-1">
+                                            <label htmlFor={`description-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest">Job Description</label>
+                                            <button
+                                                type="button"
+                                                aria-label="Rewrite description with AI"
+                                                onClick={() => handleRewriteBullet(exp.id, exp.description, personalInfo?.jobTitle || '')}
+                                                disabled={rewriting === exp.id || !exp.description?.trim()}
+                                                className="flex items-center gap-2 group/magic w-fit"
+                                            >
+                                                <div className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 min-h-[44px] ${
+                                                    rewriting === exp.id 
+                                                    ? 'bg-surface-100 text-surface-400' 
+                                                    : 'bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white hover:shadow-lg hover:shadow-primary-600/20 active:scale-95'
+                                                }`}>
+                                                    {rewriting === exp.id
+                                                        ? <><FaSpinner className="animate-spin" size={10} /> Rewriting...</>
+                                                        : <><FaMagic size={10} className="group-hover/magic:rotate-12 transition-transform" /> Rewrite with Groq AI</>
+                                                    }
+                                                </div>
+                                            </button>
+                                        </div>
+                                        <textarea
+                                            id={`description-${exp.id}`}
+                                            value={exp.description}
+                                            onChange={(e) => handleChange(exp.id, 'description', e.target.value)}
+                                            rows={5}
+                                            className="w-full resize-none p-5 text-base leading-relaxed"
+                                            placeholder="Focus on achievements and quantifiable results (e.g. Increased sales by 20%...)"
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             <button

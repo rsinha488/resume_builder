@@ -17,7 +17,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 import BuilderSidebar from '@/components/Builder/BuilderSidebar';
 import BuilderBottomBar from '@/components/Builder/BuilderBottomBar';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import { FaDownload, FaCrown, FaFileAlt, FaCheck, FaEdit, FaSpinner, FaMagic } from 'react-icons/fa';
+import { FaDownload, FaCrown, FaFileAlt, FaCheck, FaEdit, FaSpinner, FaMagic, FaChevronRight } from 'react-icons/fa';
 import ProgressBar from '@/components/Builder/ProgressBar';
 import { toast } from 'sonner';
 import { convertToPlainText } from '@/lib/utils';
@@ -28,11 +28,11 @@ import DashboardHeader from '@/components/Dashboard/DashboardHeader';
 type BuilderMode = 'templates' | 'design' | 'content' | 'analysis' | 'finalize';
 
 const contentSteps = [
-    { id: 'personal', title: 'Personal Info' },
-    { id: 'experience', title: 'Experience' },
-    { id: 'education', title: 'Education' },
-    { id: 'skills', title: 'Skills' },
-    { id: 'extra', title: 'Extra Sections' },
+    { id: 'personal', title: 'Personal Info', shortTitle: 'Contact' },
+    { id: 'experience', title: 'Experience', shortTitle: 'Experience' },
+    { id: 'education', title: 'Education', shortTitle: 'Education' },
+    { id: 'skills', title: 'Skills', shortTitle: 'Skills' },
+    { id: 'extra', title: 'Extra Sections', shortTitle: 'Extras' },
 ];
 
 export default function BuilderPage() {
@@ -277,10 +277,10 @@ export default function BuilderPage() {
                         currentMode={currentMode}
                     />
                     {/* Header Actions */}
-                    <header className="flex-shrink-0 min-h-16 h-auto py-4 lg:h-20 bg-white/80 backdrop-blur-md border-b border-surface-100 px-4 sm:px-8 flex justify-between items-center z-20">
+                    <header className="flex-shrink-0 h-12 sm:h-14 lg:h-16 bg-white/80 backdrop-blur-md border-b border-surface-100 px-4 sm:px-8 flex justify-between items-center z-20">
                         <div className="flex items-center gap-4">
                             <h1 className="text-[9px] sm:text-[10px] font-black text-surface-400 uppercase tracking-[0.2em]">
-                                {currentMode === 'content' ? `Step ${currentContentStep + 1}: ${contentSteps[currentContentStep].title}` : currentMode}
+                                {currentMode === 'content' ? `Step ${currentContentStep + 1}: ${contentSteps[currentContentStep].shortTitle}` : currentMode}
                             </h1>
                         </div>
 
@@ -297,7 +297,7 @@ export default function BuilderPage() {
                             <div className="flex gap-2">
                                 <button
                                     onClick={handleDownloadTxt}
-                                    className="px-3 sm:px-4 py-2 text-[10px] font-black uppercase tracking-widest text-surface-500 hover:text-surface-900 bg-surface-50 hover:bg-surface-100 rounded-xl transition-all"
+                                    className="hidden sm:block px-4 py-2 text-[10px] font-black uppercase tracking-widest text-surface-500 hover:text-surface-900 bg-surface-50 hover:bg-surface-100 rounded-xl transition-all"
                                 >
                                     .TXT
                                 </button>
@@ -333,11 +333,36 @@ export default function BuilderPage() {
                         </div>
                     </header>
 
+                    {/* Mobile Step Slider — sits in the flex flow, below the header, no overlap */}
+                    {currentMode === 'content' && (
+                        <div className="flex-shrink-0 lg:hidden bg-white/90 backdrop-blur-xl border-b border-surface-100 z-10 flex items-center px-3 py-2.5 overflow-x-auto no-scrollbar gap-2 shadow-sm mask-horizontal">
+                            {contentSteps.map((step, index) => (
+                                <button
+                                    key={step.id}
+                                    onClick={() => {
+                                        handleSave(true);
+                                        setCurrentContentStep(index);
+                                    }}
+                                    className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 flex items-center gap-1.5 flex-shrink-0 ${
+                                        index === currentContentStep
+                                            ? 'bg-surface-900 text-white shadow-lg shadow-surface-900/20'
+                                            : 'bg-surface-50 text-surface-400 border border-transparent hover:border-surface-200'
+                                    }`}
+                                >
+                                    <span className="w-3.5 h-3.5 rounded-full bg-white/20 flex items-center justify-center text-[7px] font-black flex-shrink-0">
+                                        {index + 1}
+                                    </span>
+                                    {step.shortTitle}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Editor Area — scrolls independently, bottom bar stays pinned */}
-                    <div id="editor-area" className="flex-1 overflow-y-auto min-h-0 pb-32 p-4 sm:p-10 scroll-smooth bg-surface-50/50">
+                    <div id="editor-area" className="flex-1 overflow-y-auto min-h-0 pb-40 p-4 sm:p-10 scroll-smooth bg-surface-50/50">
                         <div className="max-w-4xl mx-auto">
                             {currentMode === 'content' && (
-                                <div className="flex mb-6 sm:mb-10 gap-2 sm:gap-3 overflow-x-auto pb-4 no-scrollbar">
+                                <div className="hidden lg:flex mb-10 gap-3 overflow-x-auto pb-4 no-scrollbar">
                                     {contentSteps.map((step, index) => (
                                         <button
                                             key={step.id}
@@ -345,7 +370,7 @@ export default function BuilderPage() {
                                                 handleSave(true);
                                                 setCurrentContentStep(index);
                                             }}
-                                            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${index === currentContentStep
+                                            className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${index === currentContentStep
                                                 ? 'bg-surface-900 text-white shadow-xl shadow-surface-900/20'
                                                 : 'bg-white text-surface-400 border border-surface-100 hover:border-surface-200'
                                                 }`}

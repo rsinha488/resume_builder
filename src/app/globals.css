@@ -2,19 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global Form Adjustments */
+input, textarea, select {
+  font-size: 16px !important; /* Prevents auto-zoom on iOS */
+}
+
+/* Scrollbar & Navigation Utilities */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .mask-horizontal {
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
+    --shadow-premium: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05), 0 10px 15px -3px rgb(0 0 0 / 0.03);
+    --shadow-premium-hover: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
   }
 
   body {
-    @apply bg-surface-50 text-surface-900 font-sans selection:bg-primary-100 selection:text-primary-900 antialiased text-base leading-relaxed;
+    @apply bg-[#F9FAFB] text-surface-900 font-sans selection:bg-primary-100 selection:text-primary-900 antialiased text-base leading-relaxed;
   }
 
   h1 { @apply text-3xl md:text-5xl font-black; }
-  h2 { @apply text-2xl md:text-4xl font-black; }
-  h3 { @apply text-xl md:text-2xl font-bold; }
+  h2 { @apply text-2xl md:text-3xl lg:text-4xl font-black; }
+  h3 { @apply text-lg md:text-xl lg:text-2xl font-bold; }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading tracking-tight text-surface-900;
@@ -23,19 +45,29 @@
 
 @layer components {
   .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-glass;
+    @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-sm;
+  }
+
+  .glass-premium {
+    @apply bg-white/40 backdrop-blur-2xl border border-white/20 shadow-premium;
   }
 
   .premium-card {
-    @apply bg-white rounded-3xl border border-surface-100 shadow-premium hover:shadow-premium-hover transition-all duration-300;
+    @apply bg-white rounded-[2rem] border border-surface-100/80 transition-all duration-500;
+    box-shadow: var(--shadow-premium);
+  }
+
+  .premium-card:hover {
+    @apply -translate-y-1;
+    box-shadow: var(--shadow-premium-hover);
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white rounded-2xl font-semibold shadow-lg shadow-primary-600/25 hover:bg-primary-700 hover:-translate-y-0.5 active:scale-95 transition-all duration-200;
+    @apply inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white rounded-2xl font-bold shadow-xl shadow-primary-600/20 hover:bg-primary-700 hover:-translate-y-0.5 active:scale-95 transition-all duration-300;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center px-6 py-3 bg-white text-surface-700 border border-surface-100 rounded-2xl font-semibold hover:bg-surface-50 hover:border-surface-200 hover:-translate-y-0.5 active:scale-95 transition-all duration-200;
+    @apply inline-flex items-center justify-center px-6 py-3 bg-white text-surface-700 border border-surface-100 rounded-2xl font-bold hover:bg-surface-50 hover:border-surface-200 hover:-translate-y-0.5 active:scale-95 transition-all duration-300;
   }
 }
 

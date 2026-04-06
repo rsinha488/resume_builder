@@ -152,7 +152,7 @@ export default function DashboardHeader() {
                                             <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition-colors">
                                                 <FaSignOutAlt size={12} />
                                             </div>
-                                            Sign Out Safely
+                                            Logout
                                         </button>
                                     </div>
                                 </div>

@@ -4,6 +4,7 @@ import { addEducation, updateEducation, removeEducation, Education } from '@/lib
 import { FaPlus, FaTrash } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 const MONTHS = [
     { value: '01', label: 'Jan' }, { value: '02', label: 'Feb' }, { value: '03', label: 'Mar' },
@@ -17,10 +18,12 @@ const YEARS = Array.from({ length: 50 }, (_, i) => (new Date().getFullYear() - i
 export default function EducationForm() {
     const dispatch = useAppDispatch();
     const education = useAppSelector((state) => state.resume.education);
+    const [expandedId, setExpandedId] = useState<string | null>(education?.[0]?.id || null);
 
     const handleAdd = () => {
+        const id = uuidv4();
         const newEdu: Education = {
-            id: uuidv4(),
+            id,
             school: '',
             degree: '',
             field: '',
@@ -31,6 +34,7 @@ export default function EducationForm() {
             description: '',
         };
         dispatch(addEducation(newEdu));
+        setExpandedId(id);
     };
 
     const parseDateValue = (dateStr: string | undefined) => {
@@ -73,120 +77,153 @@ export default function EducationForm() {
                 </div>
             </div>
 
-            <div className="space-y-8">
-                {education?.map((edu, index) => (
-                    <div key={edu.id} className="premium-card p-8 relative group animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
-                        <button
-                            type="button"
-                            aria-label="Remove education entry"
-                            onClick={() => {
-                                dispatch(removeEducation(edu.id));
-                                toast.success('Education removed');
-                            }}
-                            className="absolute top-8 right-8 p-2 text-surface-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+            <div className="space-y-4">
+                {education?.map((edu, index) => {
+                    const isExpanded = edu.id === expandedId;
+                    
+                    return (
+                        <div 
+                            key={edu.id} 
+                            className={`premium-card p-4 sm:p-8 relative group animate-fade-in-up transition-all duration-300 ${
+                                isExpanded ? 'ring-2 ring-primary-500/50 shadow-2xl' : 'hover:border-primary-200'
+                            }`} 
+                            style={{ animationDelay: `${index * 100}ms` }}
                         >
-                            <FaTrash size={14} aria-hidden="true" />
-                        </button>
-                        
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="w-10 h-10 rounded-xl bg-surface-900 text-white flex items-center justify-center font-black text-lg shadow-lg">
-                                {index + 1}
+                            {/* Actions Header - always visible */}
+                            <div className="flex items-center justify-between mb-0 group/header cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : edu.id)}>
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs shadow-sm transition-colors ${
+                                        isExpanded ? 'bg-surface-900 text-white' : 'bg-surface-50 text-surface-400'
+                                    }`}>
+                                        {index + 1}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className={`text-base font-black transition-colors truncate ${isExpanded ? 'text-surface-900' : 'text-surface-600'}`}>
+                                            {edu.degree || "Untitled Degree"}
+                                        </h3>
+                                        {!isExpanded && (
+                                            <p className="text-[10px] font-bold text-surface-400 uppercase tracking-widest truncate">
+                                                {edu.school || "School"} • {edu.startDate || "Date"}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        aria-label="Remove education entry"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            dispatch(removeEducation(edu.id));
+                                            toast.success('Education removed');
+                                        }}
+                                        className="w-10 h-10 rounded-xl flex items-center justify-center text-surface-300 hover:text-red-500 hover:bg-red-50 transition-all duration-300"
+                                    >
+                                        <FaTrash size={14} aria-hidden="true" />
+                                    </button>
+                                    <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-180 text-primary-500' : 'text-surface-300'}`}>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </div>
+                                </div>
                             </div>
-                            <h3 className="text-xl font-black text-surface-900">Education</h3>
-                        </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                            <div className="space-y-2">
-                                <label htmlFor={`school-${edu.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">School / University</label>
-                                <input
-                                    id={`school-${edu.id}`}
-                                    type="text"
-                                    value={edu.school}
-                                    onChange={(e) => handleChange(edu.id, 'school', e.target.value)}
-                                    className="w-full"
-                                    placeholder="e.g. Stanford University"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor={`degree-${edu.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Degree / Certification</label>
-                                <input
-                                    id={`degree-${edu.id}`}
-                                    type="text"
-                                    value={edu.degree}
-                                    onChange={(e) => handleChange(edu.id, 'degree', e.target.value)}
-                                    className="w-full"
-                                    placeholder="e.g. Master of Science"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor={`field-${edu.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Field of Study</label>
-                                <input
-                                    id={`field-${edu.id}`}
-                                    type="text"
-                                    value={edu.field}
-                                    onChange={(e) => handleChange(edu.id, 'field', e.target.value)}
-                                    className="w-full"
-                                    placeholder="e.g. Computer Science"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label htmlFor={`location-${edu.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Location</label>
-                                <input
-                                    id={`location-${edu.id}`}
-                                    type="text"
-                                    value={edu.location}
-                                    onChange={(e) => handleChange(edu.id, 'location', e.target.value)}
-                                    className="w-full"
-                                    placeholder="e.g. Palo Alto, CA"
-                                />
-                            </div>
-                            <div className="space-y-4">
-                                <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <select
-                                        value={parseDateValue(edu.startDate).month}
-                                        onChange={(e) => handleDateChange(edu.id, 'startDate', e.target.value, parseDateValue(edu.startDate).year)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
-                                    >
-                                        <option value="" disabled>Month</option>
-                                        {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-                                    </select>
-                                    <select
-                                        value={parseDateValue(edu.startDate).year}
-                                        onChange={(e) => handleDateChange(edu.id, 'startDate', parseDateValue(edu.startDate).month, e.target.value)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
-                                    >
-                                        <option value="" disabled>Year</option>
-                                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                                    </select>
+                            {/* Form Content - only visible when expanded */}
+                            {isExpanded && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-8 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <div className="space-y-2">
+                                        <label htmlFor={`school-${edu.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">School / University</label>
+                                        <input
+                                            id={`school-${edu.id}`}
+                                            type="text"
+                                            value={edu.school}
+                                            onChange={(e) => handleChange(edu.id, 'school', e.target.value)}
+                                            className="w-full text-base"
+                                            placeholder="e.g. Stanford University"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor={`degree-${edu.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Degree / Certification</label>
+                                        <input
+                                            id={`degree-${edu.id}`}
+                                            type="text"
+                                            value={edu.degree}
+                                            onChange={(e) => handleChange(edu.id, 'degree', e.target.value)}
+                                            className="w-full text-base"
+                                            placeholder="e.g. Master of Science"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor={`field-${edu.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Field of Study</label>
+                                        <input
+                                            id={`field-${edu.id}`}
+                                            type="text"
+                                            value={edu.field}
+                                            onChange={(e) => handleChange(edu.id, 'field', e.target.value)}
+                                            className="w-full text-base"
+                                            placeholder="e.g. Computer Science"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor={`location-${edu.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Location</label>
+                                        <input
+                                            id={`location-${edu.id}`}
+                                            type="text"
+                                            value={edu.location}
+                                            onChange={(e) => handleChange(edu.id, 'location', e.target.value)}
+                                            className="w-full text-base"
+                                            placeholder="e.g. Palo Alto, CA"
+                                        />
+                                    </div>
+                                    <div className="space-y-4">
+                                        <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <select
+                                                value={parseDateValue(edu.startDate).month}
+                                                onChange={(e) => handleDateChange(edu.id, 'startDate', e.target.value, parseDateValue(edu.startDate).year)}
+                                                className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                            >
+                                                <option value="" disabled>Month</option>
+                                                {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                            </select>
+                                            <select
+                                                value={parseDateValue(edu.startDate).year}
+                                                onChange={(e) => handleDateChange(edu.id, 'startDate', parseDateValue(edu.startDate).month, e.target.value)}
+                                                className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                            >
+                                                <option value="" disabled>Year</option>
+                                                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">End Date</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <select
+                                                disabled={edu.current}
+                                                value={edu.current ? '' : parseDateValue(edu.endDate).month}
+                                                onChange={(e) => handleDateChange(edu.id, 'endDate', e.target.value, parseDateValue(edu.endDate).year)}
+                                                className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
+                                            >
+                                                <option value="" disabled>{edu.current ? 'Present' : 'Month'}</option>
+                                                {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                            </select>
+                                            <select
+                                                disabled={edu.current}
+                                                value={edu.current ? '' : parseDateValue(edu.endDate).year}
+                                                onChange={(e) => handleDateChange(edu.id, 'endDate', parseDateValue(edu.endDate).month, e.target.value)}
+                                                className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
+                                            >
+                                                <option value="" disabled>{edu.current ? 'Present' : 'Year'}</option>
+                                                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="space-y-4">
-                                <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">End Date</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <select
-                                        disabled={edu.current}
-                                        value={edu.current ? '' : parseDateValue(edu.endDate).month}
-                                        onChange={(e) => handleDateChange(edu.id, 'endDate', e.target.value, parseDateValue(edu.endDate).year)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
-                                    >
-                                        <option value="" disabled>{edu.current ? 'Present' : 'Month'}</option>
-                                        {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-                                    </select>
-                                    <select
-                                        disabled={edu.current}
-                                        value={edu.current ? '' : parseDateValue(edu.endDate).year}
-                                        onChange={(e) => handleDateChange(edu.id, 'endDate', parseDateValue(edu.endDate).month, e.target.value)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
-                                    >
-                                        <option value="" disabled>{edu.current ? 'Present' : 'Year'}</option>
-                                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-                                    </select>
-                                </div>
-                            </div>
+                            )}
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             <button
@@ -203,3 +240,4 @@ export default function EducationForm() {
         </div>
     );
 }
+

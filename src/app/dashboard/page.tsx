@@ -228,28 +228,28 @@ export default function DashboardPage() {
                     </div>
                 )}
                 {/* Dashboard Title & Search */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-8">
-                    <div>
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">My Documents</h1>
-                        <p className="text-lg text-gray-500 font-medium">Manage and optimize your professional career documents.</p>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-16 gap-6 md:gap-10">
+                    <div className="max-w-2xl">
+                        <h1 className="text-3xl md:text-5xl font-black text-surface-900 tracking-tight mb-2 md:mb-4">My Documents</h1>
+                        <p className="text-sm md:text-xl text-surface-500 font-medium leading-relaxed max-w-lg">Manage and optimize your professional career documents with AI-powered precision.</p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                        <div className="relative group flex-1 sm:w-64">
-                            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-600 transition-colors" />
+                    <div className="flex flex-col sm:flex-row gap-5 w-full md:w-auto">
+                        <div className="group flex-1 sm:w-80 flex items-center bg-white border border-surface-100 rounded-2xl px-6 focus-within:ring-4 focus-within:ring-primary-500/10 focus-within:border-primary-500 transition-all shadow-sm hover:border-surface-200">
+                            <FaSearch className="text-surface-400 group-focus-within:text-primary-600 transition-colors flex-shrink-0" />
                             <input
                                 type="text"
                                 placeholder="Search documents..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-600 focus:border-transparent outline-none transition-all shadow-sm"
+                                className="flex-1 bg-transparent border-none outline-none pl-4 py-4 uppercase text-[11px] font-black tracking-[0.1em] placeholder:text-surface-300"
                             />
                         </div>
                         <button
                             onClick={activeTab === 'resumes' ? createNewResume : createNewCoverLetter}
-                            className="inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-bold rounded-xl shadow-lg shadow-primary-600/20 hover:bg-primary-700 transition-all transform hover:scale-105 whitespace-nowrap"
+                            className="btn-primary !py-4 !px-8 shadow-2xl !text-[11px] !font-black uppercase tracking-[0.2em]"
                         >
-                            <FaPlus className="mr-2" /> New {activeTab === 'resumes' ? 'Resume' : 'Letter'}
+                            <FaPlus className="mr-3" /> New {activeTab === 'resumes' ? 'Resume' : 'Letter'}
                         </button>
                     </div>
                 </div>

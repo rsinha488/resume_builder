@@ -64,15 +64,15 @@ export default function ThemeSelector({ userPlan, onUpgrade }: ThemeSelectorProp
                                 title={palette.name}
                             >
                                 <div
-                                    className={`w-12 h-12 rounded-2xl border-4 transition-all duration-300 flex items-center justify-center shadow-sm ${
+                                    className={`w-14 h-14 rounded-2xl border-4 transition-all duration-300 flex items-center justify-center shadow-sm ${
                                         isSelected 
                                         ? 'border-white ring-4 ring-primary-500/20 scale-110' 
                                         : 'border-transparent group-hover:border-white group-hover:shadow-lg'
                                     }`}
                                     style={{ backgroundColor: palette.primary }}
                                 >
-                                    {isSelected && <FaCheckCircle className="text-white drop-shadow-lg" size={16} />}
-                                    {isLocked && <FaLock className="text-white/40 backdrop-blur-sm" size={12} />}
+                                    {isSelected && <FaCheckCircle className="text-white drop-shadow-lg" size={18} />}
+                                    {isLocked && <FaLock className="text-white/40 backdrop-blur-sm" size={14} />}
                                 </div>
                                 {isLocked && (
                                     <div className="absolute -top-2 -right-2 bg-amber-500 text-[8px] font-black text-white px-1.5 py-0.5 rounded-full uppercase tracking-tighter shadow-lg border border-white">
@@ -87,7 +87,7 @@ export default function ThemeSelector({ userPlan, onUpgrade }: ThemeSelectorProp
                     <div className="relative group flex flex-col items-center gap-2">
                         <button
                             onClick={handleCustomColorClick}
-                            className={`w-12 h-12 rounded-2xl border-2 border-dashed transition-all duration-300 flex items-center justify-center ${
+                            className={`w-14 h-14 rounded-2xl border-2 border-dashed transition-all duration-300 flex items-center justify-center ${
                                 isCustomColor 
                                 ? 'border-white ring-4 ring-primary-500/20 scale-110' 
                                 : 'border-surface-200 hover:border-primary-400 hover:bg-surface-50'
@@ -96,9 +96,9 @@ export default function ThemeSelector({ userPlan, onUpgrade }: ThemeSelectorProp
                             title="Custom Color"
                         >
                             {isCustomColor ? (
-                                <FaCheckCircle className="text-white drop-shadow-lg" size={16} />
+                                <FaCheckCircle className="text-white drop-shadow-lg" size={18} />
                             ) : (
-                                <FaPlus className="text-surface-400 group-hover:text-primary-600" size={16} />
+                                <FaPlus className="text-surface-400 group-hover:text-primary-600" size={18} />
                             )}
                         </button>
                         <input
