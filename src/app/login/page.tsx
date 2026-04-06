@@ -6,6 +6,7 @@ import * as z from 'zod';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const schema = z.object({
     email: z.string().email('Invalid email address'),
@@ -17,6 +18,7 @@ type FormData = z.infer<typeof schema>;
 export default function LoginPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
@@ -79,12 +81,21 @@ export default function LoginPage() {
                                     Forgot password?
                                 </Link>
                             </div>
-                            <input
-                                {...register('password')}
-                                type="password"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                placeholder="••••••••"
-                            />
+                            <div className="relative">
+                                <input
+                                    {...register('password')}
+                                    type={showPassword ? 'text' : 'password'}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                                >
+                                    {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                                </button>
+                            </div>
                             {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
                         </div>
                     </div>

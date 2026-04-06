@@ -7,6 +7,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const schema = z.object({
     password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -24,6 +25,8 @@ function ResetPasswordForm() {
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(schema),
@@ -92,22 +95,40 @@ function ResetPasswordForm() {
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">New password</label>
-                        <input
-                            {...register('password')}
-                            type="password"
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                            placeholder="At least 8 characters"
-                        />
+                        <div className="relative">
+                            <input
+                                {...register('password')}
+                                type={showPassword ? 'text' : 'password'}
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                placeholder="At least 8 characters"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                            >
+                                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                            </button>
+                        </div>
                         {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Confirm new password</label>
-                        <input
-                            {...register('confirmPassword')}
-                            type="password"
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                            placeholder="••••••••"
-                        />
+                        <div className="relative">
+                            <input
+                                {...register('confirmPassword')}
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                placeholder="••••••••"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                            >
+                                {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                            </button>
+                        </div>
                         {errors.confirmPassword && <p className="mt-1 text-xs text-red-600">{errors.confirmPassword.message}</p>}
                     </div>
                 </div>

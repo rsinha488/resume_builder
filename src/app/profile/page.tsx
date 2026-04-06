@@ -5,7 +5,8 @@ import Image from 'next/image';
 import axios from 'axios';
 import { toast } from 'sonner';
 import DashboardHeader from '@/components/Dashboard/DashboardHeader';
-import { FaUser, FaEnvelope, FaLock, FaCrown, FaCalendar, FaCamera, FaCheck } from 'react-icons/fa';
+import UpgradeModal from '@/components/UpgradeModal';
+import { FaUser, FaEnvelope, FaLock, FaCrown, FaCalendar, FaCamera, FaCheck, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 interface Profile {
     email: string;
@@ -35,10 +36,14 @@ export default function ProfilePage() {
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
     const [savingName, setSavingName] = useState(false);
     const [savingPassword, setSavingPassword] = useState(false);
+    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
     const [name, setName] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -264,7 +269,7 @@ export default function ProfilePage() {
                         </div>
                         {profile?.plan === 'FREE' && (
                             <button
-                                onClick={() => router.push('/dashboard')}
+                                onClick={() => setIsUpgradeModalOpen(true)}
                                 className="px-4 py-2 bg-primary-600 text-white text-sm font-bold rounded-xl hover:bg-primary-700 transition-colors"
                             >
                                 Upgrade
@@ -284,18 +289,45 @@ export default function ProfilePage() {
                     </h2>
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">Current Password</label>
-                        <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="••••••••"
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-600 focus:border-transparent outline-none" />
+                        <div className="relative">
+                            <input type={showCurrentPassword ? 'text' : 'password'} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="••••••••"
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-600 focus:border-transparent outline-none" />
+                            <button
+                                type="button"
+                                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                            >
+                                {showCurrentPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                            </button>
+                        </div>
                     </div>
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">New Password</label>
-                        <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Min. 8 characters"
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-600 focus:border-transparent outline-none" />
+                        <div className="relative">
+                            <input type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Min. 8 characters"
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-600 focus:border-transparent outline-none" />
+                            <button
+                                type="button"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                            >
+                                {showNewPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                            </button>
+                        </div>
                     </div>
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">Confirm New Password</label>
-                        <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••"
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-600 focus:border-transparent outline-none" />
+                        <div className="relative">
+                            <input type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••"
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-600 focus:border-transparent outline-none" />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                            >
+                                {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                            </button>
+                        </div>
                     </div>
                     <button
                         onClick={handleChangePassword}
@@ -306,6 +338,16 @@ export default function ProfilePage() {
                     </button>
                 </div>
             </main>
+
+            <UpgradeModal
+                isOpen={isUpgradeModalOpen}
+                onClose={() => setIsUpgradeModalOpen(false)}
+                onUpgradeSuccess={() => {
+                    setIsUpgradeModalOpen(false);
+                    // Optionally refresh profile here
+                    window.location.reload();
+                }}
+            />
         </div>
     );
 }
