@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { FaTimes, FaCheck, FaLock, FaMagic } from 'react-icons/fa';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { TEMPLATES } from '@/lib/templates';
@@ -27,6 +28,12 @@ export default function TemplateSelectionModal({
 }: TemplateSelectionModalProps) {
     const dispatch = useAppDispatch();
 
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     // Get current state based on mode
     const resumeState = useAppSelector((state) => state.resume);
     const coverLetterState = useAppSelector((state) => state.coverLetter);
@@ -34,7 +41,7 @@ export default function TemplateSelectionModal({
     const currentTemplateId = mode === 'resume' ? resumeState.templateId : coverLetterState.templateId;
     const currentThemeColor = mode === 'resume' ? resumeState.themeColor : coverLetterState.themeColor;
 
-    if (!isOpen) return null;
+    if (!isOpen || !mounted) return null;
 
     const handleTemplateSelect = (templateId: string, isPremium: boolean) => {
         if (isPremium && userPlan === 'FREE') {
@@ -62,7 +69,7 @@ export default function TemplateSelectionModal({
         }
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 md:p-8">
             <div className="bg-white w-full max-w-7xl h-full max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
@@ -181,6 +188,7 @@ export default function TemplateSelectionModal({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
