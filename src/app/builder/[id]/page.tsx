@@ -233,6 +233,24 @@ export default function BuilderPage() {
     };
 
     const handleSectionClick = (sectionId: string) => {
+        // Zety-like auto-fill: if user clicks an empty section in the preview, instantiate the form with that sample data!
+        if (sectionId === 'experience' && (!resume.experiences || resume.experiences.length === 0)) {
+            dispatch(setResume({ ...resume, experiences: SAMPLE_DATA.experiences } as any));
+            toast.success('Sample experiences loaded for editing!');
+        } else if (sectionId === 'education' && (!resume.education || resume.education.length === 0)) {
+            dispatch(setResume({ ...resume, education: SAMPLE_DATA.education } as any));
+            toast.success('Sample education loaded for editing!');
+        } else if (sectionId === 'skills' && (!resume.skills || resume.skills.length === 0)) {
+            dispatch(setResume({ ...resume, skills: SAMPLE_DATA.skills } as any));
+            toast.success('Sample skills loaded for editing!');
+        } else if (sectionId === 'summary' && !resume.personalInfo?.summary) {
+            dispatch(updatePersonalInfo({ summary: SAMPLE_DATA.personalInfo?.summary }));
+            toast.success('Sample summary loaded for editing!');
+        } else if (sectionId === 'personal' && !resume.personalInfo?.fullName) {
+            dispatch(updatePersonalInfo({ ...SAMPLE_DATA.personalInfo } as any));
+            toast.success('Sample details loaded for editing!');
+        }
+
         setCurrentMode('content');
         const stepIndex = contentSteps.findIndex(s => s.id === sectionId);
         if (stepIndex !== -1) setCurrentContentStep(stepIndex);

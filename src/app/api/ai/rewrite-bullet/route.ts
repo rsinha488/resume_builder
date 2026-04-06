@@ -27,18 +27,55 @@ export async function POST(req: Request) {
             model: 'llama-3.3-70b-versatile',
             messages: [{
                 role: 'user',
-                content: `Rewrite this resume experience description for a ${jobTitle || 'professional'} role. 
-Use strong action verbs, add quantifiable metrics where reasonable, and make it ATS-friendly.
-Return ONLY the rewritten text, no explanation, no bullet points prefix.
+                content: `
+            You are a professional resume EXPERIENCE rewriting agent.
 
-Original: ${description}`
+            Rewrite this resume experience for a ${jobTitle || 'professional'} role.
+
+            Ensure the output:
+            - uses strong action verbs
+            - highlights measurable impact where possible
+            - is ATS-friendly with relevant keywords
+            - is concise and professional
+            - is formatted as 4–5 bullet points only (no paragraphs)
+
+            Each bullet point should:
+            - start with an action verb
+            - focus on achievements and outcomes
+
+            DO NOT:
+            - add information not provided
+            - include explanations or extra text
+            - include bullet symbols (•, -, etc.)
+
+            Return ONLY valid JSON in this format:
+
+            {
+            "experience": ["bullet point 1", "bullet point 2", "bullet point 3", "bullet point 4"]
+            }
+
+            Experience input:
+            ${description}`
             }],
             max_tokens: 500,
             temperature: 0.7,
         });
 
-        const rewritten = chatCompletion.choices[0]?.message?.content?.trim() || '';
-        
+        const rawContent = chatCompletion.choices[0]?.message?.content?.trim() || '';
+
+        let finalRewritten = '';
+        try {
+            const jsonMatch = rawContent.match(/{[\s\S]*}/);
+            const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : rawContent);
+            if (parsed.experience && Array.isArray(parsed.experience)) {
+                finalRewritten = parsed.experience.map((point: string) => `• ${point}`).join('\n');
+            } else {
+                finalRewritten = rawContent;
+            }
+        } catch (e) {
+            finalRewritten = rawContent;
+        }
+
         let newUsageCount = aiUsageCount;
         if (!isPro) {
             const updatedUser = await prisma.user.update({
@@ -49,7 +86,7 @@ Original: ${description}`
             newUsageCount = updatedUser.aiUsageCount;
         }
 
-        return NextResponse.json({ rewritten, newUsageCount });
+        return NextResponse.json({ rewritten: finalRewritten, newUsageCount });
     } catch (error) {
         console.error('AI rewrite-bullet error:', error);
         return NextResponse.json({ error: 'Failed to rewrite description' }, { status: 500 });

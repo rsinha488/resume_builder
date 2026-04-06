@@ -36,18 +36,47 @@ Experience: ${safeExperiences.slice(0, 3).map((e: any) =>
             model: 'llama-3.3-70b-versatile',
             messages: [{
                 role: 'user',
-                content: `Write a professional resume summary (3 sentences max, 80-120 words) for this person.
-ATS-optimized, no first-person pronouns, highlight their strongest value.
-Return ONLY the summary text.
+                content: `You are a professional resume SUMMARY rewriting agent.
 
-${context}`
+            Rewrite this into a strong PROFESSIONAL SUMMARY section for a ${safePersonalInfo.jobTitle || 'professional'} role.
+
+            Ensure the summary:
+            - is concise, confident, and impactful
+            - highlights the candidate’s strongest value proposition
+            - is achievement-focused with measurable impact where possible
+            - uses strong, professional language
+            - is ATS-optimized with relevant keywords
+            - is written in third person (no first-person pronouns)
+            - is limited to 3 sentences (80–120 words total)
+
+            DO NOT:
+            - add skills or experience not provided
+            - include placeholder content
+            - include explanations or formatting outside the response
+
+            Return ONLY valid JSON in this format:
+
+            {
+            "summary": "string"
+            }
+
+            User Summary: ${context}`
             }],
             max_tokens: 300,
             temperature: 0.7,
         });
 
-        const summary = chatCompletion.choices[0]?.message?.content?.trim() || '';
+        const rawContent = chatCompletion.choices[0]?.message?.content?.trim() || '';
         
+        let finalSummary = '';
+        try {
+            const jsonMatch = rawContent.match(/{[\s\S]*}/);
+            const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : rawContent);
+            finalSummary = parsed.summary || rawContent;
+        } catch (e) {
+            finalSummary = rawContent;
+        }
+
         let newUsageCount = aiUsageCount;
         if (!isPro) {
             const updatedUser = await prisma.user.update({
@@ -58,7 +87,7 @@ ${context}`
             newUsageCount = updatedUser.aiUsageCount;
         }
 
-        return NextResponse.json({ summary, newUsageCount });
+        return NextResponse.json({ summary: finalSummary, newUsageCount });
     } catch (error) {
         console.error('AI generate-summary error:', error);
         return NextResponse.json({ error: 'Failed to generate summary' }, { status: 500 });
