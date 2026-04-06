@@ -7,7 +7,14 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import axios from 'axios';
 
-export default function ExperienceForm() {
+interface ExperienceFormProps {
+    readonly userPlan: 'FREE' | 'PRO';
+    readonly aiUsageCount?: number;
+    readonly onUsageUpdate?: (count: number) => void;
+    readonly onUpgrade: () => void;
+}
+
+export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, onUpgrade }: ExperienceFormProps) {
     const dispatch = useAppDispatch();
     const experiences = useAppSelector((state) => state.resume.experiences);
     const personalInfo = useAppSelector((state) => state.resume.personalInfo);
@@ -37,6 +44,11 @@ export default function ExperienceForm() {
     };
 
     const handleRewriteBullet = async (expId: string, description: string, jobTitle: string) => {
+        if (userPlan === 'FREE' && (aiUsageCount || 0) >= 50) {
+            onUpgrade();
+            return;
+        }
+
         setRewriting(expId);
         const token = localStorage.getItem('token');
         try {

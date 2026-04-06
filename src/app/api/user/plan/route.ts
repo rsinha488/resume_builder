@@ -58,7 +58,7 @@ export async function GET(request: Request) {
 
         const userData = await prisma.user.findUnique({
             where: { id: user.userId },
-            select: { plan: true, subscriptionType: true, planExpiry: true },
+            select: { plan: true, subscriptionType: true, planExpiry: true, aiUsageCount: true },
         });
 
         if (!userData) {
@@ -76,7 +76,7 @@ export async function GET(request: Request) {
                 where: { id: user.userId },
                 data: { plan: 'FREE', subscriptionType: 'NONE', planExpiry: null },
             });
-            return NextResponse.json({ plan: 'FREE', subscriptionType: 'NONE', planExpiry: null });
+            return NextResponse.json({ plan: 'FREE', subscriptionType: 'NONE', planExpiry: null, aiUsageCount: userData.aiUsageCount || 0 });
         }
 
         return NextResponse.json(userData);

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
 import { getUserFromRequest } from '@/lib/auth';
 import { checkProAccess } from '@/lib/planGuard';
+import { prisma } from '@/lib/prisma';
 
 const client = new Groq({
     apiKey: process.env.GROQ_API_KEY
@@ -12,9 +13,9 @@ export async function POST(req: Request) {
         const user = getUserFromRequest(req);
         if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const { isPro, reason } = await checkProAccess(user.userId);
-        if (!isPro) {
-            return NextResponse.json({ error: reason || 'PRO plan required' }, { status: 403 });
+        const { isPro, reason, aiUsageCount } = await checkProAccess(user.userId);
+        if (!isPro && aiUsageCount >= 50) {
+            return NextResponse.json({ error: reason || 'AI limit reached. Please upgrade to Pro.' }, { status: 403 });
         }
 
         const { description, jobTitle } = await req.json();
@@ -37,7 +38,18 @@ Original: ${description}`
         });
 
         const rewritten = chatCompletion.choices[0]?.message?.content?.trim() || '';
-        return NextResponse.json({ rewritten });
+        
+        let newUsageCount = aiUsageCount;
+        if (!isPro) {
+            const updatedUser = await prisma.user.update({
+                where: { id: user.userId },
+                data: { aiUsageCount: { increment: 1 } },
+                select: { aiUsageCount: true }
+            });
+            newUsageCount = updatedUser.aiUsageCount;
+        }
+
+        return NextResponse.json({ rewritten, newUsageCount });
     } catch (error) {
         console.error('AI rewrite-bullet error:', error);
         return NextResponse.json({ error: 'Failed to rewrite description' }, { status: 500 });

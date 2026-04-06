@@ -25,6 +25,7 @@ model User {
   avatarUrl            String?
   password             String
   plan                 Plan             @default(FREE)
+  aiUsageCount         Int?             @default(0)
   subscriptionType     SubscriptionType @default(NONE)
   planExpiry           DateTime?
   stripeCustomerId     String?
