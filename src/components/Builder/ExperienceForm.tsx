@@ -60,6 +60,9 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
             if (exp) {
                 dispatch(updateExperience({ ...exp, description: res.data.rewritten }));
             }
+            if (onUsageUpdate && res.data.newUsageCount !== undefined) {
+                onUsageUpdate(res.data.newUsageCount);
+            }
             toast.success('Description rewritten!');
         } catch (error: any) {
             console.error('Rewrite bullet error:', error);
@@ -78,8 +81,15 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                     <h2 className="text-2xl font-black text-surface-900 mb-2">Work Experience</h2>
                     <p className="text-sm text-surface-500 font-medium">Highlight your career achievements.</p>
                 </div>
-                <div className="px-4 py-2 bg-primary-50 rounded-2xl border border-primary-100 text-primary-700 text-xs font-black uppercase tracking-widest animate-pulse">
-                    Step 2 of 5
+                <div className="flex items-center gap-3">
+                    {userPlan === 'FREE' && (
+                        <span className="text-[10px] font-bold text-surface-500 bg-surface-50 border border-surface-200 px-3 py-1.5 rounded-xl shadow-sm">
+                            Free AI Uses: {aiUsageCount || 0}/50
+                        </span>
+                    )}
+                    <div className="px-4 py-2 bg-primary-50 rounded-2xl border border-primary-100 text-primary-700 text-xs font-black uppercase tracking-widest animate-pulse">
+                        Step 2 of 5
+                    </div>
                 </div>
             </div>
 

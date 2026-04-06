@@ -97,7 +97,13 @@ export default function BuilderPage() {
                     axios.get(`/api/resumes/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
                     axios.get('/api/user/plan', { headers: { Authorization: `Bearer ${token}` } })
                 ]);
-                dispatch(setResume(resumeRes.data.data));
+                const resumeData = {
+                    ...resumeRes.data.data,
+                    id: resumeRes.data.id,
+                    title: resumeRes.data.title,
+                    templateId: resumeRes.data.templateId || resumeRes.data.data.templateId || 'modern',
+                };
+                dispatch(setResume(resumeData));
                 setUserPlan(planRes.data.plan);
                 setAiUsageCount(planRes.data.aiUsageCount || 0);
             } catch (error) {
