@@ -40,11 +40,9 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
         formData.append('file', file);
 
         try {
-            const token = localStorage.getItem('token');
             const response = await axios.post('/api/resumes/import', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`
+                    'Content-Type': 'multipart/form-data'
                 }
             });
 

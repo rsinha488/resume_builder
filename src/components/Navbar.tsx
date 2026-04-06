@@ -9,14 +9,18 @@ export default function Navbar() {
     const pathname = usePathname();
 
     useEffect(() => {
-        const check = () => setIsLoggedIn(!!localStorage.getItem('token'));
-        check();
-        window.addEventListener('storage', check);
-        return () => window.removeEventListener('storage', check);
+        const checkAuth = async () => {
+            try {
+                const res = await fetch('/api/user/profile');
+                setIsLoggedIn(res.ok);
+            } catch {
+                setIsLoggedIn(false);
+            }
+        };
+        checkAuth();
     }, [pathname]);
 
     const handleLogout = async () => {
-        localStorage.removeItem('token');
         await fetch('/api/auth/logout', { method: 'POST' });
         setIsLoggedIn(false);
         router.push('/login');

@@ -46,14 +46,16 @@ export default function ProfilePage() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) { router.push('/login'); return; }
-        axios.get('/api/user/profile', { headers: { Authorization: `Bearer ${token}` } })
+        setLoading(true);
+        axios.get('/api/user/profile')
             .then(res => {
                 setProfile(res.data);
                 setName(res.data.name || '');
             })
-            .catch(() => { toast.error('Failed to load profile.'); router.push('/dashboard'); })
+            .catch(() => { 
+                toast.error('Failed to load profile.'); 
+                router.push('/dashboard'); 
+            })
             .finally(() => setLoading(false));
     }, [router]);
 
@@ -63,14 +65,13 @@ export default function ProfilePage() {
         if (file.size > 2 * 1024 * 1024) { toast.error('Image must be under 2MB.'); return; }
 
         setUploadingAvatar(true);
-        const token = localStorage.getItem('token');
         try {
             const formData = new FormData();
             formData.append('file', file);
             const uploadRes = await axios.post('/api/upload', formData);
             const avatarUrl = uploadRes.data.secure_url;
 
-            const res = await axios.patch('/api/user/profile', { avatarUrl }, { headers: { Authorization: `Bearer ${token}` } });
+            const res = await axios.patch('/api/user/profile', { avatarUrl });
             setProfile(prev => prev ? { ...prev, avatarUrl: res.data.avatarUrl } : prev);
             window.dispatchEvent(new Event('profile-updated'));
             toast.success('Profile photo updated.');
@@ -82,10 +83,9 @@ export default function ProfilePage() {
     };
 
     const handleSaveName = async () => {
-        const token = localStorage.getItem('token');
         setSavingName(true);
         try {
-            const res = await axios.patch('/api/user/profile', { name }, { headers: { Authorization: `Bearer ${token}` } });
+            const res = await axios.patch('/api/user/profile', { name });
             setProfile(prev => prev ? { ...prev, name: res.data.name } : prev);
             window.dispatchEvent(new Event('profile-updated'));
             toast.success('Name updated successfully.');
@@ -99,10 +99,9 @@ export default function ProfilePage() {
     const handleChangePassword = async () => {
         if (newPassword !== confirmPassword) { toast.error('New passwords do not match.'); return; }
         if (newPassword.length < 8) { toast.error('Password must be at least 8 characters.'); return; }
-        const token = localStorage.getItem('token');
         setSavingPassword(true);
         try {
-            await axios.patch('/api/user/profile', { currentPassword, newPassword }, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.patch('/api/user/profile', { currentPassword, newPassword });
             toast.success('Password changed successfully.');
             setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
         } catch (err: any) {

@@ -27,9 +27,7 @@ export default function DashboardHeader() {
     }, []);
 
     const fetchProfile = () => {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        fetch('/api/user/profile', { headers: { Authorization: `Bearer ${token}` } })
+        fetch('/api/user/profile')
             .then(r => r.json())
             .then(data => {
                 setUserName(data.name || null);

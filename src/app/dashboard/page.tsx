@@ -34,16 +34,10 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                router.push('/login');
-                return;
-            }
-
             try {
                 const [resumesRes, clRes] = await Promise.all([
-                    axios.get('/api/resumes', { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get('/api/cover-letters', { headers: { Authorization: `Bearer ${token}` } })
+                    axios.get('/api/resumes'),
+                    axios.get('/api/cover-letters')
                 ]);
                 setResumes(resumesRes.data);
                 setCoverLetters(clRes.data);
@@ -60,10 +54,8 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const fetchPlan = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) return;
             try {
-                const res = await axios.get('/api/user/plan', { headers: { Authorization: `Bearer ${token}` } });
+                const res = await axios.get('/api/user/plan');
                 setUserPlan(res.data);
             } catch { /* silent */ }
         };
@@ -71,7 +63,6 @@ export default function DashboardPage() {
     }, []);
 
     const createNewResume = async () => {
-        const token = localStorage.getItem('token');
         try {
             const response = await axios.post('/api/resumes', {
                 title: 'Untitled Resume',
@@ -84,8 +75,6 @@ export default function DashboardPage() {
                     fontFamily: 'Inter, sans-serif',
                     templateId: 'modern'
                 }
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
             router.push(`/builder/${response.data.id}`);
         } catch (error) {
@@ -95,7 +84,6 @@ export default function DashboardPage() {
     };
 
     const createNewCoverLetter = async () => {
-        const token = localStorage.getItem('token');
         try {
             const response = await axios.post('/api/cover-letters', {
                 title: 'Untitled Cover Letter',
@@ -107,8 +95,6 @@ export default function DashboardPage() {
                     fontFamily: 'Inter, sans-serif',
                     templateId: 'modern'
                 }
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
             router.push(`/cover-letter/${response.data.id}`);
         } catch (error) {
@@ -118,11 +104,8 @@ export default function DashboardPage() {
     };
 
     const handleManageBilling = async () => {
-        const token = localStorage.getItem('token');
         try {
-            const res = await axios.post('/api/checkout/portal', {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axios.post('/api/checkout/portal');
             if (res.data.url) window.location.href = res.data.url;
         } catch {
             toast.error('Could not open billing portal. Please try again.');
@@ -130,11 +113,8 @@ export default function DashboardPage() {
     };
 
     const deleteResume = async (id: string) => {
-        const token = localStorage.getItem('token');
         try {
-            await axios.delete(`/api/resumes/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axios.delete(`/api/resumes/${id}`);
             setResumes(resumes.filter(r => r.id !== id));
             toast.success('Resume deleted.');
         } catch (error) {
@@ -144,11 +124,8 @@ export default function DashboardPage() {
     };
 
     const deleteCoverLetter = async (id: string) => {
-        const token = localStorage.getItem('token');
         try {
-            await axios.delete(`/api/cover-letters/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axios.delete(`/api/cover-letters/${id}`);
             setCoverLetters(coverLetters.filter(cl => cl.id !== id));
             toast.success('Cover letter deleted.');
         } catch (error) {
@@ -158,14 +135,13 @@ export default function DashboardPage() {
     };
 
     const duplicateResume = async (id: string) => {
-        const token = localStorage.getItem('token');
         const original = resumes.find(r => r.id === id);
         if (!original) return;
         try {
             const response = await axios.post('/api/resumes', {
                 title: `${original.title} (Copy)`,
                 data: original.data,
-            }, { headers: { Authorization: `Bearer ${token}` } });
+            });
             setResumes([response.data, ...resumes]);
             toast.success('Resume duplicated!');
         } catch (error) {
@@ -175,14 +151,13 @@ export default function DashboardPage() {
     };
 
     const duplicateCoverLetter = async (id: string) => {
-        const token = localStorage.getItem('token');
         const original = coverLetters.find(cl => cl.id === id);
         if (!original) return;
         try {
             const response = await axios.post('/api/cover-letters', {
                 title: `${original.title} (Copy)`,
                 data: original.data,
-            }, { headers: { Authorization: `Bearer ${token}` } });
+            });
             setCoverLetters([response.data, ...coverLetters]);
             toast.success('Cover letter duplicated!');
         } catch (error) {

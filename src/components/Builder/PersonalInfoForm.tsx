@@ -32,13 +32,12 @@ export default function PersonalInfoForm({ userPlan, aiUsageCount, onUsageUpdate
         }
 
         setAiLoading(true);
-        const token = localStorage.getItem('token');
         try {
             const res = await axios.post('/api/ai/generate-summary', {
                 personalInfo: resume.personalInfo,
                 experiences: resume.experiences,
                 skills: resume.skills,
-            }, { headers: { Authorization: `Bearer ${token}` } });
+            });
             dispatch(updatePersonalInfo({ summary: res.data.summary }));
             if (res.data.newUsageCount !== undefined) {
                 onUsageUpdate(res.data.newUsageCount);

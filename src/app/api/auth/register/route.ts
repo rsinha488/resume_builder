@@ -43,10 +43,17 @@ export async function POST(request: Request) {
 
         const token = generateToken(user.id);
 
-        return NextResponse.json({
+        const response = NextResponse.json({
             user: { id: user.id, email: user.email },
-            token,
         });
+        response.cookies.set('token', token, {
+            httpOnly: true,
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60,
+            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production',
+        });
+        return response;
     } catch (error) {
         console.error('Registration error:', error);
         return NextResponse.json(

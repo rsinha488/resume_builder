@@ -57,16 +57,10 @@ export default function BuilderPage() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                router.push('/login');
-                return;
-            }
-
             try {
                 const [resumeRes, planRes] = await Promise.all([
-                    axios.get(`/api/resumes/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get('/api/user/plan', { headers: { Authorization: `Bearer ${token}` } })
+                    axios.get(`/api/resumes/${id}`),
+                    axios.get('/api/user/plan')
                 ]);
                 const resumeData = {
                     ...resumeRes.data.data,
@@ -92,12 +86,11 @@ export default function BuilderPage() {
         if (saving || loading) return;
         
         setSaving(true);
-        const token = localStorage.getItem('token');
         try {
             await axios.put(`/api/resumes/${id}`, {
                 title: resume.personalInfo?.fullName || 'My Resume',
                 data: resume
-            }, { headers: { Authorization: `Bearer ${token}` } });
+            });
             if (!silent) toast.success('Progress saved!');
         } catch (error) {
             console.error('Error saving resume:', error);

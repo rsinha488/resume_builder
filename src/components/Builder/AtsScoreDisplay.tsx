@@ -36,12 +36,11 @@ export default function AtsScoreDisplay({ userPlan, aiUsageCount, onUsageUpdate,
         }
 
         setAnalyzing(true);
-        const token = localStorage.getItem('token');
         try {
             const res = await axios.post('/api/ai/analyze-ats', {
                 resume,
                 jobDescription
-            }, { headers: { Authorization: `Bearer ${token}` } });
+            });
             
             setDeepAnalysis(res.data.analysis);
             if (res.data.newUsageCount !== undefined) {

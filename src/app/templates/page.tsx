@@ -13,12 +13,6 @@ export default function TemplatesPage() {
     const router = useRouter();
 
     const handleUseTemplate = async (templateId: string) => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            router.push('/login');
-            return;
-        }
-
         setLoading(templateId);
         try {
             const response = await axios.post('/api/resumes', {
@@ -36,8 +30,6 @@ export default function TemplatesPage() {
                     sectionSpacing: 24,
                     fontSize: 'medium'
                 }
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
             toast.success('New resume created with selected template!');
             router.push(`/builder/${response.data.id}`);

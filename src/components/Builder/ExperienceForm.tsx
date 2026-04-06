@@ -79,12 +79,11 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
         }
 
         setRewriting(expId);
-        const token = localStorage.getItem('token');
         try {
-            const res = await axios.post('/api/ai/rewrite-bullet',
-                { description, jobTitle },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            const res = await axios.post('/api/ai/rewrite-bullet', {
+                description,
+                jobTitle
+            });
             const exp = experiences?.find(e => e.id === expId);
             if (exp) {
                 dispatch(updateExperience({ ...exp, description: res.data.rewritten }));

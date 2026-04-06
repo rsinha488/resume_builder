@@ -35,23 +35,13 @@ export default function CoverLetterBuilderPage() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                router.push('/login');
-                return;
-            }
-
             try {
                 // Fetch Cover Letter
-                const clRes = await axios.get(`/api/cover-letters/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const clRes = await axios.get(`/api/cover-letters/${id}`);
                 dispatch(setCoverLetter(clRes.data.data));
 
                 // Fetch User Plan
-                const planRes = await axios.get('/api/user/plan', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const planRes = await axios.get('/api/user/plan');
                 setUserPlan(planRes.data.plan);
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -66,13 +56,10 @@ export default function CoverLetterBuilderPage() {
 
     const handleSave = async () => {
         setSaving(true);
-        const token = localStorage.getItem('token');
         try {
             await axios.put(`/api/cover-letters/${id}`, {
                 title: coverLetter.title || 'My Cover Letter',
                 data: coverLetter
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
             alert('Cover letter saved successfully!');
         } catch (error) {

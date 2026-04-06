@@ -19,7 +19,26 @@ export const verifyToken = (token: string) => {
 };
 
 export const getUserFromRequest = (request: Request) => {
-    const token = request.headers.get('authorization')?.split(' ')[1];
+    // 1. Try to get from Authorization header (Legacy support)
+    let token = request.headers.get('authorization')?.split(' ')[1];
+    
+    // 2. Try to get from Next.js NextRequest.cookies (if available)
+    if (!token && 'cookies' in request && typeof (request as any).cookies.get === 'function') {
+        token = (request as any).cookies.get('token')?.value;
+    }
+
+    // 3. Fallback: Parse 'cookie' header manually for standard Request objects
+    if (!token) {
+        const cookieHeader = request.headers.get('cookie');
+        if (cookieHeader) {
+            // Robust regex to find the 'token' cookie value
+            const match = cookieHeader.match(/(^|;\s*)token\s*=\s*([^;]+)/);
+            if (match) {
+                token = match[2];
+            }
+        }
+    }
+
     if (!token) return null;
     return verifyToken(token);
 };

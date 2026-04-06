@@ -17,12 +17,9 @@ export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: Upgr
 
     const handleUpgrade = async (type: 'TRIAL' | 'ANNUAL') => {
         setLoading(type);
-        const token = localStorage.getItem('token');
         try {
             const response = await axios.post('/api/checkout', {
                 subscriptionType: type
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
 
             if (response.data.url) {
