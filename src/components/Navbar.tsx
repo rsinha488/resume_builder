@@ -41,11 +41,11 @@ export default function Navbar() {
 
     return (
         <nav className="flex justify-between items-center px-8 py-4 bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
-            <Link href="/" className="flex items-center gap-2 group">
+            <Link href="/" className="flex items-center gap-2 group shrink-0">
                 <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-primary-600/20 group-hover:scale-110 transition-transform">
                     R
                 </div>
-                <span className="text-xl font-black tracking-tight text-gray-900">RESUME<span className="text-primary-600">BUILDER</span></span>
+                <span className="text-xl font-black tracking-tight text-gray-900 hidden sm:block">RESUME<span className="text-primary-600">BUILDER</span></span>
             </Link>
             {!isAuthPage && isLoggedIn !== null && (
                 <div className="flex items-center gap-6">

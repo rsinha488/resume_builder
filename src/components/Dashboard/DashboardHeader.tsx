@@ -59,7 +59,7 @@ export default function DashboardHeader() {
                             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-xl shadow-primary-600/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                                 R
                             </div>
-                            <span className="text-xl font-black tracking-tight text-surface-900 group-hover:text-primary-600 transition-colors">RESUME<span className="text-primary-600">BUILDER</span></span>
+                            <span className="text-xl font-black tracking-tight text-surface-900 group-hover:text-primary-600 transition-colors hidden sm:block">RESUME<span className="text-primary-600">BUILDER</span></span>
                         </Link>
     
                         <nav className="hidden lg:flex items-center gap-10 h-20">
@@ -96,11 +96,11 @@ export default function DashboardHeader() {
     
                         <button
                             type="button"
-                            className="relative w-10 h-10 flex items-center justify-center text-surface-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all group"
+                            className="relative w-12 h-12 flex items-center justify-center text-surface-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all group"
                             aria-label="View notifications"
                         >
                             <FaBell size={20} className="group-hover:rotate-12 transition-transform" aria-hidden="true" />
-                            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" aria-hidden="true"></span>
+                            <span className="absolute top-3.5 right-3.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white" aria-hidden="true"></span>
                         </button>
     
                         <div className="relative" ref={menuRef}>
@@ -110,7 +110,7 @@ export default function DashboardHeader() {
                                 aria-label="Open user profile menu"
                                 aria-haspopup="true"
                                 aria-expanded={isUserMenuOpen}
-                                className={`flex items-center gap-4 p-1 rounded-2xl border transition-all duration-300 ${
+                                className={`flex items-center gap-4 p-1 h-12 rounded-2xl border transition-all duration-300 ${
                                     isUserMenuOpen 
                                     ? 'bg-surface-50 border-primary-200 ring-4 ring-primary-500/10' 
                                     : 'border-surface-100 hover:border-surface-200 hover:bg-surface-50'

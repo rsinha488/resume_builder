@@ -123,7 +123,7 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
 
             <div className="space-y-8">
                 {experiences?.map((exp, index) => (
-                    <div key={exp.id} className="premium-card p-8 relative group animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                    <div key={exp.id} className="premium-card p-4 sm:p-8 relative group animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
                         <button
                             type="button"
                             aria-label="Remove experience"
@@ -131,19 +131,19 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                 dispatch(removeExperience(exp.id));
                                 toast.success('Experience removed');
                             }}
-                            className="absolute top-6 right-6 w-10 h-10 rounded-xl flex items-center justify-center text-surface-300 hover:text-red-500 hover:bg-red-50 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                            className="absolute top-4 right-4 sm:top-6 sm:right-6 w-12 h-12 rounded-xl flex items-center justify-center text-surface-300 hover:text-red-500 hover:bg-red-50 transition-all duration-300 xl:opacity-0 xl:group-hover:opacity-100"
                         >
                             <FaTrash size={16} />
                         </button>
                         
-                        <div className="flex items-center gap-4 mb-8">
+                        <div className="flex items-center gap-4 mb-6 sm:mb-8">
                             <div className="w-10 h-10 rounded-xl bg-surface-900 text-white flex items-center justify-center font-black text-lg shadow-lg">
                                 {index + 1}
                             </div>
-                            <h3 className="text-xl font-black text-surface-900">Experience</h3>
+                            <h3 className="text-lg sm:text-xl font-black text-surface-900">Experience</h3>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
                             <div className="space-y-2">
                                 <label htmlFor={`company-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Company / Organization</label>
                                 <input
@@ -151,7 +151,7 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                     type="text"
                                     value={exp.company}
                                     onChange={(e) => handleChange(exp.id, 'company', e.target.value)}
-                                    className="w-full"
+                                    className="w-full text-base"
                                     placeholder="e.g. Google"
                                 />
                             </div>
@@ -162,7 +162,7 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                     type="text"
                                     value={exp.position}
                                     onChange={(e) => handleChange(exp.id, 'position', e.target.value)}
-                                    className="w-full"
+                                    className="w-full text-base"
                                     placeholder="e.g. Senior Product Designer"
                                 />
                             </div>
@@ -172,7 +172,7 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                     <select
                                         value={parseDateValue(exp.startDate).month}
                                         onChange={(e) => handleDateChange(exp.id, 'startDate', e.target.value, parseDateValue(exp.startDate).year)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
                                     >
                                         <option value="" disabled>Month</option>
                                         {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
@@ -180,7 +180,7 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                     <select
                                         value={parseDateValue(exp.startDate).year}
                                         onChange={(e) => handleDateChange(exp.id, 'startDate', parseDateValue(exp.startDate).month, e.target.value)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
                                     >
                                         <option value="" disabled>Year</option>
                                         {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
@@ -194,7 +194,7 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                         disabled={exp.current}
                                         value={exp.current ? '' : parseDateValue(exp.endDate).month}
                                         onChange={(e) => handleDateChange(exp.id, 'endDate', e.target.value, parseDateValue(exp.endDate).year)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
                                     >
                                         <option value="" disabled>{exp.current ? 'Present' : 'Month'}</option>
                                         {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
@@ -203,36 +203,36 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                         disabled={exp.current}
                                         value={exp.current ? '' : parseDateValue(exp.endDate).year}
                                         onChange={(e) => handleDateChange(exp.id, 'endDate', parseDateValue(exp.endDate).month, e.target.value)}
-                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 h-12 text-base font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
                                     >
                                         <option value="" disabled>{exp.current ? 'Present' : 'Year'}</option>
                                         {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
                                     </select>
                                 </div>
                             </div>
-                            <div className="sm:col-span-2 flex items-center gap-3 p-4 bg-surface-50 rounded-2xl border border-surface-100 transition-colors hover:border-primary-200">
+                            <div className="sm:col-span-2 flex items-center gap-3 p-5 sm:p-4 bg-surface-50 rounded-2xl border border-surface-100 transition-colors hover:border-primary-200 min-h-[48px]">
                                 <input
                                     type="checkbox"
                                     id={`current-${exp.id}`}
                                     checked={exp.current}
                                     onChange={(e) => handleChange(exp.id, 'current', e.target.checked)}
-                                    className="h-5 w-5 !rounded-lg text-primary-600 focus:ring-primary-500 border-surface-300"
+                                    className="h-6 w-6 !rounded-lg text-primary-600 focus:ring-primary-500 border-surface-300"
                                 />
-                                <label htmlFor={`current-${exp.id}`} className="text-sm font-bold text-surface-700 select-none cursor-pointer">
+                                <label htmlFor={`current-${exp.id}`} className="text-sm sm:text-base font-bold text-surface-700 select-none cursor-pointer">
                                     I currently work here
                                 </label>
                             </div>
                             <div className="sm:col-span-2 space-y-3">
-                                <div className="flex items-center justify-between ml-1">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 ml-1">
                                     <label htmlFor={`description-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest">Job Description</label>
                                     <button
                                         type="button"
                                         aria-label="Rewrite description with AI"
                                         onClick={() => handleRewriteBullet(exp.id, exp.description, personalInfo?.jobTitle || '')}
                                         disabled={rewriting === exp.id || !exp.description?.trim()}
-                                        className="flex items-center gap-2 group/magic"
+                                        className="flex items-center gap-2 group/magic w-fit"
                                     >
-                                        <div className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                                        <div className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 min-h-[44px] ${
                                             rewriting === exp.id 
                                             ? 'bg-surface-100 text-surface-400' 
                                             : 'bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white hover:shadow-lg hover:shadow-primary-600/20 active:scale-95'
@@ -249,7 +249,7 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                     value={exp.description}
                                     onChange={(e) => handleChange(exp.id, 'description', e.target.value)}
                                     rows={5}
-                                    className="w-full resize-none p-5"
+                                    className="w-full resize-none p-5 text-base leading-relaxed"
                                     placeholder="Focus on achievements and quantifiable results (e.g. Increased sales by 20%...)"
                                 />
                             </div>
@@ -262,12 +262,12 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                 type="button"
                 aria-label="Add work experience"
                 onClick={handleAdd}
-                className="group w-full py-10 border-4 border-dashed border-surface-100 rounded-4xl text-surface-400 hover:border-primary-500/30 hover:bg-primary-50/30 hover:text-primary-600 transition-all duration-300 flex flex-col items-center justify-center gap-3 animate-fade-in"
+                className="group w-full py-12 sm:py-16 border-4 border-dashed border-surface-100 rounded-4xl text-surface-400 hover:border-primary-500/30 hover:bg-primary-50/30 hover:text-primary-600 transition-all duration-300 flex flex-col items-center justify-center gap-3 animate-fade-in"
             >
-                <div className="w-14 h-14 rounded-2xl bg-white shadow-premium flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all">
-                    <FaPlus className="text-surface-300 group-hover:text-primary-600 transition-colors" size={20} />
+                <div className="w-16 h-16 rounded-2xl bg-white shadow-premium flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all">
+                    <FaPlus className="text-surface-300 group-hover:text-primary-600 transition-colors" size={24} />
                 </div>
-                <span className="font-black uppercase tracking-[0.2em] text-[10px]">Add Work Experience</span>
+                <span className="font-black uppercase tracking-[0.2em] text-[11px]">Add Work Experience</span>
             </button>
         </div>
     );

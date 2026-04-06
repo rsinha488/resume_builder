@@ -82,35 +82,35 @@ export default function PersonalInfoForm({ userPlan, aiUsageCount, onUsageUpdate
         <div className="space-y-10 animate-fade-in-up">
             {/* Header */}
             <div>
-                <h2 className="text-2xl font-black text-surface-900 mb-2">Personal Information</h2>
-                <p className="text-sm text-surface-500 font-medium">How should employers contact you?</p>
+                <h2 className="text-2xl md:text-3xl font-black text-surface-900 mb-2">Personal Information</h2>
+                <p className="text-sm md:text-base text-surface-500 font-medium">How should employers contact you?</p>
             </div>
 
             {/* Avatar Upload */}
-            <div className="flex items-center gap-8 p-6 bg-white rounded-3xl border border-surface-100 shadow-sm transition-all hover:shadow-md">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8 p-6 bg-white rounded-3xl border border-surface-100 shadow-sm transition-all hover:shadow-md">
                 <div className="relative group">
-                    <div className="w-28 h-28 rounded-3xl overflow-hidden bg-surface-50 border-4 border-white shadow-premium relative transition-transform group-hover:scale-105 duration-300">
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden bg-surface-50 border-4 border-white shadow-premium relative transition-transform group-hover:scale-105 duration-300">
                         {personalInfo?.avatarUrl ? (
                             <img src={personalInfo?.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-surface-300">
-                                <FaCamera size={28} />
+                                <FaCamera size={24} />
                             </div>
                         )}
                         {uploading && (
                             <div className="absolute inset-0 bg-surface-900/60 backdrop-blur-sm flex items-center justify-center text-white">
-                                <FaSpinner className="animate-spin" size={24} />
+                                <FaSpinner className="animate-spin" size={20} />
                             </div>
                         )}
                     </div>
-                    <label className="absolute -bottom-2 -right-2 bg-primary-600 text-white p-2.5 rounded-2xl cursor-pointer shadow-xl hover:bg-primary-700 hover:scale-110 active:scale-95 transition-all z-10">
-                        <FaCamera size={14} />
+                    <label className="absolute -bottom-1 sm:-bottom-2 -right-1 sm:-right-2 bg-primary-600 text-white p-2 rounded-2xl cursor-pointer shadow-xl hover:bg-primary-700 hover:scale-110 active:scale-95 transition-all z-10">
+                        <FaCamera size={12} />
                         <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
                     </label>
                 </div>
-                <div>
+                <div className="text-center sm:text-left">
                     <h4 className="font-bold text-surface-900 mb-1">Profile Photo</h4>
-                    <p className="text-xs text-surface-400 leading-relaxed max-w-[200px]">
+                    <p className="text-[10px] sm:text-xs text-surface-400 leading-relaxed max-w-[200px]">
                         JPG, PNG or WebP. <br />Max size of 2MB.
                     </p>
                 </div>

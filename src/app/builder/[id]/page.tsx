@@ -48,6 +48,7 @@ export default function BuilderPage() {
     const [userPlan, setUserPlan] = useState<'FREE' | 'PRO'>('FREE');
     const [aiUsageCount, setAiUsageCount] = useState(0);
     const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+    const [showMobilePreview, setShowMobilePreview] = useState(false);
 
 
     useEffect(() => {
@@ -247,6 +248,8 @@ export default function BuilderPage() {
         }
     };
 
+    const toggleMobilePreview = () => setShowMobilePreview(!showMobilePreview);
+
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
@@ -257,7 +260,7 @@ export default function BuilderPage() {
         <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
             <DashboardHeader />
 
-            <div className="flex-1 flex overflow-hidden min-h-0">
+            <div className="flex-1 flex overflow-hidden min-h-0 relative">
                 <BuilderSidebar
                     currentMode={currentMode}
                     onModeChange={(mode) => {
@@ -267,21 +270,21 @@ export default function BuilderPage() {
                     }}
                 />
 
-                <main className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                <main className={`flex-1 flex flex-col min-h-0 overflow-hidden transition-all duration-300 ${showMobilePreview ? 'hidden xl:flex' : 'flex'}`}>
                     <ProgressBar
                         steps={contentSteps}
                         currentStep={currentContentStep}
                         currentMode={currentMode}
                     />
                     {/* Header Actions */}
-                    <header className="flex-shrink-0 h-20 bg-white/80 backdrop-blur-md border-b border-surface-100 px-8 flex justify-between items-center z-20">
+                    <header className="flex-shrink-0 min-h-16 h-auto py-4 lg:h-20 bg-white/80 backdrop-blur-md border-b border-surface-100 px-4 sm:px-8 flex justify-between items-center z-20">
                         <div className="flex items-center gap-4">
-                            <h1 className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em]">
+                            <h1 className="text-[9px] sm:text-[10px] font-black text-surface-400 uppercase tracking-[0.2em]">
                                 {currentMode === 'content' ? `Step ${currentContentStep + 1}: ${contentSteps[currentContentStep].title}` : currentMode}
                             </h1>
                         </div>
 
-                        <div className="flex gap-4">
+                        <div className="flex gap-2 sm:gap-4">
                             <button
                                 onClick={handleFillSampleData}
                                 className="hidden lg:flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-surface-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all border border-transparent hover:border-primary-100"
@@ -294,7 +297,7 @@ export default function BuilderPage() {
                             <div className="flex gap-2">
                                 <button
                                     onClick={handleDownloadTxt}
-                                    className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-surface-500 hover:text-surface-900 bg-surface-50 hover:bg-surface-100 rounded-xl transition-all"
+                                    className="px-3 sm:px-4 py-2 text-[10px] font-black uppercase tracking-widest text-surface-500 hover:text-surface-900 bg-surface-50 hover:bg-surface-100 rounded-xl transition-all"
                                 >
                                     .TXT
                                 </button>
@@ -302,18 +305,18 @@ export default function BuilderPage() {
                                     <>
                                         <button
                                             onClick={handleDownloadDocx}
-                                            className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all"
+                                            className="hidden xs:block px-4 py-2 text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all"
                                         >
                                             .DOCX
                                         </button>
                                         <PDFDownloadLink
                                             document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
                                             fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
-                                            className="btn-primary !px-6 !py-2 !rounded-xl !text-[10px] !font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-primary-600/20"
+                                            className="btn-primary !px-4 sm:!px-6 !py-2 !rounded-xl !text-[10px] !font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-primary-600/20"
                                         >
                                             {({ loading }) => (
                                                 <>
-                                                    <FaDownload size={10} /> {loading ? '...' : 'Export PDF'}
+                                                    <FaDownload size={10} className="hidden xs:block" /> {loading ? '...' : 'PDF'}
                                                 </>
                                             )}
                                         </PDFDownloadLink>
@@ -321,9 +324,9 @@ export default function BuilderPage() {
                                 ) : (
                                     <button
                                         onClick={() => setIsUpgradeModalOpen(true)}
-                                        className="btn-primary !bg-amber-500 hover:!bg-amber-600 !px-6 !py-2 !rounded-xl !text-[10px] !font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-amber-500/20"
+                                        className="btn-primary !bg-amber-500 hover:!bg-amber-600 !px-4 sm:!px-6 !py-2 !rounded-xl !text-[10px] !font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-amber-500/20"
                                     >
-                                        <FaCrown size={10} /> Get Pro
+                                        <FaCrown size={10} className="hidden xs:block" /> Get Pro
                                     </button>
                                 )}
                             </div>
@@ -331,10 +334,10 @@ export default function BuilderPage() {
                     </header>
 
                     {/* Editor Area — scrolls independently, bottom bar stays pinned */}
-                    <div id="editor-area" className="flex-1 overflow-y-auto min-h-0 pb-32 p-10 scroll-smooth bg-surface-50/50">
+                    <div id="editor-area" className="flex-1 overflow-y-auto min-h-0 pb-32 p-4 sm:p-10 scroll-smooth bg-surface-50/50">
                         <div className="max-w-4xl mx-auto">
                             {currentMode === 'content' && (
-                                <div className="flex mb-10 gap-3 overflow-x-auto pb-4 no-scrollbar">
+                                <div className="flex mb-6 sm:mb-10 gap-2 sm:gap-3 overflow-x-auto pb-4 no-scrollbar">
                                     {contentSteps.map((step, index) => (
                                         <button
                                             key={step.id}
@@ -342,9 +345,9 @@ export default function BuilderPage() {
                                                 handleSave(true);
                                                 setCurrentContentStep(index);
                                             }}
-                                            className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${index === currentContentStep
-                                                ? 'bg-surface-900 text-white shadow-xl shadow-surface-900/20 -translate-y-0.5'
-                                                : 'bg-white text-surface-400 hover:text-surface-600 border border-surface-100 hover:border-surface-200'
+                                            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${index === currentContentStep
+                                                ? 'bg-surface-900 text-white shadow-xl shadow-surface-900/20'
+                                                : 'bg-white text-surface-400 border border-surface-100 hover:border-surface-200'
                                                 }`}
                                         >
                                             {step.title}
@@ -353,7 +356,7 @@ export default function BuilderPage() {
                                 </div>
                             )}
 
-                            <div className={`${currentMode === 'content' ? 'bg-white p-10 lg:p-16' : ''} rounded-[2.5rem] shadow-premium border border-surface-100/50 relative overflow-hidden`}>
+                            <div className={`${currentMode === 'content' ? 'bg-white p-6 sm:p-10 lg:p-16' : ''} rounded-3xl lg:rounded-[2.5rem] shadow-premium border border-surface-100/50 relative overflow-hidden`}>
                                 {currentMode === 'templates' && (
                                     <TemplateSelector
                                         userPlan={userPlan}
@@ -396,69 +399,66 @@ export default function BuilderPage() {
                                     />
                                 )}
                                 {currentMode === 'finalize' && (
-                                    <div className="text-center space-y-12 py-16 animate-fade-in-up">
+                                    <div className="text-center space-y-8 sm:space-y-12 py-8 sm:py-16 animate-fade-in-up">
                                         <div className="flex justify-center">
                                             <div className="relative">
                                                 <div className="absolute -inset-4 bg-green-500/20 rounded-full blur-2xl animate-pulse"></div>
-                                                <div className="relative w-32 h-32 bg-white rounded-full flex items-center justify-center shadow-premium ring-8 ring-green-50 text-green-500">
-                                                    <FaCheck size={56} className="animate-float" />
+                                                <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-full flex items-center justify-center shadow-premium ring-8 ring-green-50 text-green-500">
+                                                    <FaCheck size={36} className="xs:text-[48px] animate-float" />
                                                 </div>
                                             </div>
                                         </div>
                                         <div>
-                                            <h2 className="text-4xl font-black text-surface-900 mb-3 tracking-tight">You're all set!</h2>
-                                            <p className="text-surface-500 text-lg font-medium max-w-md mx-auto">
+                                            <h2 className="text-2xl sm:text-4xl font-black text-surface-900 mb-2 sm:mb-3 tracking-tight">You're all set!</h2>
+                                            <p className="text-surface-500 text-base sm:text-lg font-medium max-w-sm sm:max-w-md mx-auto">
                                                 Your professional resume is polished and ready to make an impact.
                                             </p>
                                         </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
                                             <button
                                                 onClick={handleDownloadTxt}
-                                                className="premium-card p-6 flex flex-col items-center gap-4 hover:border-surface-200 transition-all hover:-translate-y-1 group"
+                                                className="premium-card p-4 sm:p-6 flex flex-col items-center gap-4 group"
                                             >
-                                                <div className="w-14 h-14 rounded-2xl bg-surface-50 flex items-center justify-center text-surface-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                                                    <FaFileAlt size={24} />
+                                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-surface-50 flex items-center justify-center text-surface-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
+                                                    <FaFileAlt size={20} />
                                                 </div>
                                                 <div className="text-center">
-                                                    <p className="text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Plain Text</p>
-                                                    <p className="text-[10px] font-bold text-surface-400">Best for simple ATS</p>
+                                                    <p className="text-[10px] sm:text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Plain Text</p>
+                                                    <span className="text-[10px] font-black text-primary-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Download</span>
                                                 </div>
-                                                <span className="mt-2 text-[10px] font-black text-primary-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Download .TXT</span>
                                             </button>
 
                                             {userPlan === 'PRO' ? (
                                                 <>
                                                     <button
                                                         onClick={handleDownloadDocx}
-                                                        className="premium-card p-6 flex flex-col items-center gap-4 border-blue-100 hover:border-blue-200 transition-all hover:-translate-y-1 group"
+                                                        className="premium-card p-4 sm:p-6 flex flex-col items-center gap-4 border-blue-100 group"
                                                     >
-                                                        <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                                            <FaFileAlt size={24} />
+                                                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                                            <FaFileAlt size={20} />
                                                         </div>
                                                         <div className="text-center">
-                                                            <p className="text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Microsoft Word</p>
-                                                            <p className="text-[10px] font-bold text-surface-400">Fully editable format</p>
+                                                            <p className="text-[10px] sm:text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Word Doc</p>
+                                                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Download</span>
                                                         </div>
-                                                        <span className="mt-2 text-[10px] font-black text-blue-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Download .DOCX</span>
                                                     </button>
                                                     <PDFDownloadLink
                                                         document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
                                                         fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
-                                                        className="premium-card p-6 flex flex-col items-center gap-4 border-primary-100 hover:border-primary-200 transition-all hover:-translate-y-1 group"
+                                                        className="premium-card p-4 sm:p-6 flex flex-col items-center gap-4 border-primary-100 group"
                                                     >
                                                         {({ loading }) => (
                                                             <>
-                                                                <div className="w-14 h-14 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors">
-                                                                    <FaDownload size={24} />
+                                                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors">
+                                                                    <FaDownload size={20} />
                                                                 </div>
                                                                 <div className="text-center">
-                                                                    <p className="text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Adobe PDF</p>
-                                                                    <p className="text-[10px] font-bold text-surface-400">Perfect for printing</p>
+                                                                    <p className="text-[10px] sm:text-xs font-black text-surface-900 uppercase tracking-widest mb-1">PDF Document</p>
+                                                                    <span className="text-[10px] font-black text-primary-600 uppercase tracking-widest whitespace-nowrap">
+                                                                        {loading ? '...' : 'Download'}
+                                                                    </span>
                                                                 </div>
-                                                                <span className="mt-2 text-[10px] font-black text-primary-600 uppercase tracking-widest">
-                                                                    {loading ? 'Preparing...' : 'Download .PDF'}
-                                                                </span>
                                                             </>
                                                         )}
                                                     </PDFDownloadLink>
@@ -466,27 +466,18 @@ export default function BuilderPage() {
                                             ) : (
                                                 <button
                                                     onClick={() => setIsUpgradeModalOpen(true)}
-                                                    className="premium-card p-6 flex flex-col items-center gap-4 border-amber-100 bg-amber-50/10 hover:bg-amber-50/50 transition-all hover:-translate-y-1 group"
+                                                    className="premium-card p-4 sm:p-6 flex flex-col items-center gap-4 border-amber-100 bg-amber-50/10 group"
                                                 >
-                                                    <div className="w-14 h-14 rounded-2xl bg-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-500/20 group-hover:rotate-12 transition-transform">
-                                                        <FaCrown size={24} />
+                                                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-500 flex items-center justify-center text-white shadow-lg">
+                                                        <FaCrown size={20} />
                                                     </div>
                                                     <div className="text-center">
-                                                        <p className="text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Premium Formats</p>
-                                                        <p className="text-[10px] font-bold text-surface-400">PDF & Word export</p>
+                                                        <p className="text-[10px] sm:text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Unlock PDF</p>
+                                                        <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest animate-pulse">Upgrade</span>
                                                     </div>
-                                                    <span className="mt-2 text-[10px] font-black text-amber-600 uppercase tracking-widest animate-pulse">Upgrade to Unlock</span>
                                                 </button>
                                             )}
                                         </div>
-
-                                        {userPlan !== 'PRO' && (
-                                            <div className="mt-12 p-6 bg-surface-50 rounded-3xl border border-surface-100 inline-block">
-                                                <p className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em]">
-                                                    Free users can download in .TXT format. Upgrade for world-class PDF and Word exports.
-                                                </p>
-                                            </div>
-                                        )}
                                     </div>
                                 )}
                             </div>
@@ -496,17 +487,22 @@ export default function BuilderPage() {
                     <BuilderBottomBar
                         onBack={handleBack}
                         onNext={handleNext}
-                        onSave={handleSave}
+                        onSave={() => handleSave()}
                         isFirstStep={currentMode === 'templates'}
                         isLastStep={currentMode === 'finalize'}
                         saving={saving}
+                        showPreview={showMobilePreview}
+                        onTogglePreview={toggleMobilePreview}
                     />
                 </main>
 
                 {/* Preview Section — own scroll, never affects page */}
-                <aside className="hidden xl:flex xl:flex-col w-[45%] bg-gray-200 overflow-y-auto min-h-0 p-12 border-l border-gray-300">
-                    <div className="scale-[0.85] origin-top transform transition-transform duration-300">
-                        <ResumePreview onSectionClick={handleSectionClick} />
+                <aside className={`flex flex-col xl:w-[45%] bg-gray-200 overflow-y-auto min-h-0 p-4 lg:p-12 border-l border-gray-300 transition-all duration-300 ${showMobilePreview ? 'flex w-full absolute inset-0 z-40 xl:relative xl:z-auto' : 'hidden xl:flex'}`}>
+                    <div className="scale-[0.7] sm:scale-[0.85] xl:scale-90 origin-top transform transition-transform duration-300 mx-auto">
+                        <ResumePreview onSectionClick={(id) => {
+                            setShowMobilePreview(false);
+                            handleSectionClick(id);
+                        }} />
                     </div>
                 </aside>
 
