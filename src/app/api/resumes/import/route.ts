@@ -59,11 +59,11 @@ export async function POST(req: NextRequest) {
         }
 
         // 3. Content Sanitization
-        const sanitizedText = sanitizeString(text);
+        const sanitizedText = await sanitizeString(text);
         const parsedData = parseResumeText(sanitizedText);
         
         // 4. Object Sanitization
-        const cleanParsedData = sanitizeObject(parsedData);
+        const cleanParsedData = await sanitizeObject(parsedData);
         
         const title = cleanParsedData.personalInfo?.fullName || 'Imported Resume';
         const resumeData = {

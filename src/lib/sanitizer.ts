@@ -1,15 +1,28 @@
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
+let sharedPurify: any = null;
 
-const window = new JSDOM('').window;
-const purify = DOMPurify(window as any);
+/**
+ * Lazily initializes and returns the DOMPurify instance.
+ * This prevents build-time errors related to JSDOM's ESM/CJS dependencies.
+ */
+const getPurify = async () => {
+    if (sharedPurify) return sharedPurify;
+    
+    // Defer loading to runtime
+    const { JSDOM } = await import('jsdom');
+    const createDOMPurify = (await import('dompurify')).default;
+    
+    const window = new JSDOM('').window;
+    sharedPurify = createDOMPurify(window as any);
+    return sharedPurify;
+};
 
 /**
  * Sanitizes a string to remove any HTML tags or script patterns.
  * This is the primary defense against XSS in resume text.
  */
-export const sanitizeString = (str: string): string => {
+export const sanitizeString = async (str: string): Promise<string> => {
     if (!str) return '';
+    const purify = await getPurify();
     // Strip all HTML tags entirely for resume text
     return purify.sanitize(str, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
 };
@@ -18,19 +31,20 @@ export const sanitizeString = (str: string): string => {
  * Recursively sanitizes a JSON object.
  * Useful for cleaning resume data before saving to the database.
  */
-export const sanitizeObject = <T>(obj: T): T => {
+export const sanitizeObject = async <T>(obj: T): Promise<T> => {
     if (typeof obj === 'string') {
-        return sanitizeString(obj) as unknown as T;
+        return (await sanitizeString(obj)) as unknown as T;
     }
     
     if (Array.isArray(obj)) {
-        return obj.map(item => sanitizeObject(item)) as unknown as T;
+        const sanitizedArray = await Promise.all(obj.map(item => sanitizeObject(item)));
+        return sanitizedArray as unknown as T;
     }
     
     if (obj !== null && typeof obj === 'object') {
         const sanitizedObj: any = {};
         for (const [key, value] of Object.entries(obj)) {
-            sanitizedObj[key] = sanitizeObject(value);
+            sanitizedObj[key] = await sanitizeObject(value);
         }
         return sanitizedObj as T;
     }
