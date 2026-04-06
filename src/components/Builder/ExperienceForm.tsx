@@ -14,6 +14,15 @@ interface ExperienceFormProps {
     readonly onUpgrade: () => void;
 }
 
+const MONTHS = [
+    { value: '01', label: 'Jan' }, { value: '02', label: 'Feb' }, { value: '03', label: 'Mar' },
+    { value: '04', label: 'Apr' }, { value: '05', label: 'May' }, { value: '06', label: 'Jun' },
+    { value: '07', label: 'Jul' }, { value: '08', label: 'Aug' }, { value: '09', label: 'Sep' },
+    { value: '10', label: 'Oct' }, { value: '11', label: 'Nov' }, { value: '12', label: 'Dec' },
+];
+
+const YEARS = Array.from({ length: 50 }, (_, i) => (new Date().getFullYear() - i).toString());
+
 export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, onUpgrade }: ExperienceFormProps) {
     const dispatch = useAppDispatch();
     const experiences = useAppSelector((state) => state.resume.experiences);
@@ -41,6 +50,11 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
         if (exp) {
             dispatch(updateExperience({ ...exp, [field]: value }));
         }
+    };
+
+    const handleDateChange = (id: string, field: 'startDate' | 'endDate', month: string, year: string) => {
+        if (!month || !year) return;
+        handleChange(id, field, `${month}/${year}`);
     };
 
     const handleRewriteBullet = async (expId: string, description: string, jobTitle: string) => {
@@ -136,28 +150,49 @@ export default function ExperienceForm({ userPlan, aiUsageCount, onUsageUpdate, 
                                     placeholder="e.g. Senior Product Designer"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label htmlFor={`startDate-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
-                                <input
-                                    id={`startDate-${exp.id}`}
-                                    type="text"
-                                    value={exp.startDate}
-                                    onChange={(e) => handleChange(exp.id, 'startDate', e.target.value)}
-                                    className="w-full"
-                                    placeholder="MM/YYYY"
-                                />
+                            <div className="space-y-4">
+                                <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <select
+                                        value={exp.startDate?.split('/')[0] || ''}
+                                        onChange={(e) => handleDateChange(exp.id, 'startDate', e.target.value, exp.startDate?.split('/')[1] || '')}
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                    >
+                                        <option value="" disabled>Month</option>
+                                        {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                    </select>
+                                    <select
+                                        value={exp.startDate?.split('/')[1] || ''}
+                                        onChange={(e) => handleDateChange(exp.id, 'startDate', exp.startDate?.split('/')[0] || '', e.target.value)}
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                    >
+                                        <option value="" disabled>Year</option>
+                                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                    </select>
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <label htmlFor={`endDate-${exp.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">End Date</label>
-                                <input
-                                    id={`endDate-${exp.id}`}
-                                    type="text"
-                                    value={exp.endDate}
-                                    onChange={(e) => handleChange(exp.id, 'endDate', e.target.value)}
-                                    disabled={exp.current}
-                                    className="w-full"
-                                    placeholder={exp.current ? 'Present' : 'MM/YYYY'}
-                                />
+                            <div className="space-y-4">
+                                <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">End Date</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <select
+                                        disabled={exp.current}
+                                        value={exp.current ? '' : (exp.endDate?.split('/')[0] || '')}
+                                        onChange={(e) => handleDateChange(exp.id, 'endDate', e.target.value, exp.endDate?.split('/')[1] || '')}
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
+                                    >
+                                        <option value="" disabled>{exp.current ? 'Present' : 'Month'}</option>
+                                        {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                    </select>
+                                    <select
+                                        disabled={exp.current}
+                                        value={exp.current ? '' : (exp.endDate?.split('/')[1] || '')}
+                                        onChange={(e) => handleDateChange(exp.id, 'endDate', exp.endDate?.split('/')[0] || '', e.target.value)}
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
+                                    >
+                                        <option value="" disabled>{exp.current ? 'Present' : 'Year'}</option>
+                                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                    </select>
+                                </div>
                             </div>
                             <div className="sm:col-span-2 flex items-center gap-3 p-4 bg-surface-50 rounded-2xl border border-surface-100 transition-colors hover:border-primary-200">
                                 <input

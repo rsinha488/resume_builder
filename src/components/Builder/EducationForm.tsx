@@ -5,6 +5,15 @@ import { FaPlus, FaTrash } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 
+const MONTHS = [
+    { value: '01', label: 'Jan' }, { value: '02', label: 'Feb' }, { value: '03', label: 'Mar' },
+    { value: '04', label: 'Apr' }, { value: '05', label: 'May' }, { value: '06', label: 'Jun' },
+    { value: '07', label: 'Jul' }, { value: '08', label: 'Aug' }, { value: '09', label: 'Sep' },
+    { value: '10', label: 'Oct' }, { value: '11', label: 'Nov' }, { value: '12', label: 'Dec' },
+];
+
+const YEARS = Array.from({ length: 50 }, (_, i) => (new Date().getFullYear() - i).toString());
+
 export default function EducationForm() {
     const dispatch = useAppDispatch();
     const education = useAppSelector((state) => state.resume.education);
@@ -29,6 +38,11 @@ export default function EducationForm() {
         if (edu) {
             dispatch(updateEducation({ ...edu, [field]: value }));
         }
+    };
+
+    const handleDateChange = (id: string, field: 'startDate' | 'endDate', month: string, year: string) => {
+        if (!month || !year) return;
+        handleChange(id, field, `${month}/${year}`);
     };
 
     return (
@@ -109,28 +123,49 @@ export default function EducationForm() {
                                     placeholder="e.g. Palo Alto, CA"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label htmlFor={`startDate-${edu.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
-                                <input
-                                    id={`startDate-${edu.id}`}
-                                    type="text"
-                                    value={edu.startDate}
-                                    onChange={(e) => handleChange(edu.id, 'startDate', e.target.value)}
-                                    className="w-full"
-                                    placeholder="MM/YYYY"
-                                />
+                            <div className="space-y-4">
+                                <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">Start Date</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <select
+                                        value={edu.startDate?.split('/')[0] || ''}
+                                        onChange={(e) => handleDateChange(edu.id, 'startDate', e.target.value, edu.startDate?.split('/')[1] || '')}
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                    >
+                                        <option value="" disabled>Month</option>
+                                        {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                    </select>
+                                    <select
+                                        value={edu.startDate?.split('/')[1] || ''}
+                                        onChange={(e) => handleDateChange(edu.id, 'startDate', edu.startDate?.split('/')[0] || '', e.target.value)}
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                    >
+                                        <option value="" disabled>Year</option>
+                                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                    </select>
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <label htmlFor={`endDate-${edu.id}`} className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">End Date</label>
-                                <input
-                                    id={`endDate-${edu.id}`}
-                                    type="text"
-                                    value={edu.endDate}
-                                    onChange={(e) => handleChange(edu.id, 'endDate', e.target.value)}
-                                    disabled={edu.current}
-                                    className="w-full"
-                                    placeholder={edu.current ? 'Present' : 'MM/YYYY'}
-                                />
+                            <div className="space-y-4">
+                                <label className="block text-[10px] font-black text-surface-400 uppercase tracking-widest ml-1">End Date</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <select
+                                        disabled={edu.current}
+                                        value={edu.current ? '' : (edu.endDate?.split('/')[0] || '')}
+                                        onChange={(e) => handleDateChange(edu.id, 'endDate', e.target.value, edu.endDate?.split('/')[1] || '')}
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
+                                    >
+                                        <option value="" disabled>{edu.current ? 'Present' : 'Month'}</option>
+                                        {MONTHS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                    </select>
+                                    <select
+                                        disabled={edu.current}
+                                        value={edu.current ? '' : (edu.endDate?.split('/')[1] || '')}
+                                        onChange={(e) => handleDateChange(edu.id, 'endDate', edu.endDate?.split('/')[0] || '', e.target.value)}
+                                        className="w-full bg-white border border-surface-200 rounded-xl px-4 py-2 text-sm font-bold focus:ring-primary-500 focus:border-primary-500 outline-none disabled:bg-surface-50 disabled:text-surface-300"
+                                    >
+                                        <option value="" disabled>{edu.current ? 'Present' : 'Year'}</option>
+                                        {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
