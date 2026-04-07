@@ -153,13 +153,13 @@ export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: Upgr
                                             <Icon className={plan.iconColor} size={18} />
                                         </div>
                                         <div>
-                                            <h3 className="text-base font-black text-surface-900">{plan.name}</h3>
-                                            <p className="text-xs text-surface-500 font-medium">{plan.tagline}</p>
+                                            <h3 className="text-sm sm:text-lg font-black text-surface-900 uppercase tracking-widest">{plan.name}</h3>
+                                            <p className="text-[10px] sm:text-xs text-surface-500 font-bold uppercase tracking-wider">{plan.tagline}</p>
                                         </div>
                                     </div>
                                     <div className="text-right flex-shrink-0 ml-3">
-                                        <div className="text-2xl font-black text-surface-900">{plan.price}</div>
-                                        <div className="text-[10px] text-surface-400 font-medium leading-tight max-w-[90px]">{plan.billingNote}</div>
+                                        <div className="text-xl sm:text-2xl font-black text-surface-900">{plan.price}</div>
+                                        <div className="text-[9px] sm:text-[10px] text-surface-400 font-bold leading-tight max-w-[90px] uppercase tracking-tighter">{plan.billingNote}</div>
                                     </div>
                                 </div>
 
@@ -176,7 +176,7 @@ export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: Upgr
                                     type="button"
                                     onClick={() => handleUpgrade(plan.type)}
                                     disabled={isDisabled}
-                                    className={`w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 ${plan.ctaClass} disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98]`}
+                                    className={`w-full py-3.5 rounded-xl font-black text-[10px] sm:text-sm uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 ${plan.ctaClass} disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98]`}
                                     aria-label={`Select ${plan.name}`}
                                     aria-busy={isLoading}
                                 >

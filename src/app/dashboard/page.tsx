@@ -8,6 +8,7 @@ import { pdf } from '@react-pdf/renderer';
 import DashboardHeader from '@/components/Dashboard/DashboardHeader';
 import DocumentCard from '@/components/Dashboard/DocumentCard';
 import EmptyState from '@/components/Dashboard/EmptyState';
+import ImportModal from '@/components/Dashboard/ImportModal';
 import UpgradeModal from '@/components/UpgradeModal';
 import { ResumePDF } from '@/components/Builder/ResumePDF';
 import { toast } from 'sonner';
@@ -33,6 +34,7 @@ export default function DashboardPage() {
     const [userPlan, setUserPlan] = useState<{ plan: string; subscriptionType: string; planExpiry: string | null } | null>(null);
     const [downloadInfo, setDownloadInfo] = useState<{ pdfDownloadCount: number; limit: number; remaining: number | null; isPro: boolean; canDownload: boolean } | null>(null);
     const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -264,23 +266,34 @@ export default function DashboardPage() {
                         <p className="text-sm md:text-xl text-surface-500 font-medium leading-relaxed max-w-lg">Manage and optimize your professional career documents with AI-powered precision.</p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-5 w-full md:w-auto">
-                        <div className="group flex-1 sm:w-80 flex items-center bg-white border border-surface-100 rounded-2xl px-6 focus-within:ring-4 focus-within:ring-primary-500/10 focus-within:border-primary-500 transition-all shadow-sm hover:border-surface-200">
-                            <FaSearch className="text-surface-400 group-focus-within:text-primary-600 transition-colors flex-shrink-0" />
+                    <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                        <div className="group flex-1 sm:min-w-[320px] flex items-center bg-white border border-surface-100 rounded-2xl px-6 focus-within:ring-4 focus-within:ring-primary-500/10 focus-within:border-primary-500 transition-all shadow-sm hover:border-surface-200">
+                            <FaSearch className="text-surface-400 group-focus-within:text-primary-600 transition-colors flex-shrink-0" size={14} />
                             <input
                                 type="text"
                                 placeholder="Search documents..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="flex-1 bg-transparent border-none outline-none pl-4 py-4 uppercase text-[11px] font-black tracking-[0.1em] placeholder:text-surface-300"
+                                className="flex-1 bg-transparent border-none outline-none pl-4 py-4 uppercase text-[10px] font-black tracking-[0.12em] placeholder:text-surface-300"
                             />
                         </div>
-                        <button
-                            onClick={activeTab === 'resumes' ? createNewResume : createNewCoverLetter}
-                            className="btn-primary !py-4 !px-8 shadow-2xl !text-[11px] !font-black uppercase tracking-[0.2em]"
-                        >
-                            <FaPlus className="mr-3" /> New {activeTab === 'resumes' ? 'Resume' : 'Letter'}
-                        </button>
+                        
+                        <div className="flex gap-3">
+                            {activeTab === 'resumes' && (
+                                <button
+                                    onClick={() => setIsImportModalOpen(true)}
+                                    className="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-4 bg-white border border-surface-200 text-surface-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-surface-50 hover:border-surface-300 transition-all active:scale-95"
+                                >
+                                    Import
+                                </button>
+                            )}
+                            <button
+                                onClick={activeTab === 'resumes' ? createNewResume : createNewCoverLetter}
+                                className="flex-1 sm:flex-none btn-primary !py-4 !px-8 shadow-2xl !text-[10px] !font-black uppercase tracking-[0.2em]"
+                            >
+                                <FaPlus className="mr-3 text-xs" /> New {activeTab === 'resumes' ? 'Resume' : 'Letter'}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -313,6 +326,7 @@ export default function DashboardPage() {
                     <EmptyState
                         type={activeTab}
                         onCreate={activeTab === 'resumes' ? createNewResume : createNewCoverLetter}
+                        onImport={activeTab === 'resumes' ? () => setIsImportModalOpen(true) : undefined}
                     />
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -353,6 +367,11 @@ export default function DashboardPage() {
                     </div>
                 </div>
             </footer>
+
+            <ImportModal 
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
+            />
 
             <UpgradeModal
                 isOpen={isUpgradeModalOpen}

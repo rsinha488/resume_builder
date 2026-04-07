@@ -73,14 +73,14 @@ export default function TemplateSelectionModal({
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 md:p-8">
             <div className="bg-white w-full h-full sm:h-auto sm:max-w-7xl sm:max-h-[90vh] sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="px-8 py-4 border-b flex justify-between items-center bg-gray-50">
+                <div className="px-6 py-5 border-b flex justify-between items-center bg-white">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                            <FaMagic />
+                        <div className="w-10 h-10 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 shadow-sm">
+                            <FaMagic size={18} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-gray-900">Change template</h2>
-                            <p className="text-sm text-gray-500">Choose a design that fits your professional style</p>
+                            <h2 className="text-lg sm:text-2xl font-black text-gray-900 tracking-tight uppercase">Change template</h2>
+                            <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-widest mt-0.5">Choose a design that fits your professional style</p>
                         </div>
                     </div>
                     <button
@@ -104,7 +104,7 @@ export default function TemplateSelectionModal({
                     <div className="w-full lg:w-[450px] flex flex-col bg-white overflow-y-auto">
                         {/* Color Selection */}
                         <div className="p-8 border-b">
-                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Choose color:</h3>
+                            <h3 className="text-[11px] sm:text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Choose color:</h3>
                             <div className="flex flex-wrap gap-3">
                                 {COLOR_PALETTES.map((palette) => (
                                     <button
@@ -127,7 +127,7 @@ export default function TemplateSelectionModal({
 
                         {/* Template Grid */}
                         <div className="p-8 flex-1">
-                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Choose template:</h3>
+                            <h3 className="text-[11px] sm:text-sm font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Choose template:</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 {TEMPLATES.map((template) => (
                                     <button
@@ -180,7 +180,7 @@ export default function TemplateSelectionModal({
                         <div className="p-8 bg-gray-50 border-t mt-auto">
                             <button
                                 onClick={onClose}
-                                className="w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all shadow-xl shadow-gray-200"
+                                className="w-full py-4 bg-gray-900 text-white rounded-xl font-black text-[10px] sm:text-sm uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200"
                             >
                                 Use this template
                             </button>

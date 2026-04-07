@@ -31,25 +31,25 @@ export default function ConfirmModal({ isOpen, title, message, confirmLabel = 'D
                     <FaTimes size={16} />
                 </button>
 
-                <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                        <FaTrash className="text-red-500" size={18} />
+                <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center flex-shrink-0">
+                        <FaTrash className="text-red-500" size={20} />
                     </div>
-                    <h2 className="text-xl font-black text-gray-900">{title}</h2>
+                    <h2 className="text-lg sm:text-2xl font-black text-gray-900 tracking-tight uppercase leading-tight">{title}</h2>
                 </div>
 
-                <p className="text-gray-500 font-medium mb-8 leading-relaxed">{message}</p>
+                <p className="text-xs sm:text-base text-gray-500 font-medium mb-10 leading-relaxed uppercase tracking-widest">{message}</p>
 
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                     <button
                         onClick={onCancel}
-                        className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-all"
+                        className="flex-1 py-4 rounded-xl border-2 border-gray-100 text-gray-400 font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 hover:text-gray-600 transition-all active:scale-95"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={onConfirm}
-                        className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold transition-all shadow-lg shadow-red-500/20"
+                        className="flex-1 py-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-red-500/20 active:scale-95"
                     >
                         {confirmLabel}
                     </button>

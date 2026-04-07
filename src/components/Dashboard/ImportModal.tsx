@@ -250,10 +250,10 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
         >
             <div className="bg-white w-full h-full sm:h-auto sm:max-w-lg sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-5 border-b border-surface-100">
+                <div className="flex items-center justify-between px-6 py-5 border-b border-surface-100 bg-white">
                     <div>
-                        <h2 className="text-base font-black text-surface-900 tracking-tight">Import Resume</h2>
-                        <p className="text-xs text-surface-400 font-medium mt-0.5">PDF or DOCX · up to {MAX_SIZE_MB}MB</p>
+                        <h2 className="text-lg sm:text-2xl font-black text-surface-900 tracking-tight uppercase">Import Resume</h2>
+                        <p className="text-[10px] sm:text-xs text-surface-400 font-bold mt-0.5 uppercase tracking-widest">PDF or DOCX · up to {MAX_SIZE_MB}MB</p>
                     </div>
                     <button
                         type="button"
@@ -383,7 +383,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="flex-1 py-3.5 border border-surface-200 text-surface-600 font-black text-sm rounded-xl hover:bg-surface-50 transition-all uppercase tracking-widest"
+                                className="flex-1 py-3.5 border border-surface-200 text-surface-600 font-black text-[10px] sm:text-sm rounded-xl hover:bg-surface-50 transition-all uppercase tracking-widest"
                             >
                                 Cancel
                             </button>
@@ -392,7 +392,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                                 <button
                                     type="button"
                                     onClick={handleUpload}
-                                    className="flex-1 py-3.5 bg-primary-600 text-white font-black text-sm rounded-xl hover:bg-primary-700 transition-all flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg shadow-primary-600/20"
+                                    className="flex-1 py-3.5 bg-primary-600 text-white font-black text-[10px] sm:text-sm rounded-xl hover:bg-primary-700 transition-all flex items-center justify-center gap-2 uppercase tracking-widest shadow-lg shadow-primary-600/20"
                                 >
                                     <FaRedo size={11} /> Try Again
                                 </button>
@@ -402,7 +402,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                                 <button
                                     type="button"
                                     onClick={() => { setError(null); setStatus('idle'); }}
-                                    className="flex-1 py-3.5 bg-surface-900 text-white font-black text-sm rounded-xl hover:bg-surface-800 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
+                                    className="flex-1 py-3.5 bg-surface-900 text-white font-black text-[10px] sm:text-sm rounded-xl hover:bg-surface-800 transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
                                 >
                                     Choose File
                                 </button>
@@ -413,7 +413,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                                     type="button"
                                     onClick={handleUpload}
                                     disabled={!file}
-                                    className="flex-1 py-3.5 bg-primary-600 text-white font-black text-sm rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary-600/20 uppercase tracking-widest active:scale-[0.98]"
+                                    className="flex-1 py-3.5 bg-primary-600 text-white font-black text-[10px] sm:text-sm rounded-xl hover:bg-primary-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary-600/20 uppercase tracking-widest active:scale-[0.98]"
                                     aria-label="Start importing resume"
                                 >
                                     Import Resume <FaArrowRight size={11} />
@@ -426,7 +426,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                 {/* Footer note */}
                 {status !== 'success' && !isProcessing && (
                     <div className="px-6 pb-5 pt-1">
-                        <p className="text-[11px] text-surface-400 leading-relaxed text-center">
+                        <p className="text-[10px] sm:text-xs text-surface-400 leading-relaxed text-center uppercase tracking-widest font-bold">
                             Your file is processed securely. We recommend reviewing imported data for accuracy.
                         </p>
                     </div>

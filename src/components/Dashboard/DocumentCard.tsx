@@ -70,14 +70,14 @@ export default function DocumentCard({
             {/* Preview Section */}
             <Link
                 href={editUrl}
-                className="aspect-[3/4] bg-surface-50 relative overflow-hidden block border-b border-surface-100"
+                className="aspect-[4/5] sm:aspect-[3/4] bg-surface-50 relative overflow-hidden block border-b border-surface-100 [--preview-scale:0.4] sm:[--preview-scale:0.25]"
             >
                 {templateId && resumeData ? (
-                    <div className="absolute inset-0 flex items-start justify-center pt-2 group-hover/card:scale-105 transition-transform duration-700 ease-out">
+                    <div className="absolute inset-0 flex items-start justify-center pt-6 group-hover/card:scale-105 transition-transform duration-700 ease-out">
                         <div style={{
                             width: '794px',
                             minHeight: '1123px',
-                            transform: 'scale(0.25)',
+                            transform: 'scale(var(--preview-scale))',
                             transformOrigin: 'top center',
                             flexShrink: 0,
                             pointerEvents: 'none',

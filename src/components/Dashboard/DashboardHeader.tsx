@@ -89,11 +89,14 @@ export default function DashboardHeader() {
                         <button
                             type="button"
                             onClick={() => setIsImportModalOpen(true)}
-                            className="flex items-center gap-2 px-3 sm:px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-surface-600 hover:text-primary-600 hover:bg-primary-50 rounded-2xl transition-all border border-transparent hover:border-primary-100"
+                            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 text-surface-600 hover:text-primary-600 hover:bg-primary-50 rounded-2xl transition-all border border-transparent hover:border-primary-100 group"
                             aria-label="Import existing resume"
                         >
-                            <FaFileImport className="text-sm flex-shrink-0" aria-hidden="true" />
-                            <span className="hidden sm:inline">Import Resume</span>
+                            <FaFileImport className="text-xs sm:text-sm flex-shrink-0 group-hover:scale-110 transition-transform" aria-hidden="true" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">
+                                <span className="sm:hidden tracking-tighter">Import</span>
+                                <span className="hidden sm:inline">Import Resume</span>
+                            </span>
                         </button>
     
                         <button
