@@ -1,30 +1,21 @@
-let sharedPurify: any = null;
-
 /**
- * Lazily initializes and returns the DOMPurify instance.
- * This prevents build-time errors related to JSDOM's ESM/CJS dependencies.
- */
-const getPurify = async () => {
-    if (sharedPurify) return sharedPurify;
-    
-    // Defer loading to runtime
-    const { JSDOM } = await import('jsdom');
-    const createDOMPurify = (await import('dompurify')).default;
-    
-    const window = new JSDOM('').window;
-    sharedPurify = createDOMPurify(window as any);
-    return sharedPurify;
-};
-
-/**
- * Sanitizes a string to remove any HTML tags or script patterns.
- * This is the primary defense against XSS in resume text.
+ * Sanitizes a string by stripping all HTML tags.
+ * This is safe for resume text which should only contain plain text.
+ * This avoids problematic server-side dependencies like JSDOM.
  */
 export const sanitizeString = async (str: string): Promise<string> => {
     if (!str) return '';
-    const purify = await getPurify();
-    // Strip all HTML tags entirely for resume text
-    return purify.sanitize(str, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    // Strip all HTML tags
+    const clean = str.replace(/<[^>]*>?/gm, '');
+    // Decode common HTML entities that might be in the source
+    return clean
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .trim();
 };
 
 /**

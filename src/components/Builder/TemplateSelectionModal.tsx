@@ -70,8 +70,8 @@ export default function TemplateSelectionModal({
     };
 
     return createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 md:p-8">
-            <div className="bg-white w-full max-w-7xl h-full max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 md:p-8">
+            <div className="bg-white w-full h-full sm:h-auto sm:max-w-7xl sm:max-h-[90vh] sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="px-8 py-4 border-b flex justify-between items-center bg-gray-50">
                     <div className="flex items-center gap-3">

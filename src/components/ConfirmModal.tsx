@@ -14,22 +14,21 @@ export default function ConfirmModal({ isOpen, title, message, confirmLabel = 'D
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm shadow-premium">
+            {/* Backdrop for desktop */}
             <button
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm cursor-default"
+                className="hidden sm:block absolute inset-0 cursor-default"
                 onClick={onCancel}
                 aria-label="Close"
             />
-
             {/* Modal */}
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-in fade-in zoom-in duration-200">
+            <div className="relative bg-white w-full h-full sm:h-auto sm:max-w-md sm:rounded-3xl p-8 flex flex-col justify-center sm:block animate-in fade-in zoom-in duration-200">
                 <button
                     onClick={onCancel}
-                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
+                    className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all"
                     aria-label="Close"
                 >
-                    <FaTimes size={14} />
+                    <FaTimes size={16} />
                 </button>
 
                 <div className="flex items-center gap-4 mb-4">

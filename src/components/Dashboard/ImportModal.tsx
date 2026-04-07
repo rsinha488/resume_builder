@@ -205,6 +205,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
         const formData = new FormData();
         formData.append('file', file);
 
+        let parsingTimer: NodeJS.Timeout | null = null;
         try {
             setStatus('uploading');
             setError(null);
@@ -215,9 +216,9 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
             });
 
             // Small delay before switching to "parsing" label
-            const timer = setTimeout(() => setStatus('parsing'), 1200);
+            parsingTimer = setTimeout(() => setStatus('parsing'), 1200);
             const response = await uploadPromise;
-            clearTimeout(timer);
+            if (parsingTimer) clearTimeout(parsingTimer);
 
             setStatus('success');
             toast.success('Resume imported successfully!');
@@ -228,6 +229,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                 onClose();
             }, 800);
         } catch (err) {
+            if (parsingTimer) clearTimeout(parsingTimer);
             const classified = classifyError(err);
             setError(classified);
             setStatus('error');
@@ -243,10 +245,10 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm"
             onClick={(e) => e.target === e.currentTarget && !isProcessing && onClose()}
         >
-            <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="bg-white w-full h-full sm:h-auto sm:max-w-lg sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-5 border-b border-surface-100">
                     <div>
@@ -264,7 +266,7 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                     </button>
                 </div>
 
-                <div className="p-5 sm:p-6 space-y-5">
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
                     {/* Success state */}
                     {status === 'success' && (
                         <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
@@ -341,7 +343,9 @@ export default function ImportModal({ isOpen, onClose }: ImportModalProps) {
                             <div className="flex-1 min-w-0">
                                 <p className="font-bold text-surface-900 text-sm truncate">{file.name}</p>
                                 <p className="text-xs text-surface-400 font-medium uppercase tracking-wider mt-0.5">
-                                    {(file.size / 1024 / 1024).toFixed(2)} MB
+                                    {file.size < 1024 * 1024
+                                        ? `${(file.size / 1024).toFixed(1)} KB`
+                                        : `${(file.size / 1024 / 1024).toFixed(2)} MB`}
                                 </p>
                             </div>
                             <button

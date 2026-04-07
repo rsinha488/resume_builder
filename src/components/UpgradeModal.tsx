@@ -95,12 +95,12 @@ export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: Upgr
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm"
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
-            <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-2xl max-h-[94vh] overflow-y-auto">
+            <div className="bg-white w-full h-full sm:h-auto sm:max-w-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300">
                 {/* Header */}
-                <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-surface-100 flex items-center justify-between px-6 py-4 z-10">
+                <div className="bg-white border-b border-surface-100 flex items-center justify-between px-6 py-4 z-10">
                     <div>
                         <h2 className="text-lg font-black text-surface-900 tracking-tight">Upgrade to PRO</h2>
                         <p className="text-xs text-surface-400 font-medium mt-0.5">Choose the plan that fits your job search</p>
@@ -128,7 +128,7 @@ export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: Upgr
                 )}
 
                 {/* Plans */}
-                <div className="p-5 sm:p-6 space-y-4">
+                <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
                     {PLANS.map((plan) => {
                         const Icon = plan.icon;
                         const isLoading = loading === plan.type;
