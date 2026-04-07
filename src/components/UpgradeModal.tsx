@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
-import axios from 'axios';
-import { FaCrown, FaCheck, FaTimes, FaSpinner } from 'react-icons/fa';
+import axios, { AxiosError } from 'axios';
+import { FaCrown, FaCheck, FaTimes, FaSpinner, FaLock, FaBolt } from 'react-icons/fa';
 import { toast } from 'sonner';
 
 interface UpgradeModalProps {
@@ -10,126 +10,197 @@ interface UpgradeModalProps {
     readonly onUpgradeSuccess: () => void;
 }
 
+type PlanType = 'TRIAL' | 'ANNUAL';
+
+const PLANS = [
+    {
+        type: 'TRIAL' as PlanType,
+        name: '14-Day Trial',
+        tagline: 'Try everything risk-free',
+        price: '$2.70',
+        billingNote: 'one-time payment',
+        icon: FaBolt,
+        iconColor: 'text-emerald-500',
+        iconBg: 'bg-emerald-50',
+        badgeBg: '',
+        borderClass: 'border-surface-200 hover:border-emerald-300',
+        cardBg: 'bg-white',
+        ctaClass: 'border-2 border-emerald-500 text-emerald-600 hover:bg-emerald-50 bg-white',
+        ctaLabel: 'Start Trial',
+        features: [
+            'Access to all 20+ Premium Templates',
+            'Unlimited PDF & Word Downloads',
+            'AI-powered Content Suggestions',
+            'ATS Score Checker',
+        ],
+        featureColor: 'text-emerald-500',
+        highlight: false,
+    },
+    {
+        type: 'ANNUAL' as PlanType,
+        name: 'Annual Plan',
+        tagline: 'Best value for job seekers',
+        price: '$5.95',
+        billingNote: '/month · billed $71.40/year',
+        icon: FaCrown,
+        iconColor: 'text-primary-600',
+        iconBg: 'bg-primary-50',
+        badgeBg: 'bg-primary-600',
+        borderClass: 'border-primary-500',
+        cardBg: 'bg-gradient-to-b from-primary-50 to-white',
+        ctaClass: 'bg-primary-600 text-white hover:bg-primary-700 shadow-lg shadow-primary-600/30',
+        ctaLabel: 'Get Started',
+        features: [
+            'Everything in Trial',
+            '1 Year of Unlimited Updates',
+            'Priority ATS Optimization',
+            'Dedicated Email Support',
+        ],
+        featureColor: 'text-primary-600',
+        highlight: true,
+    },
+];
+
 export default function UpgradeModal({ isOpen, onClose, onUpgradeSuccess }: UpgradeModalProps) {
-    const [loading, setLoading] = useState<string | null>(null);
+    const [loading, setLoading] = useState<PlanType | null>(null);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     if (!isOpen) return null;
 
-    const handleUpgrade = async (type: 'TRIAL' | 'ANNUAL') => {
+    const handleUpgrade = async (type: PlanType) => {
         setLoading(type);
+        setErrorMsg(null);
         try {
-            const response = await axios.post('/api/checkout', {
-                subscriptionType: type
-            });
+            const response = await axios.post('/api/checkout', { subscriptionType: type });
 
             if (response.data.url) {
                 globalThis.location.href = response.data.url;
             } else {
-                throw new Error('No checkout URL returned');
+                throw new Error('No checkout URL was returned. Please try again.');
             }
-        } catch (error) {
-            console.error('Upgrade error:', error);
-            toast.error('Failed to initiate checkout. Please try again.');
+        } catch (err) {
+            const axiosErr = err as AxiosError<{ error?: string; message?: string }>;
+            const backendMsg =
+                axiosErr.response?.data?.error ||
+                axiosErr.response?.data?.message ||
+                (err instanceof Error ? err.message : null) ||
+                'Something went wrong. Please try again.';
+
+            setErrorMsg(backendMsg);
+            toast.error(backendMsg);
         } finally {
             setLoading(null);
         }
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden animate-in fade-in zoom-in duration-300">
-                <div className="relative p-8 lg:p-12">
+        <div
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm"
+            onClick={(e) => e.target === e.currentTarget && onClose()}
+        >
+            <div className="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-2xl max-h-[94vh] overflow-y-auto">
+                {/* Header */}
+                <div className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-surface-100 flex items-center justify-between px-6 py-4 z-10">
+                    <div>
+                        <h2 className="text-lg font-black text-surface-900 tracking-tight">Upgrade to PRO</h2>
+                        <p className="text-xs text-surface-400 font-medium mt-0.5">Choose the plan that fits your job search</p>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-full"
+                        className="w-9 h-9 flex items-center justify-center text-surface-400 hover:text-surface-700 hover:bg-surface-100 rounded-xl transition-all"
+                        aria-label="Close"
                     >
-                        <FaTimes size={24} />
+                        <FaTimes size={16} />
                     </button>
+                </div>
 
-                    <div className="text-center mb-12">
-                        <h2 className="text-4xl font-extrabold text-gray-900 mb-4">Choose Your Plan</h2>
-                        <p className="text-xl text-gray-600">Get hired faster with a professional resume.</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Trial Plan */}
-                        <div className="relative flex flex-col p-8 bg-gray-50 rounded-2xl border-2 border-transparent hover:border-primary-200 transition-all">
-                            <h3 className="text-2xl font-bold text-gray-900 mb-2">14-Day Trial</h3>
-                            <p className="text-gray-500 mb-6">Full access to all features for two weeks.</p>
-                            <div className="mb-8">
-                                <span className="text-4xl font-black text-gray-900">$2.70</span>
-                                <span className="text-gray-500 ml-2">one-time</span>
-                            </div>
-
-                            <ul className="space-y-4 mb-10 flex-1">
-                                <li className="flex items-start text-gray-700">
-                                    <FaCheck className="text-green-500 mt-1 mr-3 flex-shrink-0" />
-                                    <span>Access to all 20+ Premium Templates</span>
-                                </li>
-                                <li className="flex items-start text-gray-700">
-                                    <FaCheck className="text-green-500 mt-1 mr-3 flex-shrink-0" />
-                                    <span>Unlimited PDF & Word Downloads</span>
-                                </li>
-                            </ul>
-
-                            <button
-                                type="button"
-                                onClick={() => handleUpgrade('TRIAL')}
-                                disabled={!!loading}
-                                className="w-full py-4 bg-white border-2 border-primary-600 text-primary-600 rounded-xl font-bold text-lg hover:bg-primary-50 transition-all disabled:opacity-50 flex items-center justify-center"
-                                aria-label="Select 14-Day Trial Plan"
-                                aria-busy={loading === 'TRIAL'}
-                            >
-                                {loading === 'TRIAL' ? <FaSpinner className="animate-spin mr-2" aria-hidden="true" /> : null}
-                                Select Trial
-                            </button>
+                {/* Error Banner */}
+                {errorMsg && (
+                    <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
+                        <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <FaTimes size={8} className="text-red-500" />
                         </div>
-
-                        {/* Annual Plan */}
-                        <div className="relative flex flex-col p-8 bg-primary-50 rounded-2xl border-2 border-primary-500 shadow-xl scale-105 z-10">
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary-600 text-white px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider">
-                                Best Value
-                            </div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-2">Annual Plan</h3>
-                            <p className="text-gray-500 mb-6">The most popular choice for job seekers.</p>
-                            <div className="mb-8">
-                                <span className="text-4xl font-black text-gray-900">$5.95</span>
-                                <span className="text-gray-500 ml-2">/ month</span>
-                                <p className="text-xs text-primary-600 font-semibold mt-1">Billed annually at $71.40</p>
-                            </div>
-
-                            <ul className="space-y-4 mb-10 flex-1">
-                                <li className="flex items-start text-gray-700">
-                                    <FaCheck className="text-primary-600 mt-1 mr-3 flex-shrink-0" />
-                                    <span className="font-semibold">Everything in Trial</span>
-                                </li>
-                                <li className="flex items-start text-gray-700">
-                                    <FaCheck className="text-primary-600 mt-1 mr-3 flex-shrink-0" />
-                                    <span>1 Year of Unlimited Updates</span>
-                                </li>
-                                <li className="flex items-start text-gray-700">
-                                    <FaCheck className="text-primary-600 mt-1 mr-3 flex-shrink-0" />
-                                    <span>Priority ATS Optimization</span>
-                                </li>
-                            </ul>
-
-                            <button
-                                type="button"
-                                onClick={() => handleUpgrade('ANNUAL')}
-                                disabled={!!loading}
-                                className="w-full py-4 bg-primary-600 text-white rounded-xl font-bold text-lg shadow-lg hover:bg-primary-700 hover:scale-[1.02] transition-all disabled:opacity-50 flex items-center justify-center"
-                                aria-label="Select Annual Plan"
-                                aria-busy={loading === 'ANNUAL'}
-                            >
-                                {loading === 'ANNUAL' ? <FaSpinner className="animate-spin mr-2" aria-hidden="true" /> : <FaCrown className="mr-2" aria-hidden="true" />}
-                                Get Started Now
-                            </button>
+                        <div>
+                            <p className="text-sm font-bold text-red-700">Checkout Failed</p>
+                            <p className="text-xs text-red-500 mt-0.5">{errorMsg}</p>
                         </div>
                     </div>
+                )}
 
-                    <p className="mt-8 text-center text-sm text-gray-400">
-                        Secure checkout powered by Stripe. Cancel anytime.
-                    </p>
+                {/* Plans */}
+                <div className="p-5 sm:p-6 space-y-4">
+                    {PLANS.map((plan) => {
+                        const Icon = plan.icon;
+                        const isLoading = loading === plan.type;
+                        const isDisabled = !!loading;
+
+                        return (
+                            <div
+                                key={plan.type}
+                                className={`relative rounded-2xl border-2 p-5 transition-all duration-200 ${plan.cardBg} ${plan.borderClass}`}
+                            >
+                                {plan.highlight && (
+                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                                        <span className="bg-primary-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
+                                            Best Value
+                                        </span>
+                                    </div>
+                                )}
+
+                                <div className="flex items-start justify-between mb-4 mt-1">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-10 h-10 rounded-xl ${plan.iconBg} flex items-center justify-center flex-shrink-0`}>
+                                            <Icon className={plan.iconColor} size={18} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-base font-black text-surface-900">{plan.name}</h3>
+                                            <p className="text-xs text-surface-500 font-medium">{plan.tagline}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right flex-shrink-0 ml-3">
+                                        <div className="text-2xl font-black text-surface-900">{plan.price}</div>
+                                        <div className="text-[10px] text-surface-400 font-medium leading-tight max-w-[90px]">{plan.billingNote}</div>
+                                    </div>
+                                </div>
+
+                                <ul className="space-y-2 mb-4">
+                                    {plan.features.map((feat) => (
+                                        <li key={feat} className="flex items-center gap-2.5 text-sm text-surface-700">
+                                            <FaCheck className={`${plan.featureColor} flex-shrink-0`} size={11} />
+                                            {feat}
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <button
+                                    type="button"
+                                    onClick={() => handleUpgrade(plan.type)}
+                                    disabled={isDisabled}
+                                    className={`w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 ${plan.ctaClass} disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.98]`}
+                                    aria-label={`Select ${plan.name}`}
+                                    aria-busy={isLoading}
+                                >
+                                    {isLoading ? (
+                                        <>
+                                            <FaSpinner className="animate-spin" size={14} aria-hidden="true" />
+                                            Redirecting to Checkout...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Icon size={13} aria-hidden="true" />
+                                            {plan.ctaLabel}
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 pb-6 pt-1 flex items-center justify-center gap-2 text-xs text-surface-400">
+                    <FaLock size={10} />
+                    <span>Secure checkout powered by Stripe &middot; Cancel anytime</span>
                 </div>
             </div>
         </div>
