@@ -85,13 +85,15 @@ export default function DashboardHeader() {
                     </div>
     
                     <div className="flex items-center gap-8">
+                        {/* Import Resume — icon-only on mobile, full label on sm:+ */}
                         <button
                             type="button"
                             onClick={() => setIsImportModalOpen(true)}
-                            className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-surface-600 hover:text-primary-600 hover:bg-primary-50 rounded-2xl transition-all border border-transparent hover:border-primary-100"
+                            className="flex items-center gap-2 px-3 sm:px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-surface-600 hover:text-primary-600 hover:bg-primary-50 rounded-2xl transition-all border border-transparent hover:border-primary-100"
                             aria-label="Import existing resume"
                         >
-                            <FaFileImport className="text-xs" aria-hidden="true" /> Import Resume
+                            <FaFileImport className="text-sm flex-shrink-0" aria-hidden="true" />
+                            <span className="hidden sm:inline">Import Resume</span>
                         </button>
     
                         <button

@@ -165,58 +165,116 @@ export default function BuilderPage() {
         URL.revokeObjectURL(url);
     };
 
-    const handleDownloadDocx = async () => {
-        const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = await import('docx');
-        const { personalInfo, experiences, education, skills } = resume;
+    const handleDownloadHtml = () => {
+        const toastId = toast.loading('Generating HTML resume...');
+        try {
+            const { personalInfo, experiences, education, skills } = resume;
+            const { certifications, languages, projects } = resume as any;
 
-        const children = [
-            new Paragraph({ text: personalInfo.fullName, heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
-            new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${personalInfo.email}  |  ${personalInfo.phone}  |  ${personalInfo.address}`, size: 20 })] }),
-            ...(personalInfo.website ? [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: personalInfo.website, size: 20 })] })] : []),
-            new Paragraph({}),
-        ];
+            const section = (title: string, content: string) => content.trim() ? `
+                <div class="section">
+                    <h2>${title}</h2>
+                    <div class="section-content">${content}</div>
+                </div>` : '';
 
-        if (personalInfo.summary) {
-            children.push(new Paragraph({ text: 'SUMMARY', heading: HeadingLevel.HEADING_2 }));
-            children.push(new Paragraph({ text: personalInfo.summary }));
-            children.push(new Paragraph({}));
+            const experienceHtml = (experiences || []).map((exp: any) => `
+                <div class="entry">
+                    <div class="entry-header">
+                        <span class="entry-title">${exp.position || ''}</span>
+                        <span class="entry-date">${exp.startDate || ''} – ${exp.current ? 'Present' : (exp.endDate || '')}</span>
+                    </div>
+                    <div class="entry-subtitle">${exp.company || ''}${exp.location ? ` · ${exp.location}` : ''}</div>
+                    ${exp.description ? `<p class="entry-desc">${exp.description.replace(/\n/g, '<br/>')}</p>` : ''}
+                </div>`).join('');
+
+            const educationHtml = (education || []).map((edu: any) => `
+                <div class="entry">
+                    <div class="entry-header">
+                        <span class="entry-title">${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}</span>
+                        <span class="entry-date">${edu.startDate || ''} – ${edu.endDate || ''}</span>
+                    </div>
+                    <div class="entry-subtitle">${edu.school || ''}</div>
+                    ${edu.gpa ? `<p class="entry-desc">GPA: ${edu.gpa}</p>` : ''}
+                </div>`).join('');
+
+            const projectsHtml = (projects || []).map((p: any) => `
+                <div class="entry">
+                    <div class="entry-header">
+                        <span class="entry-title">${p.name || ''}</span>
+                        ${p.link ? `<a class="entry-link" href="${p.link}" target="_blank">${p.link}</a>` : ''}
+                    </div>
+                    ${p.description ? `<p class="entry-desc">${p.description}</p>` : ''}
+                    ${p.technologies ? `<p class="entry-desc"><strong>Technologies:</strong> ${p.technologies}</p>` : ''}
+                </div>`).join('');
+
+            const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>${personalInfo?.fullName || 'Resume'}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Georgia', serif; font-size: 14px; color: #1a1a1a; background: #fff; max-width: 800px; margin: 40px auto; padding: 40px; line-height: 1.6; }
+  h1 { font-size: 28px; font-weight: bold; letter-spacing: 1px; color: #111; margin-bottom: 4px; }
+  .contact { font-size: 12px; color: #555; margin-bottom: 8px; }
+  .contact a { color: #2563eb; text-decoration: none; }
+  .divider { height: 2px; background: #111; margin: 16px 0; }
+  h2 { font-size: 11px; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; color: #444; margin-bottom: 12px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+  .section { margin-bottom: 24px; }
+  .section-content { font-size: 13px; }
+  .entry { margin-bottom: 14px; }
+  .entry-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px; }
+  .entry-title { font-weight: bold; font-size: 14px; color: #111; }
+  .entry-date { font-size: 12px; color: #666; white-space: nowrap; }
+  .entry-subtitle { font-size: 12px; color: #555; margin: 2px 0; font-style: italic; }
+  .entry-desc { font-size: 13px; color: #333; margin-top: 4px; }
+  .entry-link { font-size: 12px; color: #2563eb; text-decoration: none; }
+  .skills-list { font-size: 13px; color: #333; }
+  .summary-text { font-size: 13px; color: #333; font-style: italic; }
+  @media print {
+    body { margin: 0; padding: 24px; }
+    @page { margin: 1.5cm; }
+  }
+</style>
+</head>
+<body>
+  <h1>${personalInfo?.fullName || 'Resume'}</h1>
+  ${personalInfo?.jobTitle ? `<p style="font-size:13px;color:#555;margin-bottom:6px;">${personalInfo.jobTitle}</p>` : ''}
+  <p class="contact">
+    ${[personalInfo?.email, personalInfo?.phone, personalInfo?.address].filter(Boolean).join('&nbsp;&nbsp;|&nbsp;&nbsp;')}
+    ${personalInfo?.website ? `&nbsp;&nbsp;|&nbsp;&nbsp;<a href="${personalInfo.website}">${personalInfo.website}</a>` : ''}
+    ${(personalInfo as any)?.linkedin ? `&nbsp;&nbsp;|&nbsp;&nbsp;<a href="${(personalInfo as any).linkedin}">${(personalInfo as any).linkedin}</a>` : ''}
+  </p>
+  <div class="divider"></div>
+  ${personalInfo?.summary ? section('Professional Summary', `<p class="summary-text">${personalInfo.summary}</p>`) : ''}
+  ${experienceHtml ? section('Experience', experienceHtml) : ''}
+  ${educationHtml ? section('Education', educationHtml) : ''}
+  ${projectsHtml ? section('Projects', projectsHtml) : ''}
+  ${skills?.length > 0 ? section('Skills', `<p class="skills-list">${skills.join(' &nbsp;·&nbsp; ')}</p>`) : ''}
+  ${(certifications || []).length > 0 ? section('Certifications', (certifications || []).map((c: any) => `<div class="entry"><span class="entry-title">${c.name || ''}</span>${c.issuer ? ` — ${c.issuer}` : ''}${c.date ? ` <span class="entry-date">(${c.date})</span>` : ''}</div>`).join('')) : ''}
+  ${(languages || []).length > 0 ? section('Languages', `<p class="skills-list">${(languages || []).map((l: any) => `${l.language || l}${l.proficiency ? ` (${l.proficiency})` : ''}`).join(' &nbsp;·&nbsp; ')}</p>`) : ''}
+</body>
+</html>`;
+
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${personalInfo?.fullName || 'resume'}.html`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            toast.dismiss(toastId);
+            toast.success('Resume downloaded! Open the .html file in any browser. Use Ctrl+P to print/save as PDF.', { duration: 6000 });
+        } catch (error) {
+            console.error('HTML generation error:', error);
+            toast.dismiss(toastId);
+            toast.error('Failed to generate resume file. Please try again.');
         }
-
-        if (experiences?.length > 0) {
-            children.push(new Paragraph({ text: 'EXPERIENCE', heading: HeadingLevel.HEADING_2 }));
-            experiences.forEach((exp) => {
-                children.push(new Paragraph({ children: [new TextRun({ text: `${exp.position} — ${exp.company}`, bold: true })] }));
-                children.push(new Paragraph({ children: [new TextRun({ text: `${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}`, italics: true, size: 20 })] }));
-                if (exp.description) children.push(new Paragraph({ text: exp.description }));
-                children.push(new Paragraph({}));
-            });
-        }
-
-        if (education?.length > 0) {
-            children.push(new Paragraph({ text: 'EDUCATION', heading: HeadingLevel.HEADING_2 }));
-            education.forEach((edu) => {
-                children.push(new Paragraph({ children: [new TextRun({ text: `${edu.degree} in ${edu.field}`, bold: true })] }));
-                children.push(new Paragraph({ children: [new TextRun({ text: `${edu.school}  |  ${edu.startDate} - ${edu.endDate}`, italics: true, size: 20 })] }));
-                children.push(new Paragraph({}));
-            });
-        }
-
-        if (skills?.length > 0) {
-            children.push(new Paragraph({ text: 'SKILLS', heading: HeadingLevel.HEADING_2 }));
-            children.push(new Paragraph({ text: skills.join(', ') }));
-        }
-
-        const doc = new Document({ sections: [{ children }] });
-        const blob = await Packer.toBlob(doc);
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${personalInfo.fullName || 'resume'}.docx`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(url);
     };
+
 
     const handleSectionClick = (sectionId: string) => {
         // Zety-like auto-fill: if user clicks an empty section in the preview, instantiate the form with that sample data!
@@ -296,31 +354,23 @@ export default function BuilderPage() {
 
                             <div className="flex gap-2">
                                 <button
-                                    onClick={handleDownloadTxt}
-                                    className="hidden sm:block px-4 py-2 text-[10px] font-black uppercase tracking-widest text-surface-500 hover:text-surface-900 bg-surface-50 hover:bg-surface-100 rounded-xl transition-all"
+                                    onClick={handleDownloadHtml}
+                                    className="hidden sm:flex items-center gap-1.5 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all"
                                 >
-                                    .TXT
+                                    <FaDownload size={9} /> .HTML
                                 </button>
                                 {userPlan === 'PRO' ? (
-                                    <>
-                                        <button
-                                            onClick={handleDownloadDocx}
-                                            className="hidden xs:block px-4 py-2 text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all"
-                                        >
-                                            .DOCX
-                                        </button>
-                                        <PDFDownloadLink
-                                            document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
-                                            fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
-                                            className="btn-primary !px-4 sm:!px-6 !py-2 !rounded-xl !text-[10px] !font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-primary-600/20"
-                                        >
-                                            {({ loading }) => (
-                                                <>
-                                                    <FaDownload size={10} className="hidden xs:block" /> {loading ? '...' : 'PDF'}
-                                                </>
-                                            )}
-                                        </PDFDownloadLink>
-                                    </>
+                                    <PDFDownloadLink
+                                        document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
+                                        fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
+                                        className="btn-primary !px-4 sm:!px-6 !py-2 !rounded-xl !text-[10px] !font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-primary-600/20"
+                                    >
+                                        {({ loading }) => (
+                                            <>
+                                                <FaDownload size={10} className="hidden xs:block" /> {loading ? '...' : 'PDF'}
+                                            </>
+                                        )}
+                                    </PDFDownloadLink>
                                 ) : (
                                     <button
                                         onClick={() => setIsUpgradeModalOpen(true)}
@@ -440,54 +490,42 @@ export default function BuilderPage() {
                                             </p>
                                         </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-2xl mx-auto">
+                                            {/* HTML — available to all users, opens in any browser */}
                                             <button
-                                                onClick={handleDownloadTxt}
-                                                className="premium-card p-4 sm:p-6 flex flex-col items-center gap-4 group"
+                                                onClick={handleDownloadHtml}
+                                                className="premium-card p-4 sm:p-6 flex flex-col items-center gap-4 border-blue-100 group"
                                             >
-                                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-surface-50 flex items-center justify-center text-surface-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                                                    <FaFileAlt size={20} />
+                                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                                    <FaDownload size={20} />
                                                 </div>
                                                 <div className="text-center">
-                                                    <p className="text-[10px] sm:text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Plain Text</p>
-                                                    <span className="text-[10px] font-black text-primary-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Download</span>
+                                                    <p className="text-[10px] sm:text-xs font-black text-surface-900 uppercase tracking-widest mb-1">HTML Resume</p>
+                                                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Open in Browser</span>
                                                 </div>
                                             </button>
 
+                                            {/* PDF — PRO only */}
                                             {userPlan === 'PRO' ? (
-                                                <>
-                                                    <button
-                                                        onClick={handleDownloadDocx}
-                                                        className="premium-card p-4 sm:p-6 flex flex-col items-center gap-4 border-blue-100 group"
-                                                    >
-                                                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                                                            <FaFileAlt size={20} />
-                                                        </div>
-                                                        <div className="text-center">
-                                                            <p className="text-[10px] sm:text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Word Doc</p>
-                                                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Download</span>
-                                                        </div>
-                                                    </button>
-                                                    <PDFDownloadLink
-                                                        document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
-                                                        fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
-                                                        className="premium-card p-4 sm:p-6 flex flex-col items-center gap-4 border-primary-100 group"
-                                                    >
-                                                        {({ loading }) => (
-                                                            <>
-                                                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors">
-                                                                    <FaDownload size={20} />
-                                                                </div>
-                                                                <div className="text-center">
-                                                                    <p className="text-[10px] sm:text-xs font-black text-surface-900 uppercase tracking-widest mb-1">PDF Document</p>
-                                                                    <span className="text-[10px] font-black text-primary-600 uppercase tracking-widest whitespace-nowrap">
-                                                                        {loading ? '...' : 'Download'}
-                                                                    </span>
-                                                                </div>
-                                                            </>
-                                                        )}
-                                                    </PDFDownloadLink>
-                                                </>
+                                                <PDFDownloadLink
+                                                    document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
+                                                    fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
+                                                    className="premium-card p-4 sm:p-6 flex flex-col items-center gap-4 border-primary-100 group"
+                                                >
+                                                    {({ loading }) => (
+                                                        <>
+                                                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors">
+                                                                <FaDownload size={20} />
+                                                            </div>
+                                                            <div className="text-center">
+                                                                <p className="text-[10px] sm:text-xs font-black text-surface-900 uppercase tracking-widest mb-1">PDF Document</p>
+                                                                <span className="text-[10px] font-black text-primary-600 uppercase tracking-widest whitespace-nowrap">
+                                                                    {loading ? '...' : 'Download .pdf'}
+                                                                </span>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </PDFDownloadLink>
                                             ) : (
                                                 <button
                                                     onClick={() => setIsUpgradeModalOpen(true)}
@@ -498,7 +536,7 @@ export default function BuilderPage() {
                                                     </div>
                                                     <div className="text-center">
                                                         <p className="text-[10px] sm:text-xs font-black text-surface-900 uppercase tracking-widest mb-1">Unlock PDF</p>
-                                                        <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest animate-pulse">Upgrade</span>
+                                                        <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest animate-pulse">Upgrade to PRO</span>
                                                     </div>
                                                 </button>
                                             )}

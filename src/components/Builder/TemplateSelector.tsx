@@ -39,8 +39,8 @@ export default function TemplateSelector({ userPlan, onUpgradeRequired }: Templa
                             <FaMagic className="text-primary-400 animate-pulse" />
                         </div>
                         <div>
-                            <h3 className="text-2xl font-black tracking-tight mb-1">Template Gallery</h3>
-                            <p className="text-surface-400 text-sm font-medium">Explore our collection of high-impact layouts.</p>
+                            <h3 className="text-2xl font-black tracking-tight mb-1 text-white">Template Gallery</h3>
+                            <p className="text-white/70 text-sm font-medium">Explore our collection of high-impact layouts.</p>
                         </div>
                     </div>
                     <button

@@ -26,6 +26,7 @@ model User {
   password             String
   plan                 Plan             @default(FREE)
   aiUsageCount         Int?             @default(0)
+  pdfDownloadCount     Int?             @default(0)
   subscriptionType     SubscriptionType @default(NONE)
   planExpiry           DateTime?
   stripeCustomerId     String?

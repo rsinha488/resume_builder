@@ -8,6 +8,7 @@ import { pdf } from '@react-pdf/renderer';
 import DashboardHeader from '@/components/Dashboard/DashboardHeader';
 import DocumentCard from '@/components/Dashboard/DocumentCard';
 import EmptyState from '@/components/Dashboard/EmptyState';
+import UpgradeModal from '@/components/UpgradeModal';
 import { ResumePDF } from '@/components/Builder/ResumePDF';
 import { toast } from 'sonner';
 
@@ -30,6 +31,8 @@ export default function DashboardPage() {
     const [activeTab, setActiveTab] = useState<'resumes' | 'coverLetters'>('resumes');
     const [searchQuery, setSearchQuery] = useState('');
     const [userPlan, setUserPlan] = useState<{ plan: string; subscriptionType: string; planExpiry: string | null } | null>(null);
+    const [downloadInfo, setDownloadInfo] = useState<{ pdfDownloadCount: number; limit: number; remaining: number | null; isPro: boolean; canDownload: boolean } | null>(null);
+    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -55,8 +58,12 @@ export default function DashboardPage() {
     useEffect(() => {
         const fetchPlan = async () => {
             try {
-                const res = await axios.get('/api/user/plan');
-                setUserPlan(res.data);
+                const [planRes, dlRes] = await Promise.all([
+                    axios.get('/api/user/plan'),
+                    axios.get('/api/user/download-count'),
+                ]);
+                setUserPlan(planRes.data);
+                setDownloadInfo(dlRes.data);
             } catch { /* silent */ }
         };
         fetchPlan();
@@ -169,6 +176,29 @@ export default function DashboardPage() {
     const downloadResume = async (id: string) => {
         const doc = resumes.find(r => r.id === id);
         if (!doc) return;
+
+        // Gate: check quota before generating the PDF
+        try {
+            const gateRes = await axios.post('/api/user/download-count');
+            if (!gateRes.data.canDownload) {
+                toast.error(gateRes.data.error || 'Download limit reached. Upgrade to PRO for unlimited downloads.');
+                setIsUpgradeModalOpen(true);
+                return;
+            }
+            // Update local count
+            setDownloadInfo(prev => prev ? { ...prev, pdfDownloadCount: gateRes.data.pdfDownloadCount ?? prev.pdfDownloadCount, remaining: gateRes.data.remaining ?? null } : prev);
+        } catch (err: any) {
+            const msg = err.response?.data?.error || 'Could not verify download quota. Please try again.';
+            // 403 = limit reached
+            if (err.response?.status === 403) {
+                toast.error(msg);
+                setIsUpgradeModalOpen(true);
+                return;
+            }
+            toast.error(msg);
+            return;
+        }
+
         try {
             toast.loading('Generating PDF...');
             const blob = await pdf(<ResumePDF data={doc.data} pages={doc.data?.isMultiPage ? 2 : 1} />).toBlob();
@@ -183,7 +213,7 @@ export default function DashboardPage() {
         } catch (error) {
             console.error('Error downloading resume:', error);
             toast.dismiss();
-            toast.error('Failed to generate PDF.');
+            toast.error('Failed to generate PDF. Please try again.');
         }
     };
 
@@ -295,9 +325,12 @@ export default function DashboardPage() {
                                 type={activeTab === 'resumes' ? 'resume' : 'coverLetter'}
                                 templateId={doc.templateId}
                                 resumeData={doc.data}
+                                isPro={downloadInfo?.isPro ?? false}
+                                downloadInfo={downloadInfo}
                                 onDelete={activeTab === 'resumes' ? deleteResume : deleteCoverLetter}
                                 onDuplicate={activeTab === 'resumes' ? duplicateResume : duplicateCoverLetter}
                                 onDownload={activeTab === 'resumes' ? downloadResume : () => toast.error('PDF download is only available for resumes.')}
+                                onUpgradeRequired={() => setIsUpgradeModalOpen(true)}
                             />
                         ))}
                     </div>
@@ -320,6 +353,15 @@ export default function DashboardPage() {
                     </div>
                 </div>
             </footer>
+
+            <UpgradeModal
+                isOpen={isUpgradeModalOpen}
+                onClose={() => setIsUpgradeModalOpen(false)}
+                onUpgradeSuccess={() => {
+                    setIsUpgradeModalOpen(false);
+                    setDownloadInfo(prev => prev ? { ...prev, isPro: true, remaining: null, canDownload: true } : prev);
+                }}
+            />
         </div>
     );
 }
