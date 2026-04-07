@@ -34,6 +34,26 @@ export interface Education {
     description: string;
 }
 
+export interface CustomSection {
+    id: string;
+    title: string;
+    content: string; // HTML/Markdown
+}
+
+export interface SectionConfig {
+    id: string;
+    name: string;
+    isVisible: boolean;
+    type: 'default' | 'custom';
+}
+
+export interface Project {
+    id: string;
+    name: string;
+    description: string;
+    link?: string;
+    technologies?: string;
+}
 
 export interface ResumeState {
     id?: string | null;
@@ -42,10 +62,13 @@ export interface ResumeState {
     personalInfo: PersonalInfo;
     experiences: Experience[];
     education: Education[];
+    projects: Project[];
     skills: string[];
     languages: string[];
     certifications: string[];
     hobbies: string[];
+    sections: SectionConfig[];
+    customSections: CustomSection[];
     themeColor: string;
     fontFamily: string;
     fontSize: 'small' | 'medium' | 'large';
@@ -54,6 +77,18 @@ export interface ResumeState {
     margins: number;
     isMultiPage: boolean;
 }
+
+const DEFAULT_SECTIONS: SectionConfig[] = [
+    { id: 'personal', name: 'Personal info', isVisible: true, type: 'default' },
+    { id: 'summary', name: 'Professional Summary', isVisible: true, type: 'default' },
+    { id: 'experience', name: 'Work Experience', isVisible: true, type: 'default' },
+    { id: 'education', name: 'Education', isVisible: true, type: 'default' },
+    { id: 'projects', name: 'Projects', isVisible: true, type: 'default' },
+    { id: 'skills', name: 'Skills', isVisible: true, type: 'default' },
+    { id: 'languages', name: 'Languages', isVisible: true, type: 'default' },
+    { id: 'certifications', name: 'Certifications', isVisible: true, type: 'default' },
+    { id: 'hobbies', name: 'Interests', isVisible: true, type: 'default' },
+];
 
 const initialState: ResumeState = {
     id: null,
@@ -69,10 +104,13 @@ const initialState: ResumeState = {
     },
     experiences: [],
     education: [],
+    projects: [],
     skills: [],
     languages: [],
     certifications: [],
     hobbies: [],
+    sections: DEFAULT_SECTIONS,
+    customSections: [],
     themeColor: '#2563eb',
     fontFamily: 'Inter',
     fontSize: 'medium',
@@ -97,6 +135,9 @@ export const resumeSlice = createSlice({
                 fontFamily: action.payload.fontFamily ?? initialState.fontFamily,
                 themeColor: action.payload.themeColor ?? initialState.themeColor,
                 isMultiPage: action.payload.isMultiPage ?? initialState.isMultiPage,
+                sections: action.payload.sections || DEFAULT_SECTIONS,
+                customSections: action.payload.customSections || [],
+                projects: action.payload.projects || [],
             };
         },
         updateTemplate: (state, action: PayloadAction<string>) => {
@@ -125,6 +166,16 @@ export const resumeSlice = createSlice({
         removeEducation: (state, action: PayloadAction<string>) => {
             state.education = state.education.filter(edu => edu.id !== action.payload);
         },
+        addProject: (state, action: PayloadAction<Project>) => {
+            state.projects.push(action.payload);
+        },
+        updateProject: (state, action: PayloadAction<Project>) => {
+            const index = state.projects.findIndex(p => p.id === action.payload.id);
+            if (index !== -1) state.projects[index] = action.payload;
+        },
+        removeProject: (state, action: PayloadAction<string>) => {
+            state.projects = state.projects.filter(p => p.id !== action.payload);
+        },
         updateSkills: (state, action: PayloadAction<string[]>) => {
             state.skills = action.payload;
         },
@@ -136,6 +187,34 @@ export const resumeSlice = createSlice({
         },
         updateHobbies: (state, action: PayloadAction<string[]>) => {
             state.hobbies = action.payload;
+        },
+        updateSections: (state, action: PayloadAction<SectionConfig[]>) => {
+            state.sections = action.payload;
+        },
+        toggleSectionVisibility: (state, action: PayloadAction<string>) => {
+            const section = state.sections.find(s => s.id === action.payload);
+            if (section) section.isVisible = !section.isVisible;
+        },
+        addCustomSection: (state, action: PayloadAction<CustomSection>) => {
+            state.customSections.push(action.payload);
+            state.sections.push({
+                id: action.payload.id,
+                name: action.payload.title,
+                isVisible: true,
+                type: 'custom'
+            });
+        },
+        updateCustomSection: (state, action: PayloadAction<CustomSection>) => {
+            const index = state.customSections.findIndex(s => s.id === action.payload.id);
+            if (index !== -1) {
+                state.customSections[index] = action.payload;
+                const sectionConfig = state.sections.find(s => s.id === action.payload.id);
+                if (sectionConfig) sectionConfig.name = action.payload.title;
+            }
+        },
+        removeCustomSection: (state, action: PayloadAction<string>) => {
+            state.customSections = state.customSections.filter(s => s.id !== action.payload);
+            state.sections = state.sections.filter(s => s.id !== action.payload);
         },
         updateThemeColor: (state, action: PayloadAction<string>) => {
             state.themeColor = action.payload;
@@ -172,10 +251,18 @@ export const {
     addEducation,
     updateEducation,
     removeEducation,
+    addProject,
+    updateProject,
+    removeProject,
     updateSkills,
     updateLanguages,
     updateCertifications,
     updateHobbies,
+    updateSections,
+    toggleSectionVisibility,
+    addCustomSection,
+    updateCustomSection,
+    removeCustomSection,
     updateThemeColor,
     updateFontFamily,
     updateFontSize,

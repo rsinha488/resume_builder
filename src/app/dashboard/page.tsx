@@ -203,7 +203,7 @@ export default function DashboardPage() {
 
         try {
             toast.loading('Generating PDF...');
-            const blob = await pdf(<ResumePDF data={doc.data} pages={doc.data?.isMultiPage ? 2 : 1} />).toBlob();
+            const blob = await pdf(<ResumePDF data={doc.data} />).toBlob();
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;

@@ -7,6 +7,7 @@ import { setResume, updatePersonalInfo } from '@/lib/features/resume/resumeSlice
 import PersonalInfoForm from '@/components/Builder/PersonalInfoForm';
 import ExperienceForm from '@/components/Builder/ExperienceForm';
 import EducationForm from '@/components/Builder/EducationForm';
+import ProjectForm from '@/components/Builder/ProjectForm';
 import SkillsForm from '@/components/Builder/SkillsForm';
 import TemplateSelector from '@/components/Builder/TemplateSelector';
 import ThemeSelector from '@/components/Builder/ThemeSelector';
@@ -17,22 +18,26 @@ import UpgradeModal from '@/components/UpgradeModal';
 import BuilderSidebar from '@/components/Builder/BuilderSidebar';
 import BuilderBottomBar from '@/components/Builder/BuilderBottomBar';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import { FaDownload, FaCrown, FaFileAlt, FaCheck, FaEdit, FaSpinner, FaMagic, FaChevronRight } from 'react-icons/fa';
+import { FaDownload, FaCrown, FaFileAlt, FaCheck, FaEdit, FaSpinner, FaMagic, FaChevronRight, FaGripVertical } from 'react-icons/fa';
 import ProgressBar from '@/components/Builder/ProgressBar';
 import { toast } from 'sonner';
 import { convertToPlainText } from '@/lib/utils';
 import { SAMPLE_DATA } from '@/lib/sampleData';
-import ExtraSections from '@/components/Builder/ExtraSections';
 import DashboardHeader from '@/components/Dashboard/DashboardHeader';
+import SectionManager from '@/components/Builder/SectionManager';
+import CustomSectionForm from '@/components/Builder/CustomSectionForm';
+import ExtraSections from '@/components/Builder/ExtraSections';
+import { v4 as uuidv4 } from 'uuid';
 
-type BuilderMode = 'templates' | 'design' | 'content' | 'analysis' | 'finalize';
+type BuilderMode = 'templates' | 'design' | 'content' | 'sections' | 'analysis' | 'finalize';
 
 const contentSteps = [
     { id: 'personal', title: 'Personal Info', shortTitle: 'Contact' },
     { id: 'experience', title: 'Experience', shortTitle: 'Experience' },
     { id: 'education', title: 'Education', shortTitle: 'Education' },
+    { id: 'projects', title: 'Projects', shortTitle: 'Projects' },
     { id: 'skills', title: 'Skills', shortTitle: 'Skills' },
-    { id: 'extra', title: 'Extra Sections', shortTitle: 'Extras' },
+    { id: 'extra', title: 'Additional Details', shortTitle: 'Extras' },
 ];
 
 export default function BuilderPage() {
@@ -47,6 +52,7 @@ export default function BuilderPage() {
     const [saving, setSaving] = useState(false);
     const [userPlan, setUserPlan] = useState<'FREE' | 'PRO'>('FREE');
     const [aiUsageCount, setAiUsageCount] = useState(0);
+    const [activeCustomSectionId, setActiveCustomSectionId] = useState<string | null>(null);
     const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
     const [showMobilePreview, setShowMobilePreview] = useState(false);
 
@@ -114,33 +120,38 @@ export default function BuilderPage() {
 
     const handleNext = () => {
         handleSave();
-        if (currentMode === 'templates') setCurrentMode('design');
-        else if (currentMode === 'design') setCurrentMode('content');
-        else if (currentMode === 'content') {
+        const modes: BuilderMode[] = ['templates', 'design', 'content', 'sections', 'analysis', 'finalize'];
+        const currentModeIndex = modes.indexOf(currentMode);
+
+        if (currentMode === 'content') {
             if (currentContentStep < contentSteps.length - 1) {
                 setCurrentContentStep(prev => prev + 1);
             } else {
-                setCurrentMode('analysis');
+                setCurrentMode('sections');
             }
+        } else if (currentModeIndex < modes.length - 1) {
+            const nextMode = modes[currentModeIndex + 1];
+            setCurrentMode(nextMode);
+            if (nextMode === 'content') setCurrentContentStep(0);
         }
-        else if (currentMode === 'analysis') setCurrentMode('finalize');
     };
 
     const handleBack = () => {
         handleSave(true);
-        if (currentMode === 'finalize') setCurrentMode('analysis');
-        else if (currentMode === 'analysis') {
-            setCurrentContentStep(contentSteps.length - 1);
-            setCurrentMode('content');
-        }
-        else if (currentMode === 'content') {
+        const modes: BuilderMode[] = ['templates', 'design', 'content', 'sections', 'analysis', 'finalize'];
+        const currentModeIndex = modes.indexOf(currentMode);
+
+        if (currentMode === 'content') {
             if (currentContentStep > 0) {
                 setCurrentContentStep(prev => prev - 1);
             } else {
                 setCurrentMode('design');
             }
+        } else if (currentModeIndex > 0) {
+            const prevMode = modes[currentModeIndex - 1];
+            setCurrentMode(prevMode);
+            if (prevMode === 'content') setCurrentContentStep(contentSteps.length - 1);
         }
-        else if (currentMode === 'design') setCurrentMode('templates');
     };
 
     const handleFillSampleData = () => {
@@ -361,7 +372,7 @@ export default function BuilderPage() {
                                 </button>
                                 {userPlan === 'PRO' ? (
                                     <PDFDownloadLink
-                                        document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
+                                        document={<ResumePDF data={resume} />}
                                         fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
                                         className="btn-primary !px-4 sm:!px-6 !py-2 !rounded-xl !text-[10px] !font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-primary-600/20"
                                     >
@@ -459,10 +470,20 @@ export default function BuilderPage() {
                                             onUpgrade={() => setIsUpgradeModalOpen(true)} 
                                         />}
                                         {currentContentStep === 2 && <EducationForm />}
-                                        {currentContentStep === 3 && <SkillsForm />}
-                                        {currentContentStep === 4 && <ExtraSections />}
-
+                                        {currentContentStep === 3 && <ProjectForm />}
+                                        {currentContentStep === 4 && <SkillsForm />}
+                                        {currentContentStep === 5 && <ExtraSections />}
                                     </>
+                                )}
+                                {currentMode === 'sections' && (
+                                    activeCustomSectionId ? (
+                                        <CustomSectionForm 
+                                            sectionId={activeCustomSectionId} 
+                                            onBack={() => setActiveCustomSectionId(null)} 
+                                        />
+                                    ) : (
+                                        <SectionManager onEditCustom={setActiveCustomSectionId} />
+                                    )
                                 )}
                                 {currentMode === 'analysis' && (
                                     <AtsScoreDisplay 
@@ -508,7 +529,7 @@ export default function BuilderPage() {
                                             {/* PDF — PRO only */}
                                             {userPlan === 'PRO' ? (
                                                 <PDFDownloadLink
-                                                    document={<ResumePDF data={resume} pages={resume.isMultiPage ? 2 : 1} />}
+                                                    document={<ResumePDF data={resume} />}
                                                     fileName={`${resume.personalInfo?.fullName || 'resume'}.pdf`}
                                                     className="premium-card p-4 sm:p-6 flex flex-col items-center gap-4 border-primary-100 group"
                                                 >

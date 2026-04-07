@@ -1,17 +1,18 @@
 'use client';
-import { FaFileAlt, FaPalette, FaEdit, FaChartBar, FaCheck } from 'react-icons/fa';
+import { FaFileAlt, FaPalette, FaEdit, FaChartBar, FaCheck, FaMagic, FaGripVertical, FaSpinner } from 'react-icons/fa';
 
 interface BuilderSidebarProps {
-    readonly currentMode: 'templates' | 'design' | 'content' | 'analysis' | 'finalize';
-    readonly onModeChange: (mode: 'templates' | 'design' | 'content' | 'analysis' | 'finalize') => void;
+    readonly currentMode: 'templates' | 'design' | 'content' | 'sections' | 'analysis' | 'finalize';
+    readonly onModeChange: (mode: 'templates' | 'design' | 'content' | 'sections' | 'analysis' | 'finalize') => void;
 }
 
 const MODES = [
-    { id: 'templates', icon: FaFileAlt, label: 'Templates' },
-    { id: 'design', icon: FaPalette, label: 'Design' },
-    { id: 'content', icon: FaEdit, label: 'Content' },
-    { id: 'analysis', icon: FaChartBar, label: 'Analysis' },
-    { id: 'finalize', icon: FaCheck, label: 'Finalize' },
+    { id: 'templates', icon: FaMagic, label: 'Templates' },
+    { id: 'design', icon: FaEdit, label: 'Design' },
+    { id: 'content', icon: FaFileAlt, label: 'Content' },
+    { id: 'sections', icon: FaGripVertical, label: 'Sections' },
+    { id: 'analysis', icon: FaSpinner, label: 'Analysis' },
+    { id: 'finalize', icon: FaCheck, label: 'Download' },
 ] as const;
 
 export default function BuilderSidebar({ currentMode, onModeChange }: BuilderSidebarProps) {

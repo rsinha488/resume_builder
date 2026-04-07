@@ -3,7 +3,7 @@
 interface ProgressBarProps {
     readonly steps: { readonly id: string; readonly title: string }[];
     readonly currentStep: number;
-    readonly currentMode: 'templates' | 'design' | 'content' | 'analysis' | 'finalize';
+    readonly currentMode: 'templates' | 'design' | 'content' | 'sections' | 'analysis' | 'finalize';
 }
 
 export default function ProgressBar({ steps, currentStep, currentMode }: ProgressBarProps) {
@@ -11,10 +11,12 @@ export default function ProgressBar({ steps, currentStep, currentMode }: Progres
         if (currentMode === 'templates') return 10;
         if (currentMode === 'design') return 25;
         if (currentMode === 'content') {
-            const contentProgress = (currentStep / steps.length) * 50;
+            const contentProgress = (currentStep / Math.max(steps.length, 1)) * 40;
             return 25 + contentProgress;
         }
-        if (currentMode === 'analysis') return 100;
+        if (currentMode === 'sections') return 75;
+        if (currentMode === 'analysis') return 90;
+        if (currentMode === 'finalize') return 100;
         return 0;
     };
 

@@ -1,18 +1,16 @@
 'use client';
 import { useAppSelector } from '@/lib/hooks';
 import ModernTemplate from './ModernTemplate';
-import ClassicTemplate from './ClassicTemplate';
-import PrimoTemplate from './PrimoTemplate';
 import MinimalTemplate from './MinimalTemplate';
-import CascadeTemplate from './CascadeTemplate';
 import ConceptTemplate from './ConceptTemplate';
 import DiamondTemplate from './DiamondTemplate';
 import InfluxTemplate from './InfluxTemplate';
+import CascadeTemplate from './CascadeTemplate';
 import VibesTemplate from './VibesTemplate';
+import ClassicTemplate from './ClassicTemplate';
+import PrimoTemplate from './PrimoTemplate';
 import MuseTemplate from './MuseTemplate';
-
 import { SAMPLE_DATA } from '@/lib/sampleData';
-
 import { ResumeState } from '@/lib/features/resume/resumeSlice';
 
 interface ResumePreviewProps {
@@ -25,7 +23,6 @@ export default function ResumePreview({ data, templateId, onSectionClick }: Resu
     const stateResume = useAppSelector((state) => state.resume);
     const resume = data || stateResume;
 
-    // Helper to check if personal info is empty
     // Merge logic: Use user data if present, otherwise fallback to sample data
     const displayData: ResumeState = {
         ...resume,

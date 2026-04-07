@@ -1,7 +1,6 @@
 'use client';
 import { ResumeState } from '@/lib/features/resume/resumeSlice';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaGlobe } from 'react-icons/fa';
-
 import PreviewSection from './PreviewSection';
 
 export default function ModernTemplate({ data, onSectionClick }: { readonly data: ResumeState; readonly onSectionClick?: (sectionId: string) => void }) {
@@ -23,6 +22,167 @@ export default function ModernTemplate({ data, onSectionClick }: { readonly data
         medium: 'text-[14px]',
         large: 'text-[16px]'
     };
+
+    const renderSectionContent = (sectionId: string) => {
+        switch (sectionId) {
+            case 'summary':
+                if (!personalInfo?.summary) return null;
+                return (
+                    <PreviewSection key="summary" sectionId="summary" onClick={onSectionClick} title="Summary">
+                        <section style={{ marginBottom: `${sectionSpacing}px` }}>
+                            <h3 className="text-lg font-bold uppercase tracking-wide mb-3 border-b pb-1" style={{ color: themeColor, borderColor: themeColor + '40' }}>
+                                Professional Summary
+                            </h3>
+                            <p className={`${fontSizeMap[fontSize || 'medium']} leading-relaxed text-gray-700 whitespace-pre-line`}>
+                                {personalInfo.summary}
+                            </p>
+                        </section>
+                    </PreviewSection>
+                );
+            case 'experience':
+                if (!experiences?.length) return null;
+                return (
+                    <PreviewSection key="experience" sectionId="experience" onClick={onSectionClick} title="Experience">
+                        <section style={{ marginBottom: `${sectionSpacing}px` }}>
+                            <h3 className="text-lg font-bold uppercase tracking-wide mb-4 border-b pb-1" style={{ color: themeColor, borderColor: themeColor + '40' }}>
+                                Work Experience
+                            </h3>
+                            <div className="space-y-6">
+                                {experiences.map((exp) => (
+                                    <div key={exp.id}>
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h4 className="font-bold text-gray-900">{exp.position}</h4>
+                                            <span className="text-xs font-semibold text-gray-500 uppercase">
+                                                {exp.startDate} — {exp.current ? 'Present' : exp.endDate}
+                                            </span>
+                                        </div>
+                                        <div className="text-sm font-semibold mb-2" style={{ color: themeColor }}>{exp.company}</div>
+                                        <p className={`${fontSizeMap[fontSize || 'medium']} text-gray-700 whitespace-pre-line leading-relaxed`}>
+                                            {exp.description}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    </PreviewSection>
+                );
+            case 'education':
+                if (!education?.length) return null;
+                return (
+                    <PreviewSection key="education" sectionId="education" onClick={onSectionClick} title="Education">
+                        <section style={{ marginBottom: `${sectionSpacing}px` }}>
+                            <h3 className="text-lg font-bold uppercase tracking-wide mb-4 border-b pb-1" style={{ color: themeColor, borderColor: themeColor + '40' }}>
+                                Education
+                            </h3>
+                            <div className="space-y-4">
+                                {education.map((edu) => (
+                                    <div key={edu.id}>
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h4 className="font-bold text-gray-900">{edu.school}</h4>
+                                            <span className="text-xs font-semibold text-gray-500 uppercase">
+                                                {edu.startDate} — {edu.endDate}
+                                            </span>
+                                        </div>
+                                        <div className={`${fontSizeMap[fontSize || 'medium']}`}>
+                                            <span className="font-semibold">{edu.degree}</span> in {edu.field}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    </PreviewSection>
+                );
+            case 'projects':
+                if (!data.projects?.length) return null;
+                return (
+                    <PreviewSection key="projects" sectionId="projects" onClick={onSectionClick} title="Projects">
+                        <section style={{ marginBottom: `${sectionSpacing}px` }}>
+                            <h3 className="text-lg font-bold uppercase tracking-wide mb-4 border-b pb-1" style={{ color: themeColor, borderColor: themeColor + '40' }}>
+                                Projects
+                            </h3>
+                            <div className="space-y-6">
+                                {data.projects.map((proj) => (
+                                    <div key={proj.id}>
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h4 className="font-bold text-gray-900">{proj.name}</h4>
+                                            {proj.link && (
+                                                <span className="text-xs font-semibold text-primary-600">
+                                                    {proj.link}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {proj.technologies && (
+                                            <div className="flex flex-wrap gap-1 mb-2">
+                                                {proj.technologies.split(',').map((tech, idx) => (
+                                                    <span key={idx} className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded">
+                                                        {tech.trim()}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <p className={`${fontSizeMap[fontSize || 'medium']} text-gray-700 whitespace-pre-line leading-relaxed`}>
+                                            {proj.description}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    </PreviewSection>
+                );
+            case 'skills':
+                if (!skills?.length) return null;
+                return (
+                    <PreviewSection key="skills" sectionId="skills" onClick={onSectionClick} title="Skills">
+                        <section style={{ marginBottom: `${sectionSpacing}px` }}>
+                            <h3 className="text-lg font-bold uppercase tracking-wide mb-4 border-b pb-1" style={{ color: themeColor, borderColor: themeColor + '40' }}>
+                                Skills
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                                {skills.map((skill) => (
+                                    <span
+                                        key={skill}
+                                        className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded uppercase tracking-wider"
+                                    >
+                                        {skill}
+                                    </span>
+                                ))}
+                            </div>
+                        </section>
+                    </PreviewSection>
+                );
+            default:
+                if (sectionId.startsWith('custom-')) {
+                    const customSec = data.customSections?.find(s => s.id === sectionId);
+                    if (!customSec?.content) return null;
+                    return (
+                        <PreviewSection key={sectionId} sectionId={sectionId} onClick={onSectionClick} title={customSec.title}>
+                            <section style={{ marginBottom: `${sectionSpacing}px` }}>
+                                <h3 className="text-lg font-bold uppercase tracking-wide mb-4 border-b pb-1" style={{ color: themeColor, borderColor: themeColor + '40' }}>
+                                    {customSec.title}
+                                </h3>
+                                <div 
+                                    className={`${fontSizeMap[fontSize || 'medium']} text-gray-700 prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0.5`}
+                                    dangerouslySetInnerHTML={{ __html: customSec.content }}
+                                />
+                            </section>
+                        </PreviewSection>
+                    );
+                }
+                return null;
+        }
+    };
+
+    const renderedSections = data.sections
+        ? data.sections
+            .filter(s => s.isVisible && s.id !== 'personal') // personal is always in header
+            .map(s => renderSectionContent(s.id))
+        : [
+            renderSectionContent('summary'),
+            renderSectionContent('experience'),
+            renderSectionContent('education'),
+            renderSectionContent('projects'),
+            renderSectionContent('skills'),
+          ];
 
     return (
         <div
@@ -77,93 +237,7 @@ export default function ModernTemplate({ data, onSectionClick }: { readonly data
                 </header>
             </PreviewSection>
 
-            {/* Summary */}
-            {personalInfo?.summary && (
-                <PreviewSection sectionId="summary" onClick={onSectionClick} title="Summary">
-                    <section style={{ marginBottom: `${sectionSpacing}px` }}>
-                        <h3 className="text-lg font-bold uppercase tracking-wide mb-3 border-b pb-1" style={{ color: themeColor, borderColor: themeColor + '40' }}>
-                            Professional Summary
-                        </h3>
-                        <p className={`${fontSizeMap[fontSize || 'medium']} leading-relaxed text-gray-700 whitespace-pre-line`}>
-                            {personalInfo.summary}
-                        </p>
-                    </section>
-                </PreviewSection>
-            )}
-
-            {/* Experience */}
-            {experiences?.length > 0 && (
-                <PreviewSection sectionId="experience" onClick={onSectionClick} title="Experience">
-                    <section style={{ marginBottom: `${sectionSpacing}px` }}>
-                        <h3 className="text-lg font-bold uppercase tracking-wide mb-4 border-b pb-1" style={{ color: themeColor, borderColor: themeColor + '40' }}>
-                            Work Experience
-                        </h3>
-                        <div className="space-y-6">
-                            {experiences?.map((exp) => (
-                                <div key={exp.id}>
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h4 className="font-bold text-gray-900">{exp.position}</h4>
-                                        <span className="text-xs font-semibold text-gray-500 uppercase">
-                                            {exp.startDate} — {exp.current ? 'Present' : exp.endDate}
-                                        </span>
-                                    </div>
-                                    <div className="text-sm font-semibold mb-2" style={{ color: themeColor }}>{exp.company}</div>
-                                    <p className={`${fontSizeMap[fontSize || 'medium']} text-gray-700 whitespace-pre-line leading-relaxed`}>
-                                        {exp.description}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                </PreviewSection>
-            )}
-
-            {/* Education */}
-            {education?.length > 0 && (
-                <PreviewSection sectionId="education" onClick={onSectionClick} title="Education">
-                    <section style={{ marginBottom: `${sectionSpacing}px` }}>
-                        <h3 className="text-lg font-bold uppercase tracking-wide mb-4 border-b pb-1" style={{ color: themeColor, borderColor: themeColor + '40' }}>
-                            Education
-                        </h3>
-                        <div className="space-y-4">
-                            {education?.map((edu) => (
-                                <div key={edu.id}>
-                                    <div className="flex justify-between items-start mb-1">
-                                        <h4 className="font-bold text-gray-900">{edu.school}</h4>
-                                        <span className="text-xs font-semibold text-gray-500 uppercase">
-                                            {edu.startDate} — {edu.endDate}
-                                        </span>
-                                    </div>
-                                    <div className={`${fontSizeMap[fontSize || 'medium']}`}>
-                                        <span className="font-semibold">{edu.degree}</span> in {edu.field}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-                </PreviewSection>
-            )}
-
-            {/* Skills */}
-            {skills?.length > 0 && (
-                <PreviewSection sectionId="skills" onClick={onSectionClick} title="Skills">
-                    <section>
-                        <h3 className="text-lg font-bold uppercase tracking-wide mb-4 border-b pb-1" style={{ color: themeColor, borderColor: themeColor + '40' }}>
-                            Skills
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                            {skills?.map((skill) => (
-                                <span
-                                    key={skill}
-                                    className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded uppercase tracking-wider"
-                                >
-                                    {skill}
-                                </span>
-                            ))}
-                        </div>
-                    </section>
-                </PreviewSection>
-            )}
+            {renderedSections}
         </div>
     );
 }
