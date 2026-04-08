@@ -212,7 +212,7 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
     };
 
     return (
-        <div className="space-y-8 animate-fade-in pt-10 px-8 pb-12">
+        <div className="space-y-8 animate-fade-in pt-10 px-8 pb-32">
             <div className="flex flex-col gap-2">
                 <h2 className="text-2xl font-black text-surface-900 uppercase tracking-tight">Manage Sections</h2>
                 <p className="text-sm text-surface-500 font-medium leading-relaxed">
@@ -298,10 +298,11 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
                 </button>
             )}
 
-            <div className="pt-8 mt-8 border-t border-surface-100 flex items-center gap-3 text-amber-500">
-                <FaExclamationTriangle size={14} className="flex-shrink-0" />
-                <p className="text-[10px] font-bold leading-relaxed">
-                    Note: Deleting a custom section permanently removes its content. Default sections can be hidden and re-enabled later.
+            <div className="pt-8 mt-12 border-t border-surface-100 flex items-start sm:items-center gap-3 text-amber-600 bg-amber-50/30 p-4 rounded-xl">
+                <FaExclamationTriangle size={16} className="flex-shrink-0 mt-0.5 sm:mt-0" />
+                <p className="text-[11px] sm:text-xs font-bold leading-relaxed">
+                    <span className="uppercase tracking-wider mr-1">Note:</span> 
+                    Deleting a custom section permanently removes its content. Default sections can be hidden and re-enabled later.
                 </p>
             </div>
         </div>
