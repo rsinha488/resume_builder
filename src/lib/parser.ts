@@ -33,11 +33,21 @@ export function isResumeContent(text: string): { isResume: boolean; score: numbe
         signals.push('phone');
     }
 
-    // Section headers — count how many distinct resume sections appear
-    const allKeywords = Object.values(SECTION_KEYWORDS).flat();
+    // Section headers — match against individual cleaned lines (same logic as identifySections).
+    // We deliberately exclude very short/generic keywords (< 6 chars: "work", "bio", "about",
+    // "tools", "skills") to prevent false positives from docs that casually use those words.
+    const SECTION_MIN_LENGTH = 6;
+    const safeKeywords = Object.values(SECTION_KEYWORDS).flat().filter(k => k.length >= SECTION_MIN_LENGTH);
+    const textLines = text.split('\n').map(l => l.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim()).filter(Boolean);
     const foundSections = new Set<string>();
-    for (const kw of allKeywords) {
-        if (lower.includes(kw)) foundSections.add(kw);
+    for (const line of textLines) {
+        for (const kw of safeKeywords) {
+            // Exact line match or line starts with keyword and isn't much longer (a true header)
+            if (line === kw || (line.startsWith(kw) && line.length < kw.length + 15)) {
+                foundSections.add(kw);
+                break;
+            }
+        }
     }
     if (foundSections.size >= 2) {
         score += 2;
