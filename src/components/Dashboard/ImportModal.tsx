@@ -61,6 +61,15 @@ function classifyError(err: unknown): ErrorDetail {
         };
     }
 
+    if (status === 422) {
+        return {
+            title: 'Not a Resume',
+            message: backendMsg || 'This file doesn\'t appear to be a resume.',
+            hint: 'Please upload a resume PDF or DOCX — invoices, books, and other documents are not supported.',
+            canRetry: false,
+        };
+    }
+
     if (status === 400) {
         // Map specific backend messages to friendly text
         if (backendMsg?.includes('too large') || backendMsg?.includes('5MB')) {

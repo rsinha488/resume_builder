@@ -1,5 +1,79 @@
 import { ResumeState } from './features/resume/resumeSlice';
 
+// ─── Resume Confidence Scoring ──────────────────────────────────────────────
+
+/**
+ * Checks whether extracted PDF/DOCX text looks like a resume.
+ * Returns { isResume, score, reason } so the API route can reject non-resume files.
+ *
+ * Scoring rubric (threshold = 3):
+ *  +2  email found
+ *  +1  phone number found
+ *  +2  ≥ 2 known section headers found (experience, education, skills, summary…)
+ *  +1  at least one job-title keyword found near the top
+ *  +1  date range found (work/edu tenure pattern)
+ *  +1  bullet points / structured list lines found
+ */
+export function isResumeContent(text: string): { isResume: boolean; score: number; reason: string } {
+    const THRESHOLD = 3;
+    let score = 0;
+    const signals: string[] = [];
+
+    const lower = text.toLowerCase();
+
+    // Email
+    if (/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(text)) {
+        score += 2;
+        signals.push('email');
+    }
+
+    // Phone
+    if (/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/.test(text)) {
+        score += 1;
+        signals.push('phone');
+    }
+
+    // Section headers — count how many distinct resume sections appear
+    const allKeywords = Object.values(SECTION_KEYWORDS).flat();
+    const foundSections = new Set<string>();
+    for (const kw of allKeywords) {
+        if (lower.includes(kw)) foundSections.add(kw);
+    }
+    if (foundSections.size >= 2) {
+        score += 2;
+        signals.push(`sections(${[...foundSections].slice(0, 3).join(', ')})`);
+    } else if (foundSections.size === 1) {
+        score += 1;
+        signals.push(`section(${[...foundSections][0]})`);
+    }
+
+    // Job-title keywords in first 300 chars (top of resume)
+    const topText = lower.slice(0, 300);
+    if (/\b(engineer|developer|designer|manager|analyst|consultant|director|specialist|architect|lead|officer|executive|coordinator|administrator|programmer|scientist|intern|trainee|associate)\b/.test(topText)) {
+        score += 1;
+        signals.push('job-title');
+    }
+
+    // Date ranges (tenure pattern)
+    if (/((jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{4}|\d{4})\s*[-–—to]+\s*((jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{4}|\d{4}|present|current)/i.test(text)) {
+        score += 1;
+        signals.push('date-ranges');
+    }
+
+    // Bullet / list structure
+    if (/[•·▪▸►◆]|^\s*[-*]\s+/m.test(text)) {
+        score += 1;
+        signals.push('bullets');
+    }
+
+    const isResume = score >= THRESHOLD;
+    const reason = isResume
+        ? `Detected as resume (score ${score}/${THRESHOLD}): ${signals.join(', ')}`
+        : `Not a resume (score ${score}/${THRESHOLD}). Missing signals: ${['email','phone','sections','job-title','date-ranges','bullets'].filter(s => !signals.some(existing => existing.startsWith(s))).join(', ')}`;
+
+    return { isResume, score, reason };
+}
+
 // Section header keywords
 const SECTION_KEYWORDS: Record<string, string[]> = {
     experience: [

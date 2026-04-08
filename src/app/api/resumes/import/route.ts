@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mammoth from 'mammoth';
-import { parseResumeText } from '@/lib/parser';
+import { parseResumeText, isResumeContent } from '@/lib/parser';
 import { getUserFromRequest } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { sanitizeObject, sanitizeString } from '@/lib/sanitizer';
@@ -72,7 +72,20 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Could not extract text from file. Please ensure it is not a scanned image.' }, { status: 400 });
         }
 
-        // 3. Content Sanitization
+        // 3. Resume confidence check — reject non-resume files before doing anything else
+        const confidence = isResumeContent(text);
+        console.log(`Import confidence: ${confidence.reason}`);
+        if (!confidence.isResume) {
+            return NextResponse.json(
+                {
+                    error: 'This file does not appear to be a resume. Please upload a valid resume PDF or DOCX.',
+                    detail: confidence.reason,
+                },
+                { status: 422 }
+            );
+        }
+
+        // 4. Content Sanitization
         const sanitizedText = await sanitizeString(text);
         const parsedData = parseResumeText(sanitizedText);
         
