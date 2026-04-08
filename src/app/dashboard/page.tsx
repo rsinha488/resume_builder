@@ -11,6 +11,7 @@ import EmptyState from '@/components/Dashboard/EmptyState';
 import ImportModal from '@/components/Dashboard/ImportModal';
 import UpgradeModal from '@/components/UpgradeModal';
 import { ResumePDF } from '@/components/Builder/ResumePDF';
+import ConfirmModal from '@/components/ConfirmModal';
 import { toast } from 'sonner';
 
 function UpgradeToast() {
@@ -35,6 +36,8 @@ export default function DashboardPage() {
     const [downloadInfo, setDownloadInfo] = useState<{ pdfDownloadCount: number; limit: number; remaining: number | null; isPro: boolean; canDownload: boolean } | null>(null);
     const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<{ id: string; title: string; type: 'resume' | 'coverLetter' } | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -121,25 +124,27 @@ export default function DashboardPage() {
         }
     };
 
-    const deleteResume = async (id: string) => {
+    const handleDelete = async () => {
+        if (!itemToDelete) return;
+        
+        const { id, type } = itemToDelete;
+        setIsDeleting(true);
         try {
-            await axios.delete(`/api/resumes/${id}`);
-            setResumes(resumes.filter(r => r.id !== id));
-            toast.success('Resume deleted.');
+            if (type === 'resume') {
+                await axios.delete(`/api/resumes/${id}`);
+                setResumes(resumes.filter(r => r.id !== id));
+                toast.success('Resume deleted.');
+            } else {
+                await axios.delete(`/api/cover-letters/${id}`);
+                setCoverLetters(coverLetters.filter(cl => cl.id !== id));
+                toast.success('Cover letter deleted.');
+            }
         } catch (error) {
-            console.error('Error deleting resume:', error);
-            toast.error('Failed to delete resume.');
-        }
-    };
-
-    const deleteCoverLetter = async (id: string) => {
-        try {
-            await axios.delete(`/api/cover-letters/${id}`);
-            setCoverLetters(coverLetters.filter(cl => cl.id !== id));
-            toast.success('Cover letter deleted.');
-        } catch (error) {
-            console.error('Error deleting cover letter:', error);
-            toast.error('Failed to delete cover letter.');
+            console.error('Error deleting document:', error);
+            toast.error('Failed to delete document. Please try again.');
+        } finally {
+            setIsDeleting(false);
+            setItemToDelete(null);
         }
     };
 
@@ -341,9 +346,9 @@ export default function DashboardPage() {
                                 resumeData={doc.data}
                                 isPro={downloadInfo?.isPro ?? false}
                                 downloadInfo={downloadInfo}
-                                onDelete={activeTab === 'resumes' ? deleteResume : deleteCoverLetter}
                                 onDuplicate={activeTab === 'resumes' ? duplicateResume : duplicateCoverLetter}
                                 onDownload={activeTab === 'resumes' ? downloadResume : () => toast.error('PDF download is only available for resumes.')}
+                                onDelete={(data) => setItemToDelete(data)}
                                 onUpgradeRequired={() => setIsUpgradeModalOpen(true)}
                             />
                         ))}
@@ -380,6 +385,15 @@ export default function DashboardPage() {
                     setIsUpgradeModalOpen(false);
                     setDownloadInfo(prev => prev ? { ...prev, isPro: true, remaining: null, canDownload: true } : prev);
                 }}
+            />
+
+            <ConfirmModal
+                isOpen={!!itemToDelete}
+                title={`Delete ${itemToDelete?.type === 'resume' ? 'Resume' : 'Cover Letter'}`}
+                message={`Are you sure you want to delete "${itemToDelete?.title}"? This action cannot be undone.`}
+                confirmLabel={isDeleting ? 'Deleting...' : 'Delete'}
+                onConfirm={handleDelete}
+                onCancel={() => setItemToDelete(null)}
             />
         </div>
     );

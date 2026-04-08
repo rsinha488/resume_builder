@@ -3,7 +3,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { FaEllipsisV, FaEdit, FaTrash, FaCopy, FaDownload, FaFileAlt, FaSpinner, FaCrown, FaLock } from 'react-icons/fa';
 import ResumePreview from '@/components/Builder/ResumePreview';
-import ConfirmModal from '@/components/ConfirmModal';
 
 interface DownloadInfo {
     pdfDownloadCount: number;
@@ -22,7 +21,7 @@ interface DocumentCardProps {
     readonly resumeData?: any;
     readonly isPro?: boolean;
     readonly downloadInfo?: DownloadInfo | null;
-    readonly onDelete: (id: string) => void;
+    readonly onDelete: (data: { id: string; title: string; type: 'resume' | 'coverLetter' }) => void;
     readonly onDuplicate: (id: string) => void;
     readonly onDownload: (id: string) => void;
     readonly onUpgradeRequired?: () => void;
@@ -33,14 +32,11 @@ export default function DocumentCard({
     isPro = false, downloadInfo, onDelete, onDuplicate, onDownload, onUpgradeRequired
 }: DocumentCardProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
     const [loadingAction, setLoadingAction] = useState<'duplicate' | 'download' | 'delete' | null>(null);
 
     const editUrl = type === 'resume' ? `/builder/${id}` : `/cover-letter/${id}`;
 
-    // Download access logic
     const isResume = type === 'resume';
-    const canDownload = !isResume || isPro || (downloadInfo?.canDownload ?? true);
     const remaining = downloadInfo?.remaining ?? null;
     const isLimitReached = isResume && !isPro && remaining !== null && remaining <= 0;
 
@@ -65,8 +61,16 @@ export default function DocumentCard({
         return 'text-emerald-600 bg-emerald-50 border-emerald-200';
     };
 
+    const downloadBtnContent = loadingAction === 'download' ? (
+        <FaSpinner className="animate-spin" size={11} />
+    ) : isLimitReached ? (
+        <><FaCrown size={11} className="text-amber-500" /> Upgrade for PDF</>
+    ) : (
+        <><FaDownload size={11} /> Download PDF</>
+    );
+
     return (
-        <div className="premium-card flex flex-col h-full bg-white group/card overflow-hidden">
+        <div className={`premium-card flex flex-col h-full bg-white${isMenuOpen ? '' : ' group/card'}`}>
             {/* Preview Section */}
             <Link
                 href={editUrl}
@@ -111,7 +115,7 @@ export default function DocumentCard({
                             {type === 'resume' ? 'Resume' : 'Cover Letter'}
                         </p>
                     </div>
-                    <div className="relative">
+                    <div className="relative overflow-visible">
                         <button
                             type="button"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -125,8 +129,8 @@ export default function DocumentCard({
 
                         {isMenuOpen && (
                             <>
-                                <button className="fixed inset-0 z-10 w-full h-full" onClick={() => setIsMenuOpen(false)} />
-                                <div className="absolute right-0 mt-2 w-52 glass-premium rounded-2xl py-2 z-20 animate-in fade-in zoom-in slide-in-from-top-2 duration-200 shadow-xl">
+                                <button type="button" aria-label="Close menu" className="fixed inset-0 z-[40] cursor-default" onClick={() => setIsMenuOpen(false)} />
+                                <div className="absolute right-0 mt-2 w-52 glass-premium rounded-2xl py-2 z-[50] animate-in fade-in zoom-in slide-in-from-top-2 duration-200 shadow-xl">
                                     <Link
                                         href={editUrl}
                                         className="flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-surface-600 hover:bg-surface-50 hover:text-primary-600 transition-all"
@@ -175,7 +179,7 @@ export default function DocumentCard({
                                     <button
                                         type="button"
                                         disabled={!!loadingAction}
-                                        onClick={() => { setShowConfirm(true); setIsMenuOpen(false); }}
+                                        onClick={() => { onDelete({ id, title, type }); setIsMenuOpen(false); }}
                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 transition-all"
                                     >
                                         <FaTrash size={12} /> Delete
@@ -201,13 +205,7 @@ export default function DocumentCard({
                                     : 'bg-surface-50 text-surface-600 border border-surface-100 hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200'
                             }`}
                         >
-                            {loadingAction === 'download' ? (
-                                <FaSpinner className="animate-spin" size={11} />
-                            ) : isLimitReached ? (
-                                <><FaCrown size={11} className="text-amber-500" /> Upgrade for PDF</>
-                            ) : (
-                                <><FaDownload size={11} /> Download PDF</>
-                            )}
+                            {downloadBtnContent}
                         </button>
                     )}
 
@@ -235,20 +233,6 @@ export default function DocumentCard({
                     </div>
                 </div>
             </div>
-
-            <ConfirmModal
-                isOpen={showConfirm}
-                title={`Delete ${type === 'resume' ? 'Resume' : 'Cover Letter'}`}
-                message={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
-                confirmLabel="Delete"
-                onConfirm={async () => {
-                    setLoadingAction('delete');
-                    await onDelete(id);
-                    setLoadingAction(null);
-                    setShowConfirm(false);
-                }}
-                onCancel={() => setShowConfirm(false)}
-            />
         </div>
     );
 }

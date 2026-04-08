@@ -223,7 +223,7 @@ export const ResumePDF = ({ data }: ResumePDFProps) => {
                     </View>
                 );
             default:
-                if (sectionId.startsWith('custom-')) {
+                if (sectionId.startsWith('custom-') || sectionId.startsWith('custom_')) {
                     const customSec = data.customSections?.find(s => s.id === sectionId);
                     if (!customSec?.content) return null;
                     return (

@@ -75,10 +75,10 @@ function SortableItem({ id, section, onToggle, onDelete, onEdit }: SortableItemP
             <button
                 {...attributes}
                 {...listeners}
-                className="text-surface-300 hover:text-surface-500 cursor-grab active:cursor-grabbing p-1 transition-colors"
+                className="text-surface-300 hover:text-primary-500 cursor-grab active:cursor-grabbing p-1.5 transition-colors"
                 aria-label="Drag to reorder"
             >
-                <FaGripVertical size={16} />
+                <FaGripVertical size={18} />
             </button>
 
             <div className="flex-1 min-w-0">
@@ -145,7 +145,7 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                distance: 5,
+                distance: 8,
             },
         }),
         useSensor(KeyboardSensor, {
@@ -179,7 +179,7 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
             return;
         }
 
-        const confirmDelete = window.confirm(
+        const confirmDelete = globalThis.confirm(
             `Are you sure you want to delete the "${section.name}" section? This will remove all associated data.`
         );
 
@@ -198,7 +198,7 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
         e.preventDefault();
         if (!newSectionTitle.trim()) return;
 
-        const newId = `custom_${uuidv4()}`;
+        const newId = `custom-${uuidv4()}`;
         dispatch(addCustomSection({
             id: newId,
             title: newSectionTitle,
@@ -212,7 +212,7 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
     };
 
     return (
-        <div className="space-y-8 animate-fade-in">
+        <div className="space-y-8 animate-fade-in pt-10 px-8 pb-12">
             <div className="flex flex-col gap-2">
                 <h2 className="text-2xl font-black text-surface-900 uppercase tracking-tight">Manage Sections</h2>
                 <p className="text-sm text-surface-500 font-medium leading-relaxed">
@@ -259,8 +259,9 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
             {isAdding ? (
                 <form onSubmit={handleAddCustom} className="bg-white p-6 rounded-2xl border-2 border-primary-200 shadow-xl space-y-4 animate-scale-in">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-surface-400">Section Title</label>
+                        <label htmlFor="custom-section-title" className="text-[10px] font-black uppercase tracking-[0.2em] text-surface-400">Section Title</label>
                         <input
+                            id="custom-section-title"
                             autoFocus
                             type="text"
                             value={newSectionTitle}

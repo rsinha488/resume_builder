@@ -206,7 +206,7 @@ export default function ConceptTemplate({ data, onSectionClick }: { readonly dat
                     </PreviewSection>
                 );
             default:
-                if (sectionId.startsWith('custom-') || data.sections.find(s => s.id === sectionId)?.type === 'custom') {
+                if (sectionId.startsWith('custom-') || sectionId.startsWith('custom_') || data.sections.find(s => s.id === sectionId)?.type === 'custom') {
                     const customSec = data.customSections?.find(s => s.id === sectionId);
                     if (!customSec?.content) return null;
                     return (

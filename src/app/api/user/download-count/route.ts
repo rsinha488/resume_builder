@@ -74,11 +74,11 @@ export async function POST(req: NextRequest) {
 
         const updated = await (prisma.user.update as any)({
             where: { id: user.userId },
-            data: { pdfDownloadCount: { increment: 1 } },
+            data: { pdfDownloadCount: (currentCount || 0) + 1 },
             select: { pdfDownloadCount: true },
         });
 
-        const newCount: number = updated.pdfDownloadCount ?? currentCount + 1;
+        const newCount: number = updated.pdfDownloadCount ?? (currentCount || 0) + 1;
 
         return NextResponse.json({
             success: true,
