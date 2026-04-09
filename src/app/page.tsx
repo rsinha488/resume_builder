@@ -143,7 +143,7 @@ export default function HomePage() {
                                     </div>
                                 ))}
                                 <div className="mt-8 p-5 rounded-3xl bg-primary-600 text-white shadow-xl shadow-primary-600/30">
-                                    <div className="text-[10px] font-black uppercase tracking-widest mb-2 opacity-80">ATS SCORE</div>
+                                    <div className="text-micro mb-2 opacity-80">ATS SCORE</div>
                                     <div className="flex items-end gap-1">
                                         <span className="text-3xl font-black">87</span>
                                         <span className="text-xs mb-1 opacity-70">/100</span>
@@ -199,7 +199,7 @@ export default function HomePage() {
                     ].map(([stat, label]) => (
                         <div key={label} className="animate-fade-in">
                             <div className="text-4xl font-black text-white mb-1">{stat}</div>
-                            <div className="text-xs font-bold text-surface-400 uppercase tracking-widest">{label}</div>
+                            <div className="text-micro text-surface-400">{label}</div>
                         </div>
                     ))}
                 </div>
@@ -210,7 +210,7 @@ export default function HomePage() {
             <section className="py-32 bg-white relative">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="text-center mb-24">
-                        <span className="text-sm font-bold text-primary-600 uppercase tracking-[0.3em] mb-4 block">Capabilities</span>
+                        <span className="text-nav text-primary-600 mb-4 block">Capabilities</span>
                         <h2 className="text-4xl sm:text-6xl font-black text-surface-900 leading-[1.1]">Everything you need to <br />land the job</h2>
                         <p className="mt-6 text-xl text-surface-500 max-w-2xl mx-auto">
                             From blank page to job-ready PDF — we handle the hard parts so you can focus on your story.
@@ -386,7 +386,7 @@ export default function HomePage() {
                                 <h3 className="text-2xl font-bold text-surface-900 mb-4">Basic</h3>
                                 <div className="flex items-baseline gap-2">
                                     <span className="text-6xl font-black text-surface-900">$0</span>
-                                    <span className="text-surface-400 font-bold uppercase tracking-widest text-sm">forever</span>
+                                    <span className="text-nav text-surface-400">forever</span>
                                 </div>
                             </div>
                             <ul className="space-y-5 mb-12">
@@ -409,14 +409,14 @@ export default function HomePage() {
                             <div className="absolute top-0 right-0 p-8 opacity-10">
                                 <FaCrown size={120} />
                             </div>
-                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-amber-400 text-surface-900 px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-lg z-10">
+                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-amber-400 text-surface-900 px-6 py-2 rounded-full text-micro flex items-center gap-2 shadow-lg z-10">
                                 <FaCrown size={14} /> Recommended
                             </div>
                             <div className="mb-10 relative z-10">
                                 <h3 className="text-2xl font-bold text-white/90 mb-4">Professional</h3>
                                 <div className="flex items-baseline gap-2">
                                     <span className="text-6xl font-black text-white">$5.95</span>
-                                    <span className="text-primary-100 font-bold uppercase tracking-widest text-sm">/ month</span>
+                                    <span className="text-nav text-primary-100">/ month</span>
                                 </div>
                                 <p className="text-primary-100 text-sm mt-2 font-medium opacity-80">Billed annually at $71.40</p>
                             </div>
@@ -476,15 +476,15 @@ export default function HomePage() {
                             <span className="text-2xl font-black tracking-tight text-white uppercase italic">RESUME<span className="text-primary-500">BUILDER</span></span>
                         </Link>
 
-                        <div className="flex items-center gap-10 text-sm font-bold uppercase tracking-widest text-surface-500">
+                        <div className="flex items-center gap-10 text-nav text-surface-500">
                             <Link href="/login" className="hover:text-primary-400 transition-colors">Sign In</Link>
                             <Link href="/register" className="hover:text-primary-400 transition-colors">Sign Up</Link>
                         </div>
                     </div>
 
                     <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-12 border-t border-white/5">
-                        <p className="text-sm text-surface-600 font-medium">&copy; {new Date().getFullYear()} ResumeBuilder. All rights reserved.</p>
-                        <div className="flex gap-8 text-xs font-bold uppercase tracking-widest text-surface-600">
+                        <p className="text-tiny text-surface-600">&copy; {new Date().getFullYear()} ResumeBuilder. All rights reserved.</p>
+                        <div className="flex gap-8 text-micro text-surface-600">
                             <Link href="#" className="hover:text-surface-400 transition-colors">Privacy</Link>
                             <Link href="#" className="hover:text-surface-400 transition-colors">Terms</Link>
                         </div>

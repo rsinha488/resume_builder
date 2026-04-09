@@ -214,7 +214,7 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
     return (
         <div className="space-y-8 animate-fade-in pt-10 px-8 pb-32">
             <div className="flex flex-col gap-2">
-                <h2 className="text-2xl font-black text-surface-900 uppercase tracking-tight">Manage Sections</h2>
+                <h2 className="uppercase tracking-tight">Manage Sections</h2>
                 <p className="text-sm text-surface-500 font-medium leading-relaxed">
                     Personalize your resume structure. Drag to reorder, toggle visibility, or add custom sections to stand out.
                 </p>
@@ -225,8 +225,8 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
                     <FaInfoCircle size={18} />
                 </div>
                 <div className="space-y-1">
-                    <p className="text-xs font-black text-primary-900 uppercase tracking-widest">Premium Tip</p>
-                    <p className="text-[11px] text-primary-700 font-medium leading-relaxed" >
+                    <p className="text-tiny text-primary-900">Premium Tip</p>
+                    <p className="text-tiny text-primary-700 font-medium" >
                         Keep your most impressive sections (like Work Experience) near the top to catch the recruiter's eye instantly.
                     </p>
                 </div>
@@ -259,7 +259,7 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
             {isAdding ? (
                 <form onSubmit={handleAddCustom} className="bg-white p-6 rounded-2xl border-2 border-primary-200 shadow-xl space-y-4 animate-scale-in">
                     <div className="space-y-2">
-                        <label htmlFor="custom-section-title" className="text-[10px] font-black uppercase tracking-[0.2em] text-surface-400">Section Title</label>
+                        <label htmlFor="custom-section-title" className="text-subheading">Section Title</label>
                         <input
                             id="custom-section-title"
                             autoFocus
@@ -294,14 +294,14 @@ export default function SectionManager({ onEditCustom }: { onEditCustom?: (id: s
                     <div className="w-10 h-10 rounded-full bg-surface-50 flex items-center justify-center group-hover:bg-primary-100 group-hover:text-primary-600 transition-all">
                         <FaPlus size={16} />
                     </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Add Custom Section</span>
+                    <span className="text-subheading text-surface-400 group-hover:text-primary-600 transition-colors">Add Custom Section</span>
                 </button>
             )}
 
             <div className="pt-8 mt-12 border-t border-surface-100 flex items-start sm:items-center gap-3 text-amber-600 bg-amber-50/30 p-4 rounded-xl">
                 <FaExclamationTriangle size={16} className="flex-shrink-0 mt-0.5 sm:mt-0" />
-                <p className="text-[11px] sm:text-xs font-bold leading-relaxed">
-                    <span className="uppercase tracking-wider mr-1">Note:</span> 
+                <p className="text-tiny">
+                    <span className="mr-1">Note:</span> 
                     Deleting a custom section permanently removes its content. Default sections can be hidden and re-enabled later.
                 </p>
             </div>

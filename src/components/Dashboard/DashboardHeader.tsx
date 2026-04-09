@@ -65,7 +65,7 @@ export default function DashboardHeader() {
                         <nav className="hidden lg:flex items-center gap-10 h-20">
                             <Link
                                 href="/dashboard"
-                                className={`text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center px-1 border-b-2 transition-all relative group/nav ${pathname === '/dashboard'
+                                className={`text-nav h-full flex items-center px-1 border-b-2 transition-all relative group/nav ${pathname === '/dashboard'
                                     ? 'text-primary-600 border-primary-600'
                                     : 'text-surface-400 border-transparent hover:text-surface-900'}`}
                             >
@@ -74,7 +74,7 @@ export default function DashboardHeader() {
                             </Link>
                             <Link
                                 href="/templates"
-                                className={`text-[10px] font-black uppercase tracking-[0.2em] h-full flex items-center px-1 border-b-2 transition-all relative group/nav ${pathname === '/templates'
+                                className={`text-nav h-full flex items-center px-1 border-b-2 transition-all relative group/nav ${pathname === '/templates'
                                     ? 'text-primary-600 border-primary-600'
                                     : 'text-surface-400 border-transparent hover:text-surface-900'}`}
                             >
@@ -129,15 +129,15 @@ export default function DashboardHeader() {
                                     })()}
                                 </div>
                                 <div className="hidden sm:block text-left pr-4">
-                                    <p className="text-[10px] font-black text-surface-900 uppercase tracking-widest leading-none mb-1">{userName || 'My Account'}</p>
-                                    <p className="text-[9px] font-bold text-surface-400 uppercase tracking-widest leading-none">Settings</p>
+                                    <p className="text-micro text-surface-900 leading-none mb-1">{userName || 'My Account'}</p>
+                                    <p className="text-tiny text-surface-400 leading-none">Settings</p>
                                 </div>
                             </button>
     
                             {isUserMenuOpen && (
                                 <div className="absolute right-0 mt-4 w-72 bg-white rounded-3xl shadow-premium border border-surface-100 py-3 animate-fade-in-up">
                                     <div className="px-6 py-4 border-b border-surface-50">
-                                        <p className="text-[10px] font-black text-surface-400 uppercase tracking-widest mb-2">Authenticated as</p>
+                                        <p className="text-micro text-surface-400 mb-2">Authenticated as</p>
                                         <p className="text-sm font-black text-surface-900 truncate">
                                             {userName || 'My Account'}
                                         </p>

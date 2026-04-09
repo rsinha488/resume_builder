@@ -97,9 +97,9 @@ export default function DocumentCard({
                 ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-12 bg-surface-50 group-hover/card:bg-primary-50/30 transition-colors duration-500">
                         <FaFileAlt className="h-24 w-24 text-surface-200 group-hover/card:text-primary-200 transition-all duration-500 transform group-hover/card:scale-110" />
-                        <span className="mt-6 bg-white text-surface-400 px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border border-surface-100">
-                            No Preview
-                        </span>
+                        <span className="mt-6 bg-white text-surface-400 px-5 py-2 rounded-xl text-micro shadow-sm border border-surface-100">
+                             No Preview
+                         </span>
                     </div>
                 )}
             </Link>
@@ -108,10 +108,10 @@ export default function DocumentCard({
             <div className="p-5 flex-1 flex flex-col">
                 <div className="flex justify-between items-start gap-3 mb-3">
                     <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-black text-surface-900 truncate uppercase tracking-widest group-hover/card:text-primary-600 transition-colors" title={title}>
+                        <h3 className="text-base sm:text-lg font-black text-surface-900 truncate uppercase tracking-widest group-hover/card:text-primary-600 transition-colors" title={title}>
                             {title}
                         </h3>
-                        <p className="text-[10px] font-black text-surface-400 uppercase tracking-[0.2em] mt-0.5">
+                        <p className="text-subheading mt-0.5">
                             {type === 'resume' ? 'Resume' : 'Cover Letter'}
                         </p>
                     </div>
@@ -171,7 +171,7 @@ export default function DocumentCard({
                                         }
                                         <span className="flex-1 text-left">Export as PDF</span>
                                         {isLimitReached && (
-                                            <span className="text-[9px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full font-black uppercase">PRO</span>
+                                            <span className="text-micro bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">PRO</span>
                                         )}
                                     </button>
 
@@ -211,7 +211,7 @@ export default function DocumentCard({
 
                     {/* Quota badge for FREE users */}
                     {isResume && !isPro && remaining !== null && (
-                        <div className={`flex items-center justify-between px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-widest ${quotaBadgeClass()}`}>
+                        <div className={`flex items-center justify-between px-3 py-1.5 rounded-xl border text-micro ${quotaBadgeClass()}`}>
                             <span>Free Downloads</span>
                             <span>{remaining} / {downloadInfo?.limit ?? 5} left</span>
                         </div>
@@ -219,7 +219,7 @@ export default function DocumentCard({
 
                     {/* PRO unlimited badge */}
                     {isResume && isPro && (
-                        <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-50 border border-primary-100 text-[9px] font-black uppercase tracking-widest text-primary-600">
+                        <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-50 border border-primary-100 text-micro text-primary-600">
                             <FaCrown size={9} /> Unlimited Downloads
                         </div>
                     )}
@@ -227,7 +227,7 @@ export default function DocumentCard({
                     {/* Last edited */}
                     <div className="flex items-center gap-2 pt-1">
                         <div className="flex-1 h-px bg-surface-100" />
-                        <span className="text-[9px] font-black text-surface-400 uppercase tracking-widest whitespace-nowrap">
+                        <span className="text-micro text-surface-400 whitespace-nowrap">
                             {new Date(updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                         </span>
                     </div>
